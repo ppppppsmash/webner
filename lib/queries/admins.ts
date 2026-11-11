@@ -1,3 +1,4 @@
+import "server-only";
 import { asc, count, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { admins } from "@/db/schema";

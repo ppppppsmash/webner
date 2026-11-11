@@ -1,3 +1,4 @@
+import "server-only";
 import { auth } from "@/auth";
 import { t } from "@/lib/i18n/admin";
 
