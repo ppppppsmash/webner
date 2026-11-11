@@ -29,7 +29,7 @@ export default async function CategoriesPage() {
         title={t.categories.count(data.length)}
         description={t.categories.listDescription}
         action={
-          <Button render={<Link href="/management/categories/new" />}>
+          <Button nativeButton={false} render={<Link href="/management/categories/new" />}>
             <PlusIcon data-icon="inline-start" />
             {t.categories.addNew}
           </Button>

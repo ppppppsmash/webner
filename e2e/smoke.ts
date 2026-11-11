@@ -17,6 +17,7 @@ const OUT = process.env.E2E_OUT ?? path.resolve("e2e/output");
 const log = (msg: string) => console.log(`• ${msg}`);
 
 async function shot(page: Page, name: string) {
+  await page.waitForLoadState("networkidle");
   await page.screenshot({ path: path.join(OUT, `${name}.png`), fullPage: true });
 }
 
@@ -109,9 +110,11 @@ async function main() {
 
     // reload edit page: data persisted?
     await page.goto(productUrl);
-    await page.locator('input[name="name.de"]').waitFor();
-    const de = await page.inputValue('input[name="name.de"]');
-    if (de !== `E2E Produkt ${stamp}`) throw new Error(`name.de not persisted: ${de}`);
+    // react-hook-form fills uncontrolled inputs after hydration, so poll for the value.
+    await page.waitForFunction(
+      (expected) => (document.querySelector('input[name="name.de"]') as HTMLInputElement | null)?.value === expected,
+      `E2E Produkt ${stamp}`,
+    );
     await page.locator('img[src^="/uploads/images/"]').first().waitFor();
     const html = await page.locator(".tiptap").first().innerHTML();
     if (!html.includes("<strong>重點</strong>")) throw new Error(`rich text not persisted: ${html}`);
@@ -145,6 +148,10 @@ async function main() {
 
     // logout
     await page.getByRole("button", { name: /^[A-Z]$|avatar/i }).first().click().catch(() => {});
+  } catch (err) {
+    console.error(`Failed at ${page.url()}`);
+    await shot(page, "99-failure").catch(() => {});
+    throw err;
   } finally {
     await writeFile(path.join(OUT, "browser-errors.log"), errors.join("\n"));
     await browser.close();

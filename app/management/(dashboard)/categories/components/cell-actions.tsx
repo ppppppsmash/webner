@@ -11,7 +11,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -44,7 +43,6 @@ export function CategoryCellActions({ data }: { data: CategoryColumn }) {
           <MoreHorizontalIcon />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>{t.common.actions}</DropdownMenuLabel>
           <DropdownMenuItem
             onClick={() => {
               navigator.clipboard.writeText(data.id);

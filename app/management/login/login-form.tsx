@@ -58,7 +58,15 @@ export function LoginForm({
         <FieldGroup>
           <Field>
             <FieldLabel htmlFor="email">{t.login.email}</FieldLabel>
-            <Input id="email" name="email" type="email" autoComplete="email" required autoFocus />
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              autoFocus
+              defaultValue={state?.email ?? ""}
+            />
           </Field>
           <Field>
             <FieldLabel htmlFor="password">{t.login.password}</FieldLabel>

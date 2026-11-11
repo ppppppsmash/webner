@@ -38,7 +38,7 @@ export default async function ProductsPage() {
         title={t.products.count(data.length)}
         description={t.products.listDescription}
         action={
-          <Button render={<Link href="/management/products/new" />}>
+          <Button nativeButton={false} render={<Link href="/management/products/new" />}>
             <PlusIcon data-icon="inline-start" />
             {t.products.addNew}
           </Button>

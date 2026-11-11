@@ -5,7 +5,7 @@ import { signIn, signOut } from "@/auth";
 import { t } from "@/lib/i18n/admin";
 import { findAdminByEmail } from "@/lib/auth/admins";
 
-export type LoginState = { error?: string } | undefined;
+export type LoginState = { error?: string; email?: string } | undefined;
 
 function safeCallbackUrl(value: FormDataEntryValue | null): string {
   const v = typeof value === "string" ? value : "";
@@ -24,11 +24,11 @@ export async function loginWithPassword(_prev: LoginState, formData: FormData): 
     if (error instanceof AuthError) {
       if (error.type === "CredentialsSignin") {
         const admin = await findAdminByEmail(email).catch(() => null);
-        if (admin?.status === "disabled") return { error: t.login.disabled };
-        if (admin?.status === "invited") return { error: t.login.notInvited };
-        return { error: t.login.invalid };
+        if (admin?.status === "disabled") return { error: t.login.disabled, email };
+        if (admin?.status === "invited") return { error: t.login.notInvited, email };
+        return { error: t.login.invalid, email };
       }
-      return { error: t.login.error };
+      return { error: t.login.error, email };
     }
     // `redirect()` throws on success; let Next.js handle it.
     throw error;
