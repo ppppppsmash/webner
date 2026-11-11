@@ -4,7 +4,9 @@ import type { StorageDriver, UploadKind } from "./types";
 
 export * from "./types";
 
-export const UPLOAD_ROOT = path.resolve(process.cwd(), process.env.UPLOAD_DIR || "./uploads");
+// The upload directory is configured by env (development only; production uses R2),
+// so the path cannot be statically scoped for the bundler.
+export const UPLOAD_ROOT = path.resolve(/* turbopackIgnore: true */ process.cwd(), process.env.UPLOAD_DIR || "./uploads");
 
 let driver: StorageDriver | undefined;
 
