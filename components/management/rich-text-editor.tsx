@@ -91,6 +91,8 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
     editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
   };
 
+  const openImagePicker = () => fileInput.current?.click();
+
   const onPickImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -151,7 +153,7 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
         {state.link
           ? tool(t.editor.unlink, <Link2OffIcon />, () => editor.chain().focus().unsetLink().run())
           : null}
-        {tool(t.editor.image, <ImagePlusIcon />, () => fileInput.current?.click(), false, uploading)}
+        {tool(t.editor.image, <ImagePlusIcon />, openImagePicker, false, uploading)}
         <span className="ml-auto" />
         {tool(t.editor.undo, <UndoIcon />, () => editor.chain().focus().undo().run(), false, !state.canUndo)}
         {tool(t.editor.redo, <RedoIcon />, () => editor.chain().focus().redo().run(), false, !state.canRedo)}
