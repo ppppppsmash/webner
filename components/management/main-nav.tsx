@@ -13,13 +13,14 @@ const routes = [
   { href: "/management/settings", label: t.nav.settings },
 ] as const;
 
-export function MainNav({ className }: { className?: string }) {
-  const pathname = usePathname();
-
+/** Presentational list; `pathname` is null while the URL is not known yet (static shell). */
+export function MainNavLinks({ pathname, className }: { pathname: string | null; className?: string }) {
   return (
     <nav className={cn("flex items-center gap-4 lg:gap-6", className)}>
       {routes.map((route) => {
-        const active = "exact" in route && route.exact ? pathname === route.href : pathname.startsWith(route.href);
+        const active =
+          pathname !== null &&
+          ("exact" in route && route.exact ? pathname === route.href : pathname.startsWith(route.href));
         return (
           <Link
             key={route.href}
@@ -35,4 +36,9 @@ export function MainNav({ className }: { className?: string }) {
       })}
     </nav>
   );
+}
+
+export function MainNav({ className }: { className?: string }) {
+  const pathname = usePathname();
+  return <MainNavLinks pathname={pathname} className={className} />;
 }

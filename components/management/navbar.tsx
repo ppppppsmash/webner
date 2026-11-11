@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { t } from "@/lib/i18n/admin";
-import { MainNav } from "./main-nav";
+import { MainNav, MainNavLinks } from "./main-nav";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
 
@@ -16,7 +16,9 @@ export function Navbar() {
           </span>
           <span className="hidden sm:inline">{t.app.name}</span>
         </Link>
-        <MainNav />
+        <Suspense fallback={<MainNavLinks pathname={null} />}>
+          <MainNav />
+        </Suspense>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
           <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
