@@ -388,6 +388,45 @@ Claude Code 向けの開発ルールは `CLAUDE.md` に記載。要点:
 - 既存ショップへのリンク ON/OFF などのサイト設定
 - 管理画面 UI の繁体字中国語化
 
+### 公開サイト（ギャラリー）の構成と設計（2026-11-12 時点）
+
+参考サイト（WADI / etherischeoele.de）の構成「上部バー → ロゴ＋ナビ → ヒーロー → ブランド紹介 → おすすめ → ベストセラー → 大きなフッター」を踏襲しつつ、口コミ・B2B・ニュースレターなど本件に不要な要素は省いた。
+
+| パス | 画面 |
+|---|---|
+| `/` | Cookie → Accept-Language の順で言語を判定し `/{locale}` へリダイレクト |
+| `/{locale}` | トップ（ヒーロー、ブランドストーリー、分類タイル、推薦商品、最新上架、価値観、商店バナー） |
+| `/{locale}/products` | 商品一覧（左に分類ナビ、スマホはチップ横スクロール） |
+| `/{locale}/categories/{slug}` | 分類別一覧（大分類は小分類の商品も含む） |
+| `/{locale}/products/{slug}` | 商品詳細（画像ギャラリー、容量・分類、購買連結、リッチテキスト説明、影片、関連商品） |
+| `/{locale}/about` | ブランドページ |
+
+locale は `de` / `en` / `zh-TW` / `zh-CN`。文言は `lib/i18n/public/*.ts` に 4 言語分（型 `PublicDictionary`）。商品・分類名は DB の jsonb から `pickText()` で取り出し、未入力の言語はドイツ語へフォールバックする。
+
+#### デザイン方針「botanical apothecary」
+
+| 要素 | 決定 |
+|---|---|
+| 配色 | 温かい紙色の背景（`--paper` oklch 0.977/0.012/85）、墨色に近い深緑の文字（`--ink`）、主色は苔色の緑（`--moss`）、アクセントは精油を思わせる琥珀（`--amber`）。公開側はライトのみ（ブランドの見え方を固定するため） |
+| フォント | 見出し Fraunces（可変、opsz/SOFT 軸）、本文 Instrument Sans。中国語は Noto Serif TC / Noto Sans TC をフォールバックで同梱 |
+| 演出 | ヒーローは CSS のみの段階的フェード、以降は IntersectionObserver による 1 回だけのスクロール表示（`data-reveal`）。`prefers-reduced-motion` では無効化。イージングは `cubic-bezier(0.16,1,0.3,1)` に統一 |
+| 質感 | ヒーローとバナーに SVG ノイズの粒状オーバーレイ（`.grain`）、琥珀の滲みブロブ |
+| 商品カード | 4:5 の画像、ホバーで 2 枚目の画像にクロスフェード、容量バッジ、分類の小見出し |
+
+トークンは `app/globals.css` の `.site` に定義し、Tailwind には `@theme inline` で `bg-paper` `text-moss` などとして公開している。管理画面（shadcn のテーマ）とは分離。
+
+#### キャッシュ
+
+公開ページのデータ取得（`lib/queries/public`）はすべて `"use cache"` ＋ `cacheTag`（`products` / `categories` / `settings`）。管理画面の保存・削除・公開切替の Server Action が `updateTag` を呼ぶので、保存した瞬間に公開側へ反映される。
+
+#### 確認用スクリプト
+
+| スクリプト | 内容 |
+|---|---|
+| `pnpm seed:sample` | README の商品リストから 10 点のサンプル商品を、生成したボトル画像付きで投入（開発用。本番に入れない） |
+| `pnpm shoot /de /de/products …` | 390 / 820 / 1440 幅でスクリーンショットを撮って `e2e/output/shots/` に保存 |
+| `pnpm e2e:site` | 公開サイトのスモーク（言語判定、ナビ、モバイルメニューのフォーカスと Escape、言語切替、横はみ出しチェック） |
+
 ### Claude Code スキル
 
 `nextjs/me` プロジェクト（`docs/reference/.claude/skills/`）から以下のスキルを取り込み、`.claude/skills/` に配置している。
@@ -414,3 +453,4 @@ Claude Code 向けの開発ルールは `CLAUDE.md` に記載。要点:
 | 2026-11-11 | DB は PostgreSQL で確定。ORM の比較表（Prisma vs Drizzle）を追記 |
 | 2026-11-11 | ORM は Drizzle で確定。参考プロジェクト ecommerce-admin を確認し、流用する/しない部分を 8. に整理 |
 | 2026-11-12 | 管理画面を実装（ログイン、総覧、商品、分類、管理員招待、設定）。セットアップ手順と構成を 8. に追記 |
+| 2026-11-12 | 公開サイトを実装（4言語ルーティング、トップ、商品一覧・分類・詳細、ブランドページ）。デザイン方針とキャッシュ設計を 8. に追記 |
