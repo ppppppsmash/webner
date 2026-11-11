@@ -13,7 +13,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
-    "seed:categories": "tsx --env-file=.env scripts/seed-categories.ts"
+    "seed:categories": "tsx --env-file=.env scripts/seed-categories.ts",
+    "e2e": "tsx --env-file=.env e2e/smoke.ts"
   },
   "dependencies": {
     "@auth/core": "0.41.3",
@@ -52,6 +53,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "playwright": "^1.65.0",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^5"

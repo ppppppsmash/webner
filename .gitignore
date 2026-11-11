@@ -44,3 +44,6 @@ next-env.d.ts
 uploads/
 .env
 .env.local
+
+# e2e
+e2e/output/

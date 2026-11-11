@@ -108,28 +108,6 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
     }
   };
 
-  const tool = (
-    label: string,
-    icon: React.ReactNode,
-    onClick: () => void,
-    active = false,
-    toolDisabled = false,
-  ) => (
-    <Button
-      type="button"
-      variant={active ? "secondary" : "ghost"}
-      size="icon-sm"
-      aria-label={label}
-      aria-pressed={active}
-      title={label}
-      disabled={disabled || toolDisabled}
-      onMouseDown={(e) => e.preventDefault()}
-      onClick={onClick}
-    >
-      {icon}
-    </Button>
-  );
-
   return (
     <div
       className={cn(
@@ -139,27 +117,81 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
       )}
     >
       <div className="flex flex-wrap items-center gap-0.5 border-b p-1">
-        {tool(t.editor.bold, <BoldIcon />, () => editor.chain().focus().toggleBold().run(), state.bold)}
-        {tool(t.editor.italic, <ItalicIcon />, () => editor.chain().focus().toggleItalic().run(), state.italic)}
-        {tool(t.editor.underline, <UnderlineIcon />, () => editor.chain().focus().toggleUnderline().run(), state.underline)}
+        <ToolButton label={t.editor.bold} active={state.bold} disabled={disabled} onClick={() => editor.chain().focus().toggleBold().run()}>
+          <BoldIcon />
+        </ToolButton>
+        <ToolButton label={t.editor.italic} active={state.italic} disabled={disabled} onClick={() => editor.chain().focus().toggleItalic().run()}>
+          <ItalicIcon />
+        </ToolButton>
+        <ToolButton label={t.editor.underline} active={state.underline} disabled={disabled} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+          <UnderlineIcon />
+        </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        {tool(t.editor.heading2, <Heading2Icon />, () => editor.chain().focus().toggleHeading({ level: 2 }).run(), state.h2)}
-        {tool(t.editor.heading3, <Heading3Icon />, () => editor.chain().focus().toggleHeading({ level: 3 }).run(), state.h3)}
+        <ToolButton label={t.editor.heading2} active={state.h2} disabled={disabled} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+          <Heading2Icon />
+        </ToolButton>
+        <ToolButton label={t.editor.heading3} active={state.h3} disabled={disabled} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+          <Heading3Icon />
+        </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        {tool(t.editor.bulletList, <ListIcon />, () => editor.chain().focus().toggleBulletList().run(), state.bulletList)}
-        {tool(t.editor.orderedList, <ListOrderedIcon />, () => editor.chain().focus().toggleOrderedList().run(), state.orderedList)}
+        <ToolButton label={t.editor.bulletList} active={state.bulletList} disabled={disabled} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+          <ListIcon />
+        </ToolButton>
+        <ToolButton label={t.editor.orderedList} active={state.orderedList} disabled={disabled} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+          <ListOrderedIcon />
+        </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        {tool(t.editor.link, <Link2Icon />, setLink, state.link)}
-        {state.link
-          ? tool(t.editor.unlink, <Link2OffIcon />, () => editor.chain().focus().unsetLink().run())
-          : null}
-        {tool(t.editor.image, <ImagePlusIcon />, openImagePicker, false, uploading)}
+        <ToolButton label={t.editor.link} active={state.link} disabled={disabled} onClick={setLink}>
+          <Link2Icon />
+        </ToolButton>
+        {state.link ? (
+          <ToolButton label={t.editor.unlink} disabled={disabled} onClick={() => editor.chain().focus().unsetLink().run()}>
+            <Link2OffIcon />
+          </ToolButton>
+        ) : null}
+        <ToolButton label={t.editor.image} disabled={disabled || uploading} onClick={openImagePicker}>
+          <ImagePlusIcon />
+        </ToolButton>
         <span className="ml-auto" />
-        {tool(t.editor.undo, <UndoIcon />, () => editor.chain().focus().undo().run(), false, !state.canUndo)}
-        {tool(t.editor.redo, <RedoIcon />, () => editor.chain().focus().redo().run(), false, !state.canRedo)}
+        <ToolButton label={t.editor.undo} disabled={disabled || !state.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+          <UndoIcon />
+        </ToolButton>
+        <ToolButton label={t.editor.redo} disabled={disabled || !state.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+          <RedoIcon />
+        </ToolButton>
         <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={onPickImage} />
       </div>
       <EditorContent editor={editor} />
     </div>
+  );
+}
+
+function ToolButton({
+  label,
+  onClick,
+  active = false,
+  disabled = false,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  active?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <Button
+      type="button"
+      variant={active ? "secondary" : "ghost"}
+      size="icon-sm"
+      aria-label={label}
+      aria-pressed={active}
+      title={label}
+      disabled={disabled}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+    >
+      {children}
+    </Button>
   );
 }
