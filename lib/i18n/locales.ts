@@ -2,6 +2,11 @@ export const LOCALES = ["de", "en", "zh-TW", "zh-CN"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "de";
 
+export const isLocale = (value: string): value is Locale => (LOCALES as readonly string[]).includes(value);
+
+/** BCP 47 tags for <html lang> */
+export const HTML_LANG: Record<Locale, string> = { de: "de", en: "en", "zh-TW": "zh-Hant-TW", "zh-CN": "zh-Hans-CN" };
+
 export const LOCALE_LABELS: Record<Locale, string> = {
   de: "Deutsch",
   en: "English",

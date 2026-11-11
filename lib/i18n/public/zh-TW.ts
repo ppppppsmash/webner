@@ -1,0 +1,103 @@
+import type { PublicDictionary } from "./types";
+
+export const zhTW: PublicDictionary = {
+  meta: {
+    siteTitle: "webner 葦柏納",
+    tagline: "來自德國的精油與天然保養",
+    description: "webner 葦柏納－德國製造的純天然精油、純露與天然保養品。探索完整系列。",
+  },
+  nav: {
+    home: "首頁",
+    products: "商品",
+    categories: "分類",
+    about: "關於 webner",
+    shop: "前往商店",
+    menu: "選單",
+    close: "關閉",
+    language: "語言",
+  },
+  hero: {
+    eyebrow: "芳香療法 · 芳香照護 · 天然保養",
+    title: "植物的力量，於德國蒸餾而成。",
+    lead: "webner 代表純淨的精油、珍貴的原精與滋養的保養油－為臉部、身體與感官細心調配。",
+    ctaProducts: "探索商品",
+    ctaStory: "品牌故事",
+  },
+  story: {
+    eyebrow: "關於 webner",
+    title: "源自對自然香氣的熱愛",
+    body: [
+      "數十年來，webner 將芳香療法的專業與德國工藝的嚴謹結合。每一款精油皆取自嚴選原料，並經過純度檢測。",
+      "玫瑰、茉莉或乳香－我們的配方旨在滋養、安撫，讓日常生活多一點香氣。",
+    ],
+  },
+  values: {
+    title: "我們的堅持",
+    items: [
+      { title: "純淨天然", body: "100% 天然成分，不含合成香精。" },
+      { title: "德國製造", body: "依循嚴格的品質標準研發與充填。" },
+      { title: "芳療專業", body: "配方建立於數十年精油研究的經驗之上。" },
+    ],
+  },
+  home: {
+    categoriesTitle: "商品分類",
+    categoriesLead: "找到屬於你的精油－臉部、身體、居家與儀式。",
+    featuredTitle: "推薦商品",
+    featuredLead: "系列中最受喜愛的選品。",
+    latestTitle: "最新上架",
+    viewAll: "查看全部商品",
+    shopBannerTitle: "台灣官方合作夥伴販售中",
+    shopBannerBody: "所有 webner 商品皆可於合作夥伴的官方線上商店訂購。",
+    shopBannerCta: "前往商店",
+  },
+  products: {
+    title: "商品",
+    lead: "一覽完整的 webner 系列。",
+    all: "全部",
+    count: (n) => `${n} 件商品`,
+    empty: "此分類目前尚無商品。",
+    filterBy: "依分類瀏覽",
+    details: "詳細資訊",
+    volume: "容量",
+    category: "分類",
+    buyAt: "前往商店查看",
+    buyAtHint: "將在新分頁開啟合作夥伴的線上商店。",
+    related: "你可能也會喜歡",
+    backToList: "回到商品列表",
+    videos: "影片",
+    description: "商品說明",
+    noImage: "尚無圖片",
+  },
+  about: {
+    title: "關於 webner",
+    lead: "純淨精油與天然保養－在德國細心製造。",
+    sections: [
+      {
+        title: "品牌起源",
+        body: "webner 源自一個信念：植物的力量在未經修飾時最為強大。純淨、透明與工藝，從一開始就是我們的核心。",
+      },
+      {
+        title: "原料來源",
+        body: "我們只向熟識且信任的夥伴採購原料。每一批原料在成為 webner 商品前都經過檢測。",
+      },
+      {
+        title: "品牌理念",
+        body: "對我們而言，芳香療法是生活中的正念練習：一滴精油，一次深呼吸，一個屬於自己的片刻。",
+      },
+    ],
+  },
+  footer: {
+    about: "webner 葦柏納－來自德國的精油與天然保養。",
+    categories: "商品分類",
+    links: "更多",
+    distributor: "台灣官方合作夥伴",
+    distributorBody: "久保雅司國際股份有限公司 · 台北",
+    rights: "版權所有。",
+    management: "管理後台",
+  },
+  notFound: {
+    title: "找不到頁面",
+    body: "您要找的頁面不存在或已移動。",
+    cta: "回到首頁",
+  },
+};

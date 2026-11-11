@@ -1,7 +1,8 @@
 "use server";
 
 import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { db } from "@/db";
 import { categories } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
@@ -51,6 +52,7 @@ export async function saveCategory(input: CategoryFormInput): Promise<ActionResu
       .set({ name, slug, parentId, sortOrder: data.sortOrder })
       .where(eq(categories.id, data.id));
     revalidatePath(PATH);
+    updateTag(CACHE_TAGS.categories);
     return ok({ id: data.id });
   }
 
@@ -59,6 +61,7 @@ export async function saveCategory(input: CategoryFormInput): Promise<ActionResu
     .values({ name, slug, parentId, sortOrder: data.sortOrder })
     .returning({ id: categories.id });
   revalidatePath(PATH);
+  updateTag(CACHE_TAGS.categories);
   return ok({ id: row.id });
 }
 
@@ -68,5 +71,7 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
   if (child) return fail(t.categories.hasChildren);
   await db.delete(categories).where(eq(categories.id, id));
   revalidatePath(PATH);
+  updateTag(CACHE_TAGS.categories);
+  updateTag(CACHE_TAGS.products);
   return ok(undefined);
 }

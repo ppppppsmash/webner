@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth/guard";
 import { t } from "@/lib/i18n/admin";
@@ -15,6 +16,6 @@ export async function updateSiteSettings(input: SiteSettingsInput): Promise<Acti
   }
   await saveSiteSettings(parsed.data);
   revalidatePath("/management/settings");
-  revalidatePath("/");
+  updateTag(CACHE_TAGS.settings);
   return ok(undefined);
 }

@@ -1,7 +1,8 @@
 "use server";
 
 import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache-tags";
 import { db } from "@/db";
 import { productImages, products, productVideos } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
@@ -83,6 +84,8 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
 
   revalidatePath(PATH);
   revalidatePath(`${PATH}/${id}`);
+  updateTag(CACHE_TAGS.products);
+  updateTag(CACHE_TAGS.product(id));
   return ok({ id });
 }
 
@@ -105,6 +108,8 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
   await Promise.allSettled(keys.map((k) => storage.delete(k)));
 
   revalidatePath(PATH);
+  updateTag(CACHE_TAGS.products);
+  updateTag(CACHE_TAGS.product(id));
   return ok(undefined);
 }
 
@@ -112,5 +117,7 @@ export async function setProductPublished(id: string, isPublished: boolean): Pro
   await requireAdmin();
   await db.update(products).set({ isPublished }).where(eq(products.id, id));
   revalidatePath(PATH);
+  updateTag(CACHE_TAGS.products);
+  updateTag(CACHE_TAGS.product(id));
   return ok(undefined);
 }
