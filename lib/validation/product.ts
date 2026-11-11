@@ -1,0 +1,45 @@
+import { z } from "zod";
+import { t } from "@/lib/i18n/admin";
+import { SLUG_PATTERN } from "@/lib/slug";
+import { hasAnyText, localizedRichTextSchema, localizedTextSchema } from "./localized";
+
+export const productImageSchema = z.object({
+  url: z.string().min(1).max(2000),
+  alt: z.string().trim().max(200).default(""),
+});
+
+export const productVideoSchema = z.object({
+  kind: z.enum(["file", "embed"]),
+  url: z.string().trim().min(1).max(2000),
+  title: z.string().trim().max(200).default(""),
+});
+
+export const productFormSchema = z.object({
+  id: z.uuid().optional(),
+  name: localizedTextSchema.refine(hasAnyText, { message: t.products.nameRequired }),
+  summary: localizedTextSchema,
+  description: localizedRichTextSchema,
+  slug: z
+    .string()
+    .trim()
+    .max(80)
+    .refine((v) => v === "" || SLUG_PATTERN.test(v), { message: t.common.slugHint })
+    .default(""),
+  categoryId: z.uuid().nullable().default(null),
+  volume: z.string().trim().max(100).default(""),
+  externalUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .refine((v) => v === "" || /^https?:\/\//.test(v), { message: "URL" })
+    .default(""),
+  isPublished: z.boolean().default(false),
+  isFeatured: z.boolean().default(false),
+  sortOrder: z.number().int().min(0).max(100000).default(0),
+  /** Ordered; first = main image */
+  images: z.array(productImageSchema).max(30).default([]),
+  videos: z.array(productVideoSchema).max(10).default([]),
+});
+
+export type ProductFormInput = z.input<typeof productFormSchema>;
+export type ProductFormValues = z.output<typeof productFormSchema>;
