@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -16,6 +16,7 @@
     "seed:categories": "tsx --env-file=.env scripts/seed-categories.ts"
   },
   "dependencies": {
+    "@auth/core": "0.41.3",
     "@base-ui/react": "^1.9.0",
     "@hookform/resolvers": "^7.0.5",
     "@tanstack/react-table": "^8.21.3",
