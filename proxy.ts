@@ -16,6 +16,9 @@ export default auth((req) => {
   const isLoggedIn = Boolean(req.auth?.user);
 
   if (!isLoggedIn && !isPublic) {
+    if (pathname.startsWith("/api/")) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const url = new URL("/management/login", req.nextUrl);
     if (pathname !== "/management") url.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(url);
