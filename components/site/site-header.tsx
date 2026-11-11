@@ -57,11 +57,11 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
-          <MobileMenu items={items} openLabel={d.nav.menu} closeLabel={d.nav.close}>
-            <Suspense fallback={null}>
+          <Suspense fallback={<span className="size-10" />}>
+            <MobileMenu items={items} openLabel={d.nav.menu} closeLabel={d.nav.close}>
               <LocaleSwitcher current={locale} label={d.nav.language} className="text-base" />
-            </Suspense>
-          </MobileMenu>
+            </MobileMenu>
+          </Suspense>
         </div>
       </div>
     </header>
