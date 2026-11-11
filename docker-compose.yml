@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: webner-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: webner
+      POSTGRES_PASSWORD: webner
+      POSTGRES_DB: webner
+    ports:
+      - "5432:5432"
+    volumes:
+      - webner-db-data:/var/lib/postgresql/data
+
+volumes:
+  webner-db-data:
