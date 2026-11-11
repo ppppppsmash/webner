@@ -7,10 +7,11 @@ import { t } from "@/lib/i18n/admin";
 import { pickText } from "@/lib/i18n/locales";
 import { listCategories } from "@/lib/queries/categories";
 import { CategoriesTable, type CategoryColumn } from "./components/categories-table";
+import { PageSuspense } from "@/components/management/page-suspense";
 
 export const metadata: Metadata = { title: t.categories.title };
 
-export default async function CategoriesPage() {
+async function CategoriesContent() {
   const rows = await listCategories();
   const data: CategoryColumn[] = rows.map((r) => ({
     id: r.id,
@@ -37,5 +38,13 @@ export default async function CategoriesPage() {
       />
       <CategoriesTable data={data} />
     </>
+  );
+}
+
+export default function CategoriesPage() {
+  return (
+    <PageSuspense>
+      <CategoriesContent />
+    </PageSuspense>
   );
 }

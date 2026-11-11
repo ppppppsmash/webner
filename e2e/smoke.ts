@@ -146,8 +146,73 @@ async function main() {
     await page.getByText("分類已刪除").waitFor();
     log("category deleted");
 
-    // logout
-    await page.getByRole("button", { name: /^[A-Z]$|avatar/i }).first().click().catch(() => {});
+    // --- settings -----------------------------------------------------------
+    await page.goto(`${BASE_URL}/management/settings`);
+    await page.waitForFunction(() => (document.querySelector("#siteName") as HTMLInputElement | null)?.value !== "");
+    await page.fill("#siteName", `webner ${stamp}`);
+    await page.getByRole("button", { name: "儲存" }).click();
+    await page.getByText("設定已儲存").waitFor();
+    await page.reload();
+    await page.waitForFunction(
+      (expected) => (document.querySelector("#siteName") as HTMLInputElement | null)?.value === expected,
+      `webner ${stamp}`,
+    );
+    await page.fill("#siteName", "webner");
+    await page.getByRole("button", { name: "儲存" }).click();
+    await page.getByText("設定已儲存").waitFor();
+    log("settings saved");
+    await shot(page, "07-settings");
+
+    // --- admins: invite -> set password -> login as invitee ------------------
+    const inviteeEmail = `e2e-${stamp}@example.com`;
+    await page.goto(`${BASE_URL}/management/admins`);
+    await page.getByRole("button", { name: "邀請管理員" }).click();
+    await page.fill("#invite-email", inviteeEmail);
+    await page.fill("#invite-name", "E2E Invitee");
+    await page.getByRole("dialog").getByRole("button", { name: "邀請管理員" }).click();
+    await page.getByText("邀請連結", { exact: true }).waitFor();
+    const inviteUrl = await page.locator('input[readonly]').first().inputValue();
+    if (!/\/management\/invite\/[a-f0-9]{64}$/.test(inviteUrl)) throw new Error(`unexpected invite url: ${inviteUrl}`);
+    log("admin invited");
+    await shot(page, "08-invite-link");
+    await page.getByRole("dialog").getByRole("button", { name: "確認" }).click();
+
+    // accept the invitation in a fresh (logged-out) context
+    const guest = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const gpage = await guest.newPage();
+    await gpage.goto(inviteUrl);
+    await gpage.fill("#password", "invitee-pass-123");
+    await gpage.fill("#passwordConfirm", "invitee-pass-123");
+    await gpage.getByRole("button", { name: "完成設定" }).click();
+    await gpage.waitForURL(/\/management\/login/);
+    await gpage.fill("#email", inviteeEmail);
+    await gpage.fill("#password", "invitee-pass-123");
+    await gpage.click('button[type="submit"]');
+    await gpage.waitForURL(/\/management$/);
+    await gpage.goto(`${BASE_URL}/management/admins`);
+    // a non-owner must not see the invite button
+    if (await gpage.getByRole("button", { name: "邀請管理員" }).count()) throw new Error("invitee can see owner controls");
+    log("invitee set password, logged in, owner controls hidden");
+    await guest.close();
+
+    // owner: disable, then delete the invitee
+    await page.goto(`${BASE_URL}/management/admins`);
+    const arow = page.getByRole("row").filter({ hasText: inviteeEmail });
+    await arow.getByText("使用中").waitFor();
+    await arow.getByRole("button", { name: "操作" }).click();
+    await page.getByRole("menuitem", { name: "停用" }).click();
+    await arow.getByText("已停用").waitFor();
+    await arow.getByRole("button", { name: "操作" }).click();
+    await page.getByRole("menuitem", { name: "刪除帳號" }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "刪除" }).click();
+    await page.getByText("帳號已刪除").waitFor();
+    log("invitee disabled and deleted");
+
+    // --- dashboard ----------------------------------------------------------
+    await page.goto(`${BASE_URL}/management`);
+    await page.getByText("商品總數").waitFor();
+    await shot(page, "09-dashboard");
+    log("dashboard ok");
   } catch (err) {
     console.error(`Failed at ${page.url()}`);
     await shot(page, "99-failure").catch(() => {});

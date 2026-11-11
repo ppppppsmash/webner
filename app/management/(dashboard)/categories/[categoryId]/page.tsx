@@ -4,10 +4,11 @@ import { BackLink } from "@/components/management/back-link";
 import { t } from "@/lib/i18n/admin";
 import { getCategory, listParentCategories } from "@/lib/queries/categories";
 import { CategoryForm } from "../components/category-form";
+import { PageSuspense } from "@/components/management/page-suspense";
 
 export const metadata: Metadata = { title: t.categories.editTitle };
 
-export default async function EditCategoryPage({ params }: PageProps<"/management/categories/[categoryId]">) {
+async function EditCategoryContent({ params }: PageProps<"/management/categories/[categoryId]">) {
   const { categoryId } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(categoryId)) notFound();
 
@@ -19,5 +20,13 @@ export default async function EditCategoryPage({ params }: PageProps<"/managemen
       <BackLink href="/management/categories" label={t.categories.title} />
       <CategoryForm initialData={category} parents={parents} />
     </>
+  );
+}
+
+export default function EditCategoryPage(props: PageProps<"/management/categories/[categoryId]">) {
+  return (
+    <PageSuspense>
+      <EditCategoryContent {...props} />
+    </PageSuspense>
   );
 }

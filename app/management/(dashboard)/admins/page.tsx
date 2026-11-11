@@ -7,10 +7,11 @@ import { listAdmins } from "@/lib/queries/admins";
 import { ADMIN_LIMIT } from "@/lib/validation/admin";
 import { AdminsTable, type AdminColumn } from "./components/admins-table";
 import { InviteDialog } from "./components/invite-dialog";
+import { PageSuspense } from "@/components/management/page-suspense";
 
 export const metadata: Metadata = { title: t.admins.title };
 
-export default async function AdminsPage() {
+async function AdminsContent() {
   const [session, rows] = await Promise.all([auth(), listAdmins()]);
   const me = session?.user;
   const isOwner = me?.role === "owner";
@@ -36,5 +37,13 @@ export default async function AdminsPage() {
       />
       <AdminsTable data={data} isOwner={isOwner} />
     </>
+  );
+}
+
+export default function AdminsPage() {
+  return (
+    <PageSuspense>
+      <AdminsContent />
+    </PageSuspense>
   );
 }

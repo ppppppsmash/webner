@@ -4,13 +4,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { t } from "@/lib/i18n/admin";
 
-/**
- * The management area is an internal tool: pages read the database at request
- * time and stream in behind `loading.tsx`. Opt out of instant-navigation
- * validation here; the public gallery is validated separately.
- */
-export const instant = false;
-
 export const metadata: Metadata = {
   title: {
     default: t.app.name,

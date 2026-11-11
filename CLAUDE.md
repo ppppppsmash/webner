@@ -8,6 +8,14 @@
 - 管理画面では商品の登録・説明文・画像・動画を管理する
 - 詳細は `README.md` の「4.2 サイト構成」「4.3 技術構成」を参照
 
+## 開発の進め方
+
+- 変更後は `pnpm typecheck` と `pnpm lint` を通す。画面に触れる変更は dev サーバーを起動して `pnpm e2e`（Playwright スモーク）も通す
+- Next.js 16（Cache Components 有効）。この版の作法は `node_modules/next/dist/docs/` を参照する（`AGENTS.md` 参照）。`middleware.ts` ではなく `proxy.ts`
+- shadcn/ui は Base UI 版（`@base-ui/react`）。`asChild` ではなく `render` prop、`DropdownMenuLabel` は `DropdownMenuGroup` の中に置く、`Button` を `Link` として描画するときは `nativeButton={false}`
+- DB を読む管理ページは `PageSuspense` で包む。クライアントコンポーネントから `db` や `lib/queries` を import しない（`server-only`）
+- 管理画面の文言は `lib/i18n/admin.ts` に追加する（繁体字中国語）
+
 ## 技術スタック
 
 - **Next.js**（App Router）

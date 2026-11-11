@@ -5,10 +5,11 @@ import { t } from "@/lib/i18n/admin";
 import { listCategoryOptions } from "@/lib/queries/categories";
 import { getProduct } from "@/lib/queries/products";
 import { ProductForm } from "../components/product-form";
+import { PageSuspense } from "@/components/management/page-suspense";
 
 export const metadata: Metadata = { title: t.products.editTitle };
 
-export default async function EditProductPage({ params }: PageProps<"/management/products/[productId]">) {
+async function EditProductContent({ params }: PageProps<"/management/products/[productId]">) {
   const { productId } = await params;
   if (!/^[0-9a-f-]{36}$/i.test(productId)) notFound();
 
@@ -20,5 +21,13 @@ export default async function EditProductPage({ params }: PageProps<"/management
       <BackLink href="/management/products" label={t.products.title} />
       <ProductForm initialData={product} categories={categories} />
     </>
+  );
+}
+
+export default function EditProductPage(props: PageProps<"/management/products/[productId]">) {
+  return (
+    <PageSuspense>
+      <EditProductContent {...props} />
+    </PageSuspense>
   );
 }

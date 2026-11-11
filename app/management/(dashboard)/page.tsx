@@ -1,5 +1,6 @@
 import { ArrowRightIcon, FolderTreeIcon, PackageCheckIcon, PackageIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
+import { PageSuspense } from "@/components/management/page-suspense";
 import { Heading } from "@/components/management/heading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { t } from "@/lib/i18n/admin";
 import { pickText } from "@/lib/i18n/locales";
 import { getDashboardStats, getRecentProducts } from "@/lib/queries/dashboard";
 
-export default async function DashboardPage() {
+async function DashboardContent() {
   const [stats, recent] = await Promise.all([getDashboardStats(), getRecentProducts()]);
 
   const cards = [
@@ -75,5 +76,13 @@ export default async function DashboardPage() {
         </CardContent>
       </Card>
     </>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <PageSuspense>
+      <DashboardContent />
+    </PageSuspense>
   );
 }

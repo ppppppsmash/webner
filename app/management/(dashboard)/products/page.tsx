@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { PageSuspense } from "@/components/management/page-suspense";
 import { PageHeader } from "@/components/management/page-header";
 import { Button } from "@/components/ui/button";
 import { formatDateTime } from "@/lib/format";
@@ -11,7 +12,7 @@ import { ProductsTable, type ProductColumn } from "./components/products-table";
 
 export const metadata: Metadata = { title: t.products.title };
 
-export default async function ProductsPage() {
+async function ProductsContent() {
   const rows = await listProducts();
   const data: ProductColumn[] = rows.map((p) => ({
     id: p.id,
@@ -46,5 +47,13 @@ export default async function ProductsPage() {
       />
       <ProductsTable data={data} />
     </>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <PageSuspense>
+      <ProductsContent />
+    </PageSuspense>
   );
 }

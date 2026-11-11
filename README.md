@@ -291,6 +291,50 @@
 
 ## 8. 開発環境メモ
 
+### セットアップ（ローカル）
+
+```bash
+pnpm install
+cp .env.example .env          # AUTH_SECRET は `openssl rand -base64 32` で生成して記入
+docker compose up -d          # PostgreSQL 17（localhost:5432, user/pass/db = webner）
+pnpm db:migrate               # drizzle/ 配下のマイグレーションを適用
+pnpm seed:categories          # README 4.5 の初期カテゴリを投入
+pnpm seed:admin               # .env の SEED_ADMIN_EMAIL / PASSWORD で最初のオーナーを作成
+pnpm dev                      # http://localhost:3000/management
+```
+
+| スクリプト | 内容 |
+|---|---|
+| `pnpm dev` / `pnpm build` / `pnpm start` | Next.js |
+| `pnpm typecheck` | `next typegen` ＋ `tsc --noEmit` |
+| `pnpm lint` | ESLint（React Compiler ルール含む） |
+| `pnpm db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle Kit |
+| `pnpm seed:admin` / `pnpm seed:categories` | 初期データ投入 |
+| `pnpm e2e` | Playwright によるスモークテスト（dev サーバー起動中に実行。ログイン→分類→商品→設定→招待まで一通り操作し、`e2e/output/` にスクリーンショットを保存） |
+
+Google ログインを使う場合は Google Cloud Console で OAuth クライアントを作り、`AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` を `.env` に設定する。リダイレクト URI は `http://localhost:3000/api/auth/callback/google`（本番はドメインを追加）。未設定の間はログイン画面に Google ボタンが出ない。
+
+### 管理画面の構成（2026-11-12 時点）
+
+| パス | 画面 |
+|---|---|
+| `/management/login` | ログイン（メール＋パスワード、Google） |
+| `/management/invite/[token]` | 招待リンクからのパスワード設定 |
+| `/management` | 総覧（商品数・公開数・分類数・管理員数、最近更新した商品） |
+| `/management/products` | 商品一覧（検索、公開/草稿フィルタ、公開スイッチ、…メニューから編集・削除） |
+| `/management/products/new`, `/[id]` | 商品フォーム（4言語の名前・簡介・リッチテキスト説明、画像の複数アップロードと並び替え、動画のアップロード／URL 埋め込み、分類、容量、購入連結、公開／推薦、排序、slug） |
+| `/management/categories` | 分類一覧（大分類→小分類の2階層） |
+| `/management/categories/new`, `/[id]` | 分類フォーム（4言語の名前、上層分類、排序、slug） |
+| `/management/admins` | 管理員一覧。オーナーのみ招待・停用・削除・招待リンク再発行ができる |
+| `/management/settings` | サイト設定（サイト名、購買連結の表示 ON/OFF、官方商店 URL） |
+
+- UI 文言はすべて `lib/i18n/admin.ts`（繁体字中国語）に集約
+- 認証: `auth.ts`（Credentials ＋ Google、JWT セッション 8 時間）、`proxy.ts` で `/management` 配下を保護。Google ログインは `admins` テーブルに存在するメールのみ許可（招待制）
+- データ: `db/schema/index.ts`。商品名・説明・分類名は `jsonb` に `{ de, en, "zh-TW", "zh-CN" }` で保存
+- 画像・動画: `/api/upload` → `lib/storage`（開発は `uploads/` にローカル保存、`/uploads/[...path]` で配信。本番は R2 用ドライバを `lib/storage/index.ts` に追加する）
+- 説明文のリッチテキストは Tiptap（HTML で保存）
+- Next.js 16 の Cache Components を有効にしているため、DB を読む管理ページは `PageSuspense` で包む（`components/management/page-suspense.tsx`）
+
 ### 開発ルール
 
 Claude Code 向けの開発ルールは `CLAUDE.md` に記載。要点:
@@ -369,3 +413,4 @@ Claude Code 向けの開発ルールは `CLAUDE.md` に記載。要点:
 | 2026-11-11 | インフラは開発の最後に決定。ローカル構成と差し替え前提の実装ルールを 4.4 に追記 |
 | 2026-11-11 | DB は PostgreSQL で確定。ORM の比較表（Prisma vs Drizzle）を追記 |
 | 2026-11-11 | ORM は Drizzle で確定。参考プロジェクト ecommerce-admin を確認し、流用する/しない部分を 8. に整理 |
+| 2026-11-12 | 管理画面を実装（ログイン、総覧、商品、分類、管理員招待、設定）。セットアップ手順と構成を 8. に追記 |
