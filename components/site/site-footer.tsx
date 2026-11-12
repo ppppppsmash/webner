@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { LocaleSwitcher } from "@/components/site/locale-switcher";
 import { Wordmark } from "@/components/site/wordmark";
-import type { Locale } from "@/lib/i18n/locales";
-import { pickText } from "@/lib/i18n/locales";
+import { type Locale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import { getCategoryTree, getPublicSettings } from "@/lib/queries/public";
@@ -12,13 +11,14 @@ import { getCurrentYear } from "@/lib/year";
 export async function SiteFooter({ locale }: { locale: Locale }) {
   const d = getDictionary(locale);
   const [settings, tree, year] = await Promise.all([getPublicSettings(), getCategoryTree(), getCurrentYear()]);
+  const shopUrl = settings.showShopLink && settings.shopUrl ? settings.shopUrl : null;
 
   return (
-    <footer className="mt-24 border-t border-line bg-paper-2">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+    <footer className="mt-20 bg-tint text-ink">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
         <div className="space-y-4">
           <Wordmark />
-          <p className="max-w-xs text-sm leading-relaxed text-ink-2">{d.footer.about}</p>
+          <p className="max-w-xs text-sm leading-relaxed">{d.footer.about}</p>
         </div>
 
         <div>
@@ -47,9 +47,9 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 {d.nav.about}
               </Link>
             </li>
-            {settings.showShopLink && settings.shopUrl ? (
+            {shopUrl ? (
               <li>
-                <a href={settings.shopUrl} target="_blank" rel="noreferrer" className="footer-link">
+                <a href={shopUrl} target="_blank" rel="noreferrer" className="footer-link">
                   {d.nav.shop} ↗
                 </a>
               </li>
@@ -59,17 +59,17 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
 
         <div>
           <h2 className="footer-title">{d.footer.distributor}</h2>
-          <p className="text-sm leading-relaxed text-ink-2">{d.footer.distributorBody}</p>
-          {settings.showShopLink && settings.shopUrl ? (
-            <a href={settings.shopUrl} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm text-moss underline underline-offset-4">
-              japanaceshop.com
+          <p className="text-sm leading-relaxed">{d.footer.distributorBody}</p>
+          {shopUrl ? (
+            <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary mt-4">
+              {d.nav.shop}
             </a>
           ) : null}
         </div>
       </div>
 
-      <div className="border-t border-line/70">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-xs text-ink-2 md:flex-row md:items-center md:justify-between">
+      <div className="border-t border-brand/15">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-xs md:flex-row md:items-center md:justify-between">
           <p>
             © {year} webner · {d.footer.rights}
           </p>
@@ -77,7 +77,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
             <Suspense fallback={null}>
               <LocaleSwitcher current={locale} label={d.nav.language} />
             </Suspense>
-            <Link href="/management" className="hover:text-ink">
+            <Link href="/management" className="hover:text-brand">
               {d.footer.management}
             </Link>
           </div>

@@ -68,6 +68,8 @@ export const de: PublicDictionary = {
     videos: "Videos",
     description: "Beschreibung",
     noImage: "Kein Bild",
+    searchResults: (n, q) => `${n} Treffer für „${q}“`,
+    searchPlaceholder: "Produkte suchen …",
   },
   about: {
     title: "Über webner",

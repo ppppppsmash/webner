@@ -58,6 +58,8 @@ export interface PublicDictionary {
     videos: string;
     description: string;
     noImage: string;
+    searchResults: (n: number, q: string) => string;
+    searchPlaceholder: string;
   };
   about: {
     title: string;

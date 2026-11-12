@@ -68,6 +68,8 @@ export const en: PublicDictionary = {
     videos: "Videos",
     description: "Description",
     noImage: "No image",
+    searchResults: (n, q) => `${n} results for “${q}”`,
+    searchPlaceholder: "Search products …",
   },
   about: {
     title: "About webner",
