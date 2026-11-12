@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Instrument_Sans, Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
+import { Libre_Franklin, Lora, Noto_Sans_TC, Noto_Serif_TC } from "next/font/google";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -8,15 +8,14 @@ import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import "@/app/globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin", "latin-ext"],
   weight: "variable",
   style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
 });
-const instrument = Instrument_Sans({
-  variable: "--font-instrument",
+const franklin = Libre_Franklin({
+  variable: "--font-franklin",
   subsets: ["latin", "latin-ext"],
   weight: "variable",
 });
@@ -57,7 +56,7 @@ export default async function SiteLayout({ children, params }: LayoutProps<"/[lo
   return (
     <html
       lang={HTML_LANG[locale as Locale]}
-      className={`${fraunces.variable} ${instrument.variable} ${notoSansTC.variable} ${notoSerifTC.variable} h-full`}
+      className={`${lora.variable} ${franklin.variable} ${notoSansTC.variable} ${notoSerifTC.variable} h-full`}
     >
       <body className="site flex min-h-full flex-col">
         <SiteHeader locale={locale} />
