@@ -16,7 +16,7 @@
 - DB を読む管理ページは `PageSuspense` で包む。クライアントコンポーネントから `db` や `lib/queries` を import しない（`server-only`）
 - 管理画面の文言は `lib/i18n/admin.ts` に追加する（繁体字中国語）。画面を増やしたら `lib/management-nav.ts` にナビ項目（パンくずにも使われる）を足す
 - 公開サイトの文言は `lib/i18n/public/{de,en,zh-TW,zh-CN}.ts` に 4 言語同時に追加する（型 `PublicDictionary` が揃っていないと型エラーになる）
-- 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-moss` / `bg-amber` …）だけを使う。shadcn のトークンは管理画面専用
+- 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白・紺・水色、Lora＋Libre Franklin、長方形ボタン、中央揃え）。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ
 - ルートレイアウトは 2 つ（`app/(site)/[locale]/layout.tsx` と `app/(management)/management/layout.tsx`）。`app/layout.tsx` は置かない
 - 見た目の変更は `pnpm shoot <paths>` で 390 / 820 / 1440 幅を撮って目視し、`pnpm e2e:site` を通す
