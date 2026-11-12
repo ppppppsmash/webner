@@ -1,4 +1,4 @@
-import { ArrowUpRightIcon, ChevronLeftIcon } from "lucide-react";
+import { ArrowUpRightIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -45,16 +45,19 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
   ].filter((c): c is { slug: string; label: string } => Boolean(c));
 
   return (
-    <article className="mx-auto max-w-6xl px-6 pt-8 pb-8 md:pt-12">
+    <article className="mx-auto max-w-6xl px-6 pt-6 pb-8 md:pt-8">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-ink-2">
-        <Link href={localePath(locale, "/products")} className="inline-flex items-center gap-1 hover:text-moss">
-          <ChevronLeftIcon className="size-3.5" />
+        <Link href={localePath(locale)} className="hover:text-brand">
+          {d.nav.home}
+        </Link>
+        <span aria-hidden>/</span>
+        <Link href={localePath(locale, "/products")} className="hover:text-brand">
           {d.products.title}
         </Link>
         {crumbs.map((c) => (
           <span key={c.slug} className="flex items-center gap-1.5">
             <span aria-hidden>/</span>
-            <Link href={localePath(locale, `/categories/${c.slug}`)} className="hover:text-moss">
+            <Link href={localePath(locale, `/categories/${c.slug}`)} className="hover:text-brand">
               {c.label}
             </Link>
           </span>
@@ -64,11 +67,9 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
       <div className="mt-6 grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <ProductGallery images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} name={name} noImageLabel={d.products.noImage} />
 
-        <div className="lg:pt-6">
-          {product.category ? (
-            <p className="eyebrow rise">{pickText(product.category.name, locale)}</p>
-          ) : null}
-          <h1 className="rise mt-3 text-4xl leading-tight md:text-5xl" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
+        <div className="lg:pt-4">
+          {product.category ? <p className="rise text-sm text-ink-2">{crumbs.map((c) => c.label).join(" › ")}</p> : null}
+          <h1 className="rise mt-2 text-3xl leading-tight text-brand md:text-[2.6rem]" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
             {name}
           </h1>
           {summary ? (
@@ -77,7 +78,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
             </p>
           ) : null}
 
-          <dl className="rise mt-8 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-y border-line py-4 text-sm" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
+          <dl className="rise mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-y border-line py-4 text-sm" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
             {product.volume ? (
               <>
                 <dt className="text-ink-2">{d.products.volume}</dt>
@@ -93,8 +94,8 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
           </dl>
 
           {shopUrl ? (
-            <div className="rise mt-8" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
-              <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary">
+            <div className="rise mt-6" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
+              <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary w-full sm:w-auto">
                 {d.products.buyAt}
                 <ArrowUpRightIcon className="size-4" />
               </a>
@@ -104,7 +105,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
           {description ? (
             <section className="mt-10">
-              <h2 className="footer-title">{d.products.description}</h2>
+              <h2 className="footer-title border-b border-line pb-2">{d.products.description}</h2>
               <div className="rich-text" dangerouslySetInnerHTML={{ __html: sanitizeRichText(description) }} />
             </section>
           ) : null}
@@ -113,8 +114,8 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
       {product.videos.length ? (
         <Reveal as="section" className="mt-20">
-          <h2 className="text-2xl md:text-3xl">{d.products.videos}</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <h2 className="section-title">{d.products.videos}</h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
             {product.videos.map((v) => (
               <VideoEmbed key={v.id} kind={v.kind} url={v.url} title={v.title} />
             ))}
@@ -123,12 +124,12 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
       ) : null}
 
       {related.length ? (
-        <Reveal as="section" className="mt-24">
-          <h2 className="text-2xl md:text-3xl">{d.products.related}</h2>
-          <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:gap-x-6 lg:grid-cols-4">
+        <Reveal as="section" className="mt-20">
+          <h2 className="section-title">{d.products.related}</h2>
+          <ul className="mt-8 grid grid-cols-2 gap-x-2 gap-y-6 md:gap-x-4 lg:grid-cols-4">
             {related.map((p) => (
               <li key={p.id}>
-                <ProductCard product={p} locale={locale} noImageLabel={d.products.noImage} />
+                <ProductCard product={p} locale={locale} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />
               </li>
             ))}
           </ul>

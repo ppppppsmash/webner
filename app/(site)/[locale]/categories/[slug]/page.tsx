@@ -26,12 +26,17 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/cate
     category.children.map((c) => c.id),
   );
 
-  const title = pickText(category.name, locale);
-  const lead = category.parent ? pickText(category.parent.name, locale) : undefined;
-
   return (
-    <CatalogLayout d={d} locale={locale} tree={tree} activeSlug={category.slug} title={title} lead={lead} count={products.length}>
-      <ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} />
+    <CatalogLayout
+      d={d}
+      locale={locale}
+      tree={tree}
+      activeSlug={category.slug}
+      title={pickText(category.name, locale)}
+      lead={category.parent ? pickText(category.parent.name, locale) : undefined}
+      count={products.length}
+    >
+      <ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />
     </CatalogLayout>
   );
 }

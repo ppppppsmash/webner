@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Reveal } from "@/components/site/reveal";
 import { Values } from "@/components/site/home/values";
+import { Reveal } from "@/components/site/reveal";
 import { isLocale } from "@/lib/i18n/locales";
 import { getDictionary } from "@/lib/i18n/public";
 
@@ -19,36 +19,33 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
 
   return (
     <>
-      <section className="grain relative overflow-hidden bg-paper-2">
-        <div aria-hidden className="pointer-events-none absolute -top-32 -left-24 size-[30rem] rounded-full bg-amber-soft blur-3xl" />
-        <div className="relative mx-auto max-w-3xl px-6 py-20 text-center md:py-28">
+      <section className="bg-tint-soft">
+        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
           <p className="eyebrow rise">{d.story.eyebrow}</p>
-          <h1 className="rise mt-4 text-4xl leading-tight md:text-6xl" style={{ "--rise-delay": "100ms" } as React.CSSProperties}>
+          <h1 className="rise mt-3 text-4xl text-brand md:text-5xl" style={{ "--rise-delay": "100ms" } as React.CSSProperties}>
             {d.about.title}
           </h1>
-          <p className="rise mt-6 text-lg text-ink-2" style={{ "--rise-delay": "200ms" } as React.CSSProperties}>
+          <p className="rise mt-5 text-lg text-ink-2" style={{ "--rise-delay": "200ms" } as React.CSSProperties}>
             {d.about.lead}
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-16 md:py-24">
-        <ol className="space-y-16">
+      <section className="mx-auto max-w-4xl px-6 py-16 md:py-20">
+        <ol className="divide-y divide-line">
           {d.about.sections.map((s, i) => (
-            <Reveal as="li" key={s.title} className="grid gap-4 md:grid-cols-[120px_minmax(0,1fr)] md:gap-10">
-              <span className="font-display text-5xl text-amber md:text-6xl">0{i + 1}</span>
+            <Reveal as="li" key={s.title} className="grid gap-3 py-10 first:pt-0 md:grid-cols-[100px_minmax(0,1fr)] md:gap-8">
+              <span className="font-display text-4xl text-tint md:text-5xl">0{i + 1}</span>
               <div>
-                <h2 className="text-2xl md:text-3xl">{s.title}</h2>
-                <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-2 md:text-lg">{s.body}</p>
+                <h2 className="text-2xl text-brand">{s.title}</h2>
+                <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-2">{s.body}</p>
               </div>
             </Reveal>
           ))}
         </ol>
       </section>
 
-      <div className="bg-paper-2">
-        <Values d={d} />
-      </div>
+      <Values d={d} withTitle />
     </>
   );
 }
