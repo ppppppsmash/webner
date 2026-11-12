@@ -1,23 +1,12 @@
 import { cn } from "@/lib/utils";
 
-export function SectionHeading({
-  eyebrow,
-  title,
-  lead,
-  align = "left",
-  className,
-}: {
-  eyebrow?: string;
-  title: string;
-  lead?: string;
-  align?: "left" | "center";
-  className?: string;
-}) {
+/** Centered serif section title with an optional lead, in the style of German brand shops. */
+export function SectionHeading({ title, lead, className }: { title: string; lead?: string; className?: string }) {
   return (
-    <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center", className)}>
-      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-      <h2 className="mt-3 text-3xl leading-tight md:text-4xl">{title}</h2>
-      {lead ? <p className="mt-3 text-base text-ink-2 md:text-lg">{lead}</p> : null}
+    <div className={cn("mx-auto max-w-2xl text-center", className)}>
+      <h2 className="section-title">{title}</h2>
+      {lead ? <p className="mt-3 text-base text-ink-2">{lead}</p> : null}
+      <span aria-hidden className="mx-auto mt-4 block h-px w-12 bg-tint" />
     </div>
   );
 }
