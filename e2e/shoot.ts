@@ -19,10 +19,22 @@ if (!paths.length) {
 async function main() {
 await mkdir(OUT, { recursive: true });
 const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+if (process.env.LOGIN) {
+  // Log in once (SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD) so management pages can be captured.
+  const login = await context.newPage();
+  await login.goto(`${BASE_URL}/management/login`);
+  await login.fill("#email", process.env.SEED_ADMIN_EMAIL ?? "");
+  await login.fill("#password", process.env.SEED_ADMIN_PASSWORD ?? "");
+  await login.click('button[type="submit"]');
+  await login.waitForURL(/\/management(?!\/login)/);
+  await login.close();
+}
 try {
   for (const p of paths) {
     for (const width of WIDTHS) {
-      const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+      const page = await context.newPage();
+      await page.setViewportSize({ width, height: 900 });
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
       page.on("console", (m) => m.type() === "error" && errors.push(m.text()));

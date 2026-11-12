@@ -15,7 +15,7 @@
     "seed:admin": "tsx --env-file=.env scripts/seed-admin.ts",
     "seed:categories": "tsx --env-file=.env scripts/seed-categories.ts",
     "e2e": "tsx --env-file=.env e2e/smoke.ts",
-    "shoot": "tsx e2e/shoot.ts",
+    "shoot": "tsx --env-file=.env e2e/shoot.ts",
     "seed:sample": "tsx --env-file=.env scripts/seed-sample-products.ts",
     "e2e:site": "tsx e2e/smoke-site.ts"
   },

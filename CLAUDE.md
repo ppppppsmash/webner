@@ -14,7 +14,7 @@
 - Next.js 16（Cache Components 有効）。この版の作法は `node_modules/next/dist/docs/` を参照する（`AGENTS.md` 参照）。`middleware.ts` ではなく `proxy.ts`
 - shadcn/ui は Base UI 版（`@base-ui/react`）。`asChild` ではなく `render` prop、`DropdownMenuLabel` は `DropdownMenuGroup` の中に置く、`Button` を `Link` として描画するときは `nativeButton={false}`
 - DB を読む管理ページは `PageSuspense` で包む。クライアントコンポーネントから `db` や `lib/queries` を import しない（`server-only`）
-- 管理画面の文言は `lib/i18n/admin.ts` に追加する（繁体字中国語）
+- 管理画面の文言は `lib/i18n/admin.ts` に追加する（繁体字中国語）。画面を増やしたら `lib/management-nav.ts` にナビ項目（パンくずにも使われる）を足す
 - 公開サイトの文言は `lib/i18n/public/{de,en,zh-TW,zh-CN}.ts` に 4 言語同時に追加する（型 `PublicDictionary` が揃っていないと型エラーになる）
 - 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-moss` / `bg-amber` …）だけを使う。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ

@@ -328,6 +328,8 @@ Google ログインを使う場合は Google Cloud Console で OAuth クライ�
 | `/management/admins` | 管理員一覧。オーナーのみ招待・停用・削除・招待リンク再発行ができる |
 | `/management/settings` | サイト設定（サイト名、購買連結の表示 ON/OFF、官方商店 URL） |
 
+- レイアウトは `mgr-project`（ppppppsmash/mgr-project）を参考にした shadcn の sidebar 構成: 左に折りたたみ式（アイコン化）の inset サイドバー（ロゴ、総覧／商品／分類／管理員／設定、商品と分類は小項目付き、フッターにユーザーメニュー）、上部ヘッダーにサイドバー開閉・パンくず・テーマ切替。ナビとパンくずの定義は `lib/management-nav.ts`
+- ページタイトルは左から現れるクリップ演出＋下線（CSS のみ、`components/management/heading.tsx`）
 - UI 文言はすべて `lib/i18n/admin.ts`（繁体字中国語）に集約
 - 認証: `auth.ts`（Credentials ＋ Google、JWT セッション 8 時間）、`proxy.ts` で `/management` 配下を保護。Google ログインは `admins` テーブルに存在するメールのみ許可（招待制）
 - データ: `db/schema/index.ts`。商品名・説明・分類名は `jsonb` に `{ de, en, "zh-TW", "zh-CN" }` で保存
@@ -454,3 +456,4 @@ locale は `de` / `en` / `zh-TW` / `zh-CN`。文言は `lib/i18n/public/*.ts` �
 | 2026-11-11 | ORM は Drizzle で確定。参考プロジェクト ecommerce-admin を確認し、流用する/しない部分を 8. に整理 |
 | 2026-11-12 | 管理画面を実装（ログイン、総覧、商品、分類、管理員招待、設定）。セットアップ手順と構成を 8. に追記 |
 | 2026-11-12 | 公開サイトを実装（4言語ルーティング、トップ、商品一覧・分類・詳細、ブランドページ）。デザイン方針とキャッシュ設計を 8. に追記 |
+| 2026-11-12 | 管理画面のレイアウトを mgr-project 準拠のサイドバー構成に変更 |
