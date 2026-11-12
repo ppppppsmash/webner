@@ -10,6 +10,8 @@ export const siteSettingsSchema = z.object({
     .max(2000)
     .refine((v) => v === "" || /^https?:\/\//.test(v), { message: "URL" })
     .default("https://www.japanaceshop.com/categories/webner"),
+  /** Full-width photo behind the home hero (uploaded in the management panel). */
+  heroImageUrl: z.string().trim().max(2000).default(""),
 });
 
 export type SiteSettings = z.output<typeof siteSettingsSchema>;

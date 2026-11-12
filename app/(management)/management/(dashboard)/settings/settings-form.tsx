@@ -6,6 +6,7 @@ import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { updateSiteSettings } from "@/actions/settings";
+import { SingleImageField } from "@/components/management/single-image-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldTitle } from "@/components/ui/field";
@@ -57,6 +58,18 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
                     <FieldDescription>{t.settings.shopLinkHint}</FieldDescription>
                   </FieldContent>
                   <Switch checked={field.value ?? false} onCheckedChange={field.onChange} disabled={pending} />
+                </Field>
+              )}
+            />
+
+            <Controller
+              control={form.control}
+              name="heroImageUrl"
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t.settings.heroImage}</FieldLabel>
+                  <SingleImageField value={field.value ?? ""} onChange={field.onChange} disabled={pending} />
+                  <FieldDescription>{t.settings.heroImageHint}</FieldDescription>
                 </Field>
               )}
             />

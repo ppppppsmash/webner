@@ -209,6 +209,10 @@ export const t = {
     shopUrl: "官方商店網址",
     shopUrlHint: "商品若未填寫個別購買連結，會使用這個網址。",
     siteName: "網站名稱",
+    heroImage: "首頁主視覺圖片",
+    heroImageHint: "顯示在展示網站首頁最上方的大圖。建議 2400×1200 以上的橫向照片；未設定時會使用推薦商品的圖片。",
+    uploadHeroImage: "上傳圖片",
+    removeImage: "移除圖片",
     saved: "設定已儲存",
   },
   upload: {
