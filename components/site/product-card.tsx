@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { type Locale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
+import { getDictionary } from "@/lib/i18n/public";
 import type { PublicProduct } from "@/lib/queries/public";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export function ProductCard({
   const [main, alt] = product.images;
   const name = pickText(product.name, locale);
   const category = product.category ? pickText(product.category.name, locale) : null;
+  const badge = product.badge ? getDictionary(locale).products.badges[product.badge] : null;
 
   return (
     <Link
@@ -57,9 +59,9 @@ export function ProductCard({
         ) : (
           <div className="flex size-full items-center justify-center text-sm text-ink-2">{noImageLabel}</div>
         )}
-        {product.isFeatured ? (
-          <span className="absolute top-2 left-2 rounded-full bg-tint px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-brand">
-            TOP
+        {badge ? (
+          <span className="absolute top-2 left-2 bg-brand px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-paper uppercase">
+            {badge}
           </span>
         ) : null}
       </div>

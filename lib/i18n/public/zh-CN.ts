@@ -67,6 +67,7 @@ export const zhCN: PublicDictionary = {
     videos: "视频",
     description: "商品说明",
     noImage: "暂无图片",
+    badges: { new: "新品", limited: "限定", popular: "人气" },
     searchResults: (n, q) => `“${q}”的搜索结果：${n} 件`,
     searchPlaceholder: "搜索商品…",
   },

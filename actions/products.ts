@@ -45,6 +45,7 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
     externalUrl: data.externalUrl || null,
     isPublished: data.isPublished,
     isFeatured: data.isFeatured,
+    badge: data.badge,
     sortOrder: data.sortOrder,
   };
 

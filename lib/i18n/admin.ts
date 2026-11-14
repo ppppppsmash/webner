@@ -161,6 +161,10 @@ export const t = {
     seoDescriptionHint: "搜尋結果顯示的說明文字，建議 160 字以內。留空時使用簡短介紹。",
     seoPreview: "搜尋結果預覽",
     seoPreviewEmpty: "請先輸入商品名稱，以預覽搜尋結果",
+    badge: "商品標籤",
+    badgeHint: "顯示在商品卡片左上角，一次只顯示一個。",
+    badgeNone: "不顯示",
+    badges: { new: "新品", limited: "限定", popular: "人氣" } as const,
   },
   categories: {
     title: "分類",

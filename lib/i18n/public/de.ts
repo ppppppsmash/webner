@@ -68,6 +68,7 @@ export const de: PublicDictionary = {
     videos: "Videos",
     description: "Beschreibung",
     noImage: "Kein Bild",
+    badges: { new: "Neu", limited: "Limitiert", popular: "Beliebt" },
     searchResults: (n, q) => `${n} Treffer für „${q}“`,
     searchPlaceholder: "Produkte suchen …",
   },

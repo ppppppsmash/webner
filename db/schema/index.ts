@@ -12,6 +12,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { LocalizedText } from "@/lib/i18n/locales";
+import { PRODUCT_BADGES } from "@/lib/product-badges";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -71,6 +72,8 @@ export const categories = pgTable(
 // ---------------------------------------------------------------------------
 // Products: gallery items. No price, no stock.
 // ---------------------------------------------------------------------------
+export const productBadgeEnum = pgEnum("product_badge", PRODUCT_BADGES);
+
 export const products = pgTable(
   "products",
   {
@@ -92,6 +95,7 @@ export const products = pgTable(
     externalUrl: text("external_url"),
     isPublished: boolean("is_published").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
+    badge: productBadgeEnum("badge"),
     sortOrder: integer("sort_order").notNull().default(0),
     ...timestamps,
   },

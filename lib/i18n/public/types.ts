@@ -1,3 +1,4 @@
+import type { ProductBadge } from "@/lib/product-badges";
 export interface PublicDictionary {
   meta: {
     siteTitle: string;
@@ -58,6 +59,7 @@ export interface PublicDictionary {
     videos: string;
     description: string;
     noImage: string;
+    badges: Record<ProductBadge, string>;
     searchResults: (n: number, q: string) => string;
     searchPlaceholder: string;
   };

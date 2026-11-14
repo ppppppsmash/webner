@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRODUCT_BADGES } from "@/lib/product-badges";
 import { t } from "@/lib/i18n/admin";
 import { SLUG_PATTERN } from "@/lib/slug";
 import { hasAnyText, localizedRichTextSchema, localizedTextSchema, localizedTextSchemaWithMax } from "./localized";
@@ -41,6 +42,7 @@ export const productFormSchema = z.object({
     .default(""),
   isPublished: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
+  badge: z.enum(PRODUCT_BADGES).nullable().default(null),
   sortOrder: z.number().int().min(0).max(100000).default(0),
   /** Ordered; first = main image */
   images: z.array(productImageSchema).max(30).default([]),

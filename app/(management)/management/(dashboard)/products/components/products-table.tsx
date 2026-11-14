@@ -23,6 +23,7 @@ export type ProductColumn = {
   isPublished: boolean;
   isFeatured: boolean;
   status: "published" | "draft";
+  badge: string | null;
   sortOrder: number;
   updatedAt: string;
 };
@@ -77,13 +78,17 @@ const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "isFeatured",
     header: t.products.featured,
-    cell: ({ row }) =>
-      row.original.isFeatured ? (
-        <Badge variant="secondary" className="gap-1">
-          <StarIcon />
-          {t.products.featured}
-        </Badge>
-      ) : null,
+    cell: ({ row }) => (
+      <div className="flex flex-wrap gap-1">
+        {row.original.isFeatured ? (
+          <Badge variant="secondary" className="gap-1">
+            <StarIcon />
+            {t.products.featured}
+          </Badge>
+        ) : null}
+        {row.original.badge ? <Badge variant="outline">{row.original.badge}</Badge> : null}
+      </div>
+    ),
   },
   {
     accessorKey: "sortOrder",

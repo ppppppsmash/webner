@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Category } from "@/db/schema";
+import { PRODUCT_BADGES, type ProductBadge } from "@/lib/product-badges";
 import { t } from "@/lib/i18n/admin";
 import { DEFAULT_LOCALE, emptyLocalizedText, type Locale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
@@ -39,7 +40,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   media: ["images", "videos"],
   category: ["categoryId", "volume"],
   seo: ["slug", "seoTitle", "seoDescription"],
-  settings: ["externalUrl", "sortOrder", "isFeatured", "isPublished"],
+  settings: ["externalUrl", "sortOrder", "isFeatured", "isPublished", "badge"],
 };
 
 const TABS: Array<{ key: TabKey; label: string }> = [
@@ -119,6 +120,11 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(initialData);
 
+  const badgeItems = [
+    { value: NONE, label: t.products.badgeNone },
+    ...PRODUCT_BADGES.map((b) => ({ value: b, label: t.products.badges[b] })),
+  ];
+
   const categoryItems = [
     { value: NONE, label: t.products.noCategory },
     ...categories.map((c) => ({
@@ -142,6 +148,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       externalUrl: initialData?.externalUrl ?? "",
       isPublished: initialData?.isPublished ?? false,
       isFeatured: initialData?.isFeatured ?? false,
+      badge: initialData?.badge ?? null,
       sortOrder: initialData?.sortOrder ?? 0,
       images: initialData?.images.map((i) => ({ url: i.url, alt: i.alt ?? "" })) ?? [],
       videos: initialData?.videos.map((v) => ({ kind: v.kind, url: v.url, title: v.title ?? "" })) ?? [],
@@ -465,6 +472,35 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                           <FieldDescription>{t.products.isFeaturedHint}</FieldDescription>
                         </FieldContent>
                         <Switch checked={field.value ?? false} onCheckedChange={field.onChange} disabled={pending} />
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    control={form.control}
+                    name="badge"
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid || undefined}>
+                        <FieldLabel>{t.products.badge}</FieldLabel>
+                        <Select
+                          items={badgeItems}
+                          value={field.value ?? NONE}
+                          onValueChange={(v) => field.onChange(v === NONE || v == null ? null : (String(v) as ProductBadge))}
+                          disabled={pending}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {badgeItems.map((item) => (
+                              <SelectItem key={item.value} value={item.value}>
+                                {item.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FieldDescription>{t.products.badgeHint}</FieldDescription>
+                        <FieldError errors={[fieldState.error]} />
                       </Field>
                     )}
                   />

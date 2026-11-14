@@ -67,6 +67,7 @@ export const zhTW: PublicDictionary = {
     videos: "影片",
     description: "商品說明",
     noImage: "尚無圖片",
+    badges: { new: "新品", limited: "限定", popular: "人氣" },
     searchResults: (n, q) => `「${q}」的搜尋結果：${n} 件`,
     searchPlaceholder: "搜尋商品…",
   },

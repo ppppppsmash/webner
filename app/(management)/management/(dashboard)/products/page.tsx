@@ -28,6 +28,7 @@ async function ProductsContent() {
     volume: p.volume ?? "",
     isPublished: p.isPublished,
     isFeatured: p.isFeatured,
+    badge: p.badge ? t.products.badges[p.badge] : null,
     status: p.isPublished ? "published" : "draft",
     sortOrder: p.sortOrder,
     updatedAt: formatDateTime(p.updatedAt),
