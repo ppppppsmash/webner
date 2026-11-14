@@ -147,6 +147,13 @@ export const t = {
     filterPublished: "已公開",
     filterDraft: "草稿",
     searchPlaceholder: "搜尋商品名稱",
+    tabBasic: "基本資訊",
+    tabMedia: "圖片與影片",
+    tabCategory: "分類與規格",
+    tabSeo: "網址與 SEO",
+    tabSettings: "設定",
+    saveBarHint: "填寫商品資料後，按下「建立」或「儲存變更」儲存。",
+    tabHasError: "此分頁有待修正的欄位",
   },
   categories: {
     title: "分類",

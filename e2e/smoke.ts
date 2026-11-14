@@ -77,7 +77,8 @@ async function main() {
     await page.getByRole("button", { name: "粗體" }).first().click();
     await page.keyboard.type("重點");
 
-    // image upload
+    // image upload (圖片與影片 tab)
+    await page.getByRole("tab", { name: "圖片與影片" }).click();
     const png = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
       "base64",
@@ -95,14 +96,15 @@ async function main() {
     await page.getByRole("button", { name: "加入影片網址" }).click();
     await page.getByText("外部連結").waitFor();
 
-    // category select + volume + publish
+    // category select + volume (分類與規格 tab), publish switch in the save bar
+    await page.getByRole("tab", { name: "分類與規格" }).click();
     await page.getByRole("combobox").first().click();
     await page.getByRole("option", { name: `測試分類 ${stamp}` }).click();
     await page.fill("#volume", "100ml");
     await page.getByRole("switch").first().click(); // isPublished
     await shot(page, "04-product-form");
 
-    await page.getByRole("button", { name: "建立" }).click();
+    await page.getByRole("button", { name: "建立" }).first().click();
     await page.waitForURL(/\/management\/products\/[0-9a-f-]{36}$/);
     await page.getByText("商品已建立").waitFor();
     const productUrl = page.url();
@@ -115,8 +117,9 @@ async function main() {
       (expected) => (document.querySelector('input[name="name.de"]') as HTMLInputElement | null)?.value === expected,
       `E2E Produkt ${stamp}`,
     );
-    await page.locator('img[src^="/uploads/images/"]').first().waitFor();
     const html = await page.locator(".tiptap").first().innerHTML();
+    await page.getByRole("tab", { name: "圖片與影片" }).click();
+    await page.locator('img[src^="/uploads/images/"]').first().waitFor();
     if (!html.includes("<strong>重點</strong>")) throw new Error(`rich text not persisted: ${html}`);
     log("product persisted (name, image, rich text)");
     await shot(page, "05-product-edit");
