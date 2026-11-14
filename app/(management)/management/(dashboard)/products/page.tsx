@@ -27,6 +27,7 @@ async function ProductsContent() {
       : "",
     volume: p.volume ?? "",
     visibility: p.visibility,
+    scheduledAt: p.visibility === "published" && p.publishAt && p.publishAt > new Date() ? formatDateTime(p.publishAt) : null,
     isFeatured: p.isFeatured,
     badge: p.badge ? t.products.badges[p.badge] : null,
     sortOrder: p.sortOrder,

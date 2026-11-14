@@ -42,6 +42,12 @@ export const productFormSchema = z.object({
     .refine((v) => v === "" || /^https?:\/\//.test(v), { message: "URL" })
     .default(""),
   visibility: z.enum(PRODUCT_VISIBILITIES).default("draft"),
+  /** datetime-local string from the form ("" = none) */
+  publishAt: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || !Number.isNaN(new Date(v).getTime()), { message: t.products.publishAtInvalid })
+    .default(""),
   isFeatured: z.boolean().default(false),
   badge: z.enum(PRODUCT_BADGES).nullable().default(null),
   sortOrder: z.number().int().min(0).max(100000).default(0),

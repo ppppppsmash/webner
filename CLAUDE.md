@@ -16,7 +16,9 @@
 - DB を読む管理ページは `PageSuspense` で包む。クライアントコンポーネントから `db` や `lib/queries` を import しない（`server-only`）
 - 管理画面の文言は `lib/i18n/admin.ts` に追加する（繁体字中国語）。画面を増やしたら `lib/management-nav.ts` にナビ項目（パンくずにも使われる）を足す
 - 公開サイトの文言は `lib/i18n/public/{de,en,zh-TW,zh-CN}.ts` に 4 言語同時に追加する（型 `PublicDictionary` が揃っていないと型エラーになる）
-- 商品の公開状態は `visibility`（draft / hidden / published、`lib/product-visibility.ts`）。公開側の一覧は published のみ、詳細ページは hidden も表示（noindex）。`is_published` は廃止済み
+- 商品の公開状態は `visibility`（draft / hidden / published、`lib/product-visibility.ts`）＋ `publishAt`（予約公開）。公開側の一覧は published かつ時刻到来分のみ、詳細ページは hidden も表示（noindex）。`is_published` は廃止済み
+- 公開側の商品クエリは `productsCacheLife()` で cacheLife を決める（予約中の商品があれば `minutes`、なければ `hours`）。1 つの `use cache` 関数内で cacheLife は 1 回だけ呼ぶ
+- `loading.tsx` のある公開ページでは `notFound()` が Suspense 内で起きるため HTTP ステータスは 200 のまま。e2e で存在チェックをするときは本文の内容で判定する
 - クライアントからも使う定数（商品ラベル `lib/product-badges.ts`、公開状態 `lib/product-visibility.ts`）は `db/schema` に置かず `lib/` に置き、schema 側がそれを import する（drizzle をクライアントに持ち込まないため）
 - 商品フォームは 5 タブ＋上下の固定保存バー。項目を増やすときは `TAB_FIELDS`（product-form.tsx）にフィールド名を登録するとエラー時にそのタブへ切り替わる。`LocalizedField` は `max` で字数カウンタ、`locale`/`onLocaleChange` で言語タブを外から制御できる
 - スキーマ変更は `pnpm db:generate` → 生成 SQL を確認（データ移行が要るなら UPDATE を挟む）→ `pnpm db:migrate`。generate が列の作成／リネームを聞いてくる場合は TTY が要る

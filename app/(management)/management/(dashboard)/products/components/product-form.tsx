@@ -35,6 +35,13 @@ import { VISIBILITY_ITEMS, VisibilityDot } from "./visibility-select";
 
 const NONE = "__none__";
 
+/** Date → value for <input type="datetime-local"> in the browser's local time zone. */
+function toDateTimeLocal(date: Date | null): string {
+  if (!date) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
 type TabKey = "basic" | "media" | "category" | "seo" | "settings";
 
 /** Which form fields live on which tab (used to flag tabs with validation errors). */
@@ -43,7 +50,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   media: ["images", "videos"],
   category: ["categoryId", "volume"],
   seo: ["slug", "seoTitle", "seoDescription"],
-  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "badge"],
+  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge"],
 };
 
 const TABS: Array<{ key: TabKey; label: string }> = [
@@ -166,6 +173,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       volume: initialData?.volume ?? "",
       externalUrl: initialData?.externalUrl ?? "",
       visibility: initialData?.visibility ?? "draft",
+      publishAt: toDateTimeLocal(initialData?.publishAt ?? null),
       isFeatured: initialData?.isFeatured ?? false,
       badge: initialData?.badge ?? null,
       sortOrder: initialData?.sortOrder ?? 0,
@@ -496,6 +504,20 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                         </li>
                       ))}
                     </ul>
+                  </Field>
+
+                  <Field data-invalid={Boolean(errors.publishAt) || undefined}>
+                    <FieldLabel htmlFor="publishAt">{t.products.publishAt}</FieldLabel>
+                    <div className="flex items-center gap-2">
+                      <Input id="publishAt" type="datetime-local" {...form.register("publishAt")} disabled={pending} className="w-auto" />
+                      {form.watch("publishAt") ? (
+                        <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={() => form.setValue("publishAt", "", { shouldDirty: true })}>
+                          {t.products.publishAtClear}
+                        </Button>
+                      ) : null}
+                    </div>
+                    <FieldDescription>{t.products.publishAtHint}</FieldDescription>
+                    <FieldError errors={[errors.publishAt]} />
                   </Field>
 
                   <Field>

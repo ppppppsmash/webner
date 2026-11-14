@@ -128,6 +128,26 @@ async function main() {
     log("product persisted (name, image, rich text)");
     await shot(page, "05-product-edit");
 
+    // scheduled go-live: published + future publishAt must not be reachable yet
+    await page.getByRole("tab", { name: "設定" }).click();
+    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    await page.fill(
+      "#publishAt",
+      `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}T${pad(tomorrow.getHours())}:${pad(tomorrow.getMinutes())}`,
+    );
+    await page.getByRole("button", { name: "儲存變更" }).first().click();
+    await page.getByText("商品已更新").waitFor();
+    // not-found renders inside the streamed shell (status stays 200), so check the body instead
+    const scheduledHtml = await (await page.request.get(`${BASE_URL}/de/products/${productSlug}`)).text();
+    if (scheduledHtml.includes(`E2E Produkt ${stamp}`)) throw new Error("scheduled product is visible before its publish time");
+    await page.getByRole("button", { name: "清除" }).click();
+    await page.getByRole("button", { name: "儲存變更" }).first().click();
+    await page.getByText("商品已更新").waitFor();
+    const liveHtml = await (await page.request.get(`${BASE_URL}/de/products/${productSlug}`)).text();
+    if (!liveHtml.includes(`E2E Produkt ${stamp}`)) throw new Error("product should be live again after clearing publish time");
+    log("scheduled publish gates the public page");
+
     // list shows product + inline visibility select (公開 → 隱藏)
     await page.goto(`${BASE_URL}/management/products`);
     await page.getByText(`測試商品 ${stamp}`).waitFor();
@@ -136,8 +156,10 @@ async function main() {
     await page.getByRole("option", { name: "隱藏" }).click();
     await row.getByRole("combobox", { name: "狀態" }).filter({ hasText: "隱藏" }).waitFor();
     // hidden product is still reachable by direct URL on the public site
-    const hiddenRes = await page.request.get(`${BASE_URL}/de/products/${productSlug}`);
-    if (hiddenRes.status() !== 200) throw new Error(`hidden product not reachable: ${hiddenRes.status()}`);
+    const hiddenHtml = await (await page.request.get(`${BASE_URL}/de/products/${productSlug}`)).text();
+    if (!hiddenHtml.includes(`E2E Produkt ${stamp}`)) throw new Error("hidden product not reachable by direct URL");
+    const listHtml = await (await page.request.get(`${BASE_URL}/de/products`)).text();
+    if (listHtml.includes(`E2E Produkt ${stamp}`)) throw new Error("hidden product must not be listed");
     log("visibility changed to hidden, direct URL still works");
     await shot(page, "06-products-list");
 

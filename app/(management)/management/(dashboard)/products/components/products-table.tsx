@@ -22,6 +22,7 @@ export type ProductColumn = {
   category: string;
   volume: string;
   visibility: ProductVisibility;
+  scheduledAt: string | null;
   isFeatured: boolean;
   badge: string | null;
   sortOrder: number;
@@ -73,7 +74,14 @@ const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "visibility",
     header: t.products.visibility,
-    cell: ({ row }) => <VisibilitySelect id={row.original.id} visibility={row.original.visibility} />,
+    cell: ({ row }) => (
+      <div className="space-y-1">
+        <VisibilitySelect id={row.original.id} visibility={row.original.visibility} />
+        {row.original.scheduledAt ? (
+          <p className="text-xs text-amber-600 dark:text-amber-400">{t.products.scheduled(row.original.scheduledAt)}</p>
+        ) : null}
+      </div>
+    ),
   },
   {
     accessorKey: "isFeatured",

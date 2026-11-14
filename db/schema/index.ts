@@ -96,6 +96,8 @@ export const products = pgTable(
     /** Link to the product page on the existing shop (japanaceshop.com). */
     externalUrl: text("external_url"),
     visibility: productVisibilityEnum("visibility").notNull().default("draft"),
+    /** Scheduled go-live: a published product only shows once this time has passed (null = immediately) */
+    publishAt: timestamp("publish_at", { withTimezone: true }),
     isFeatured: boolean("is_featured").notNull().default(false),
     badge: productBadgeEnum("badge"),
     sortOrder: integer("sort_order").notNull().default(0),
