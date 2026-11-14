@@ -1,12 +1,16 @@
 import { z } from "zod";
 import { LOCALES, type LocalizedText } from "@/lib/i18n/locales";
 
-export const localizedTextSchema = z.object({
-  de: z.string().trim().max(500).default(""),
-  en: z.string().trim().max(500).default(""),
-  "zh-TW": z.string().trim().max(500).default(""),
-  "zh-CN": z.string().trim().max(500).default(""),
-});
+/** Short text per locale with a per-locale character limit. */
+export const localizedTextSchemaWithMax = (max: number) =>
+  z.object({
+    de: z.string().trim().max(max).default(""),
+    en: z.string().trim().max(max).default(""),
+    "zh-TW": z.string().trim().max(max).default(""),
+    "zh-CN": z.string().trim().max(max).default(""),
+  });
+
+export const localizedTextSchema = localizedTextSchemaWithMax(500);
 
 /** Long text (rich text HTML) per locale */
 export const localizedRichTextSchema = z.object({

@@ -19,13 +19,14 @@ import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLab
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Category } from "@/db/schema";
 import { t } from "@/lib/i18n/admin";
 import { emptyLocalizedText, pickText } from "@/lib/i18n/locales";
 import type { ProductWithMedia } from "@/lib/queries/products";
 import { cn } from "@/lib/utils";
-import { productFormSchema, type ProductFormInput } from "@/lib/validation/product";
+import { PRODUCT_LIMITS, productFormSchema, type ProductFormInput } from "@/lib/validation/product";
 
 const NONE = "__none__";
 
@@ -243,16 +244,24 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                   <FieldError errors={[errors.name as { message?: string } | undefined]} />
                 </Field>
 
-                <Field>
+                <Field data-invalid={Boolean(errors.summary) || undefined}>
                   <FieldLabel>
                     {t.products.summary}
                     <span className="font-normal text-muted-foreground">（{t.common.optional}）</span>
                   </FieldLabel>
-                  <LocalizedField value={summaryValue}>
+                  <LocalizedField value={summaryValue} max={PRODUCT_LIMITS.summary}>
                     {(locale) => (
-                      <Input {...form.register(`summary.${locale}`)} disabled={pending} placeholder={t.products.summaryPlaceholder} />
+                      <Textarea
+                        {...form.register(`summary.${locale}`)}
+                        rows={3}
+                        disabled={pending}
+                        placeholder={t.products.summaryPlaceholder}
+                        aria-invalid={Boolean(errors.summary) || undefined}
+                      />
                     )}
                   </LocalizedField>
+                  <FieldDescription>{t.products.summaryHint}</FieldDescription>
+                  <FieldError errors={[errors.summary as { message?: string } | undefined]} />
                 </Field>
 
                 <Field>

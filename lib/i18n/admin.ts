@@ -108,6 +108,7 @@ export const t = {
     namePlaceholder: "例：白玫瑰美白精萃",
     summary: "簡短介紹",
     summaryPlaceholder: "一句話介紹這個商品（選填）",
+    summaryHint: "顯示在商品詳情頁的商品名稱下方，以及商品卡片。建議寫重點資訊並簡短，最多 300 字。",
     description: "商品說明",
     category: "分類",
     selectCategory: "選擇分類",

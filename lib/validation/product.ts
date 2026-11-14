@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { t } from "@/lib/i18n/admin";
 import { SLUG_PATTERN } from "@/lib/slug";
-import { hasAnyText, localizedRichTextSchema, localizedTextSchema } from "./localized";
+import { hasAnyText, localizedRichTextSchema, localizedTextSchema, localizedTextSchemaWithMax } from "./localized";
 
 export const productImageSchema = z.object({
   url: z.string().min(1).max(2000),
@@ -14,10 +14,14 @@ export const productVideoSchema = z.object({
   title: z.string().trim().max(200).default(""),
 });
 
+/** Character limits shown as counters in the form */
+export const PRODUCT_LIMITS = { summary: 300 } as const;
+const SUMMARY_MAX = PRODUCT_LIMITS.summary;
+
 export const productFormSchema = z.object({
   id: z.uuid().optional(),
   name: localizedTextSchema.refine(hasAnyText, { message: t.products.nameRequired }),
-  summary: localizedTextSchema,
+  summary: localizedTextSchemaWithMax(SUMMARY_MAX),
   description: localizedRichTextSchema,
   slug: z
     .string()
