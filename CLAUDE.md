@@ -21,6 +21,8 @@
 - 公開側の商品クエリは `productsCacheLife()` で cacheLife を決める（予約中の商品があれば `minutes`、なければ `hours`）。1 つの `use cache` 関数内で cacheLife は 1 回だけ呼ぶ
 - `loading.tsx` のある公開ページでは `notFound()` が Suspense 内で起きるため HTTP ステータスは 200 のまま。e2e で存在チェックをするときは本文の内容で判定する
 - クライアントからも使う定数（商品ラベル `lib/product-badges.ts`、公開状態 `lib/product-visibility.ts`）は `db/schema` に置かず `lib/` に置き、schema 側がそれを import する（drizzle をクライアントに持ち込まないため）
+- アップロードは `/api/upload` が `media` テーブルに登録する（媒體庫 `/management/media`）。商品側は URL で参照するだけなので、商品削除でファイルを消さない。ファイルの削除は `actions/media.ts` の `deleteMedia`（使用中なら拒否）。商品フォームの画像欄は `MediaPickerDialog` で既存画像を選べる
+- 管理用タグは `products.tags`（text[]、公開側には出さない）。候補は `listProductTags()`、入力 UI は `TagsField`
 - 商品フォームは 5 タブ＋上下の固定保存バー。項目を増やすときは `TAB_FIELDS`（product-form.tsx）にフィールド名を登録するとエラー時にそのタブへ切り替わる。`LocalizedField` は `max` で字数カウンタ、`locale`/`onLocaleChange` で言語タブを外から制御できる
 - スキーマ変更は `pnpm db:generate` → 生成 SQL を確認（データ移行が要るなら UPDATE を挟む）→ `pnpm db:migrate`。generate が列の作成／リネームを聞いてくる場合は TTY が要る
 - 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白・紺・水色、Lora＋Libre Franklin、長方形ボタン、中央揃え）。shadcn のトークンは管理画面専用
