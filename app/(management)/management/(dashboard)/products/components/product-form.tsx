@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TrashIcon } from "lucide-react";
+import { ExternalLinkIcon, LinkIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { Controller, type Control, type FieldErrors, useForm } from "react-hook-form";
@@ -23,12 +23,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Category } from "@/db/schema";
 import { PRODUCT_BADGES, type ProductBadge } from "@/lib/product-badges";
+import type { ProductVisibility } from "@/lib/product-visibility";
+import { publicProductUrl } from "@/lib/public-url";
 import { t } from "@/lib/i18n/admin";
 import { DEFAULT_LOCALE, emptyLocalizedText, type Locale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import type { ProductWithMedia } from "@/lib/queries/products";
 import { cn } from "@/lib/utils";
 import { PRODUCT_LIMITS, productFormSchema, type ProductFormInput } from "@/lib/validation/product";
+import { VISIBILITY_ITEMS, VisibilityDot } from "./visibility-select";
 
 const NONE = "__none__";
 
@@ -40,7 +43,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   media: ["images", "videos"],
   category: ["categoryId", "volume"],
   seo: ["slug", "seoTitle", "seoDescription"],
-  settings: ["externalUrl", "sortOrder", "isFeatured", "isPublished", "badge"],
+  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "badge"],
 };
 
 const TABS: Array<{ key: TabKey; label: string }> = [
@@ -88,18 +91,34 @@ function SaveBar({
       <div className="ml-auto flex items-center gap-3">
         <Controller
           control={control}
-          name="isPublished"
-          render={({ field }) => (
-            <div className="flex items-center gap-2">
-              <span className="font-medium">{t.products.isPublished}</span>
-              <Switch
-                checked={field.value ?? false}
-                onCheckedChange={field.onChange}
-                disabled={pending}
-                aria-label={t.products.isPublished}
-              />
-            </div>
-          )}
+          name="visibility"
+          render={({ field }) => {
+            const current = (field.value ?? "draft") as ProductVisibility;
+            return (
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{t.products.visibility}</span>
+                <Select
+                  items={VISIBILITY_ITEMS}
+                  value={current}
+                  onValueChange={(v) => v && field.onChange(v as ProductVisibility)}
+                  disabled={pending}
+                >
+                  <SelectTrigger className="min-w-28" aria-label={t.products.visibility}>
+                    <VisibilityDot visibility={current} />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VISIBILITY_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        <VisibilityDot visibility={item.value} />
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            );
+          }}
         />
         <Button type="button" variant="ghost" disabled={pending} onClick={onCancel}>
           {t.common.cancel}
@@ -146,7 +165,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       categoryId: initialData?.categoryId ?? null,
       volume: initialData?.volume ?? "",
       externalUrl: initialData?.externalUrl ?? "",
-      isPublished: initialData?.isPublished ?? false,
+      visibility: initialData?.visibility ?? "draft",
       isFeatured: initialData?.isFeatured ?? false,
       badge: initialData?.badge ?? null,
       sortOrder: initialData?.sortOrder ?? 0,
@@ -205,6 +224,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
   const seoTitleValue = form.watch("seoTitle") ?? emptyLocalizedText();
   const seoDescriptionValue = form.watch("seoDescription") ?? emptyLocalizedText();
   const slugValue = form.watch("slug") ?? "";
+  const productUrl = publicProductUrl(initialData?.slug ?? slugValue);
   const previewTitle = seoTitleValue[seoLocale] || nameValue[seoLocale] || pickText(nameValue, seoLocale);
   const previewDescription =
     seoDescriptionValue[seoLocale] || summaryValue[seoLocale] || pickText(summaryValue, seoLocale);
@@ -462,6 +482,58 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
             <Card>
               <CardContent>
                 <FieldGroup className="max-w-xl">
+                  <Field>
+                    <FieldLabel>{t.products.visibility}</FieldLabel>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      {VISIBILITY_ITEMS.map((item) => (
+                        <li key={item.value} className="flex items-start gap-2">
+                          <span className="mt-1.5 flex shrink-0">
+                            <VisibilityDot visibility={item.value} />
+                          </span>
+                          <span>
+                            <span className="font-medium text-foreground">{item.label}</span>：{t.products.visibilityHints[item.value]}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Field>
+
+                  <Field>
+                    <FieldLabel>{t.products.productUrl}</FieldLabel>
+                    {initialData ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <code className="min-w-0 flex-1 truncate rounded-md border bg-muted/40 px-2 py-1.5 text-xs" title={productUrl}>
+                          {productUrl}
+                        </code>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            await navigator.clipboard.writeText(productUrl);
+                            toast.success(t.common.copied);
+                          }}
+                        >
+                          <LinkIcon />
+                          {t.products.copyUrl}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          nativeButton={false}
+                          render={<a href={productUrl} target="_blank" rel="noreferrer" />}
+                        >
+                          <ExternalLinkIcon />
+                          {t.products.openUrl}
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{t.products.productUrlAfterSave}</p>
+                    )}
+                    <FieldDescription>{t.products.productUrlHint}</FieldDescription>
+                  </Field>
+
                   <Controller
                     control={form.control}
                     name="isFeatured"

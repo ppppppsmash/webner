@@ -26,10 +26,9 @@ async function ProductsContent() {
           .join(" › ")
       : "",
     volume: p.volume ?? "",
-    isPublished: p.isPublished,
+    visibility: p.visibility,
     isFeatured: p.isFeatured,
     badge: p.badge ? t.products.badges[p.badge] : null,
-    status: p.isPublished ? "published" : "draft",
     sortOrder: p.sortOrder,
     updatedAt: formatDateTime(p.updatedAt),
   }));

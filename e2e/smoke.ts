@@ -98,10 +98,11 @@ async function main() {
 
     // category select + volume (分類與規格 tab), publish switch in the save bar
     await page.getByRole("tab", { name: "分類與規格" }).click();
-    await page.getByRole("combobox").first().click();
+    await page.locator('[data-slot="tabs-content"]:not([hidden])').getByRole("combobox").first().click();
     await page.getByRole("option", { name: `測試分類 ${stamp}` }).click();
     await page.fill("#volume", "100ml");
-    await page.getByRole("switch").first().click(); // isPublished
+    await page.getByRole("combobox", { name: "狀態" }).first().click(); // visibility in the save bar
+    await page.getByRole("option", { name: "公開" }).click();
     await shot(page, "04-product-form");
 
     await page.getByRole("button", { name: "建立" }).first().click();
@@ -109,6 +110,9 @@ async function main() {
     await page.getByText("商品已建立").waitFor();
     const productUrl = page.url();
     log(`product created: ${productUrl}`);
+    await page.getByRole("tab", { name: "網址與 SEO" }).click();
+    const productSlug = await page.inputValue("#slug");
+    if (!productSlug) throw new Error("slug not generated");
 
     // reload edit page: data persisted?
     await page.goto(productUrl);
@@ -124,13 +128,17 @@ async function main() {
     log("product persisted (name, image, rich text)");
     await shot(page, "05-product-edit");
 
-    // list shows product + publish switch
+    // list shows product + inline visibility select (公開 → 隱藏)
     await page.goto(`${BASE_URL}/management/products`);
     await page.getByText(`測試商品 ${stamp}`).waitFor();
     const row = page.getByRole("row").filter({ hasText: `測試商品 ${stamp}` });
-    await row.getByRole("switch").click();
-    await row.getByText("草稿").waitFor();
-    log("publish switch toggled");
+    await row.getByRole("combobox", { name: "狀態" }).click();
+    await page.getByRole("option", { name: "隱藏" }).click();
+    await row.getByRole("combobox", { name: "狀態" }).filter({ hasText: "隱藏" }).waitFor();
+    // hidden product is still reachable by direct URL on the public site
+    const hiddenRes = await page.request.get(`${BASE_URL}/de/products/${productSlug}`);
+    if (hiddenRes.status() !== 200) throw new Error(`hidden product not reachable: ${hiddenRes.status()}`);
+    log("visibility changed to hidden, direct URL still works");
     await shot(page, "06-products-list");
 
     // delete product via row menu

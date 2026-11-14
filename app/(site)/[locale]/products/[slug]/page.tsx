@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/products
     title,
     description,
     openGraph: { title, description, images: image ? [{ url: image }] : undefined },
+    robots: product.visibility === "hidden" ? { index: false, follow: false } : undefined,
   };
 }
 

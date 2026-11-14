@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { t } from "@/lib/i18n/admin";
 import { ProductCellActions } from "./cell-actions";
-import { PublishSwitch } from "./publish-switch";
+import { PRODUCT_VISIBILITIES, type ProductVisibility } from "@/lib/product-visibility";
+import { VisibilitySelect } from "./visibility-select";
 
 export type ProductColumn = {
   id: string;
@@ -20,9 +21,8 @@ export type ProductColumn = {
   imageUrl: string | null;
   category: string;
   volume: string;
-  isPublished: boolean;
+  visibility: ProductVisibility;
   isFeatured: boolean;
-  status: "published" | "draft";
   badge: string | null;
   sortOrder: number;
   updatedAt: string;
@@ -71,9 +71,9 @@ const columns: ColumnDef<ProductColumn>[] = [
       ),
   },
   {
-    accessorKey: "status",
-    header: t.products.status,
-    cell: ({ row }) => <PublishSwitch id={row.original.id} isPublished={row.original.isPublished} />,
+    accessorKey: "visibility",
+    header: t.products.visibility,
+    cell: ({ row }) => <VisibilitySelect id={row.original.id} visibility={row.original.visibility} />,
   },
   {
     accessorKey: "isFeatured",
@@ -105,11 +105,11 @@ const columns: ColumnDef<ProductColumn>[] = [
   },
 ];
 
-type Filter = "all" | "published" | "draft";
+type Filter = "all" | ProductVisibility;
 
 export function ProductsTable({ data }: { data: ProductColumn[] }) {
   const [filter, setFilter] = useState<Filter>("all");
-  const filtered = useMemo(() => (filter === "all" ? data : data.filter((d) => d.status === filter)), [data, filter]);
+  const filtered = useMemo(() => (filter === "all" ? data : data.filter((d) => d.visibility === filter)), [data, filter]);
 
   return (
     <DataTable
@@ -121,8 +121,11 @@ export function ProductsTable({ data }: { data: ProductColumn[] }) {
         <Tabs value={filter} onValueChange={(v) => setFilter(v as Filter)}>
           <TabsList>
             <TabsTrigger value="all">{t.products.filterAll}</TabsTrigger>
-            <TabsTrigger value="published">{t.products.filterPublished}</TabsTrigger>
-            <TabsTrigger value="draft">{t.products.filterDraft}</TabsTrigger>
+            {PRODUCT_VISIBILITIES.map((v) => (
+              <TabsTrigger key={v} value={v}>
+                {t.products.visibilityLabels[v]}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </Tabs>
       }

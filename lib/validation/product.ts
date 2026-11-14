@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PRODUCT_BADGES } from "@/lib/product-badges";
+import { PRODUCT_VISIBILITIES } from "@/lib/product-visibility";
 import { t } from "@/lib/i18n/admin";
 import { SLUG_PATTERN } from "@/lib/slug";
 import { hasAnyText, localizedRichTextSchema, localizedTextSchema, localizedTextSchemaWithMax } from "./localized";
@@ -40,7 +41,7 @@ export const productFormSchema = z.object({
     .max(2000)
     .refine((v) => v === "" || /^https?:\/\//.test(v), { message: "URL" })
     .default(""),
-  isPublished: z.boolean().default(false),
+  visibility: z.enum(PRODUCT_VISIBILITIES).default("draft"),
   isFeatured: z.boolean().default(false),
   badge: z.enum(PRODUCT_BADGES).nullable().default(null),
   sortOrder: z.number().int().min(0).max(100000).default(0),

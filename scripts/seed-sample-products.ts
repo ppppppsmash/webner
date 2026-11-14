@@ -197,7 +197,7 @@ async function main() {
           categoryId: cat?.id ?? null,
           volume: s.volume,
           externalUrl: "https://www.japanaceshop.com/categories/webner",
-          isPublished: true,
+          visibility: "published",
           isFeatured: Boolean(s.featured),
           sortOrder: i,
         })

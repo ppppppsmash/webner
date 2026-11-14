@@ -64,8 +64,8 @@ async function DashboardContent() {
                         .join(" · ")}
                     </span>
                   </div>
-                  <Badge variant={p.isPublished ? "default" : "outline"}>
-                    {p.isPublished ? t.products.statusPublished : t.products.statusDraft}
+                  <Badge variant={p.visibility === "published" ? "default" : p.visibility === "hidden" ? "secondary" : "outline"}>
+                    {t.products.visibilityLabels[p.visibility]}
                   </Badge>
                 </li>
               ))}

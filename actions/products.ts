@@ -10,6 +10,8 @@ import { requireAdmin } from "@/lib/auth/guard";
 import { t } from "@/lib/i18n/admin";
 import { slugFromName } from "@/lib/slug";
 import { getStorage, keyFromLocalUrl } from "@/lib/storage";
+import type { ProductVisibility } from "@/lib/product-visibility";
+import { PRODUCT_VISIBILITIES } from "@/lib/product-visibility";
 import { compactLocalized, compactRichText } from "@/lib/validation/localized";
 import { productFormSchema, type ProductFormInput } from "@/lib/validation/product";
 
@@ -43,7 +45,7 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
     categoryId: data.categoryId,
     volume: data.volume || null,
     externalUrl: data.externalUrl || null,
-    isPublished: data.isPublished,
+    visibility: data.visibility,
     isFeatured: data.isFeatured,
     badge: data.badge,
     sortOrder: data.sortOrder,
@@ -116,9 +118,10 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
   return ok(undefined);
 }
 
-export async function setProductPublished(id: string, isPublished: boolean): Promise<ActionResult> {
+export async function setProductVisibility(id: string, visibility: ProductVisibility): Promise<ActionResult> {
   await requireAdmin();
-  await db.update(products).set({ isPublished }).where(eq(products.id, id));
+  if (!PRODUCT_VISIBILITIES.includes(visibility)) return fail(t.common.somethingWentWrong);
+  await db.update(products).set({ visibility }).where(eq(products.id, id));
   revalidatePath(PATH);
   updateTag(CACHE_TAGS.products);
   updateTag(CACHE_TAGS.product(id));

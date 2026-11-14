@@ -1,6 +1,6 @@
 "use client";
 
-import { CopyIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { CopyIcon, ExternalLinkIcon, LinkIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { t } from "@/lib/i18n/admin";
+import { publicProductUrl } from "@/lib/public-url";
 import type { ProductColumn } from "./products-table";
 
 export function ProductCellActions({ data }: { data: ProductColumn }) {
@@ -55,6 +56,20 @@ export function ProductCellActions({ data }: { data: ProductColumn }) {
           <DropdownMenuItem onClick={() => router.push(`/management/products/${data.id}`)}>
             <PencilIcon />
             {t.common.edit}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={async () => {
+              await navigator.clipboard.writeText(publicProductUrl(data.slug));
+              toast.success(t.common.copied);
+            }}
+          >
+            <LinkIcon />
+            {t.products.copyUrl}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => window.open(publicProductUrl(data.slug), "_blank", "noopener")}>
+            <ExternalLinkIcon />
+            {t.products.openUrl}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onClick={() => setOpen(true)}>

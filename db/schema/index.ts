@@ -13,6 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { LocalizedText } from "@/lib/i18n/locales";
 import { PRODUCT_BADGES } from "@/lib/product-badges";
+import { PRODUCT_VISIBILITIES } from "@/lib/product-visibility";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -73,6 +74,7 @@ export const categories = pgTable(
 // Products: gallery items. No price, no stock.
 // ---------------------------------------------------------------------------
 export const productBadgeEnum = pgEnum("product_badge", PRODUCT_BADGES);
+export const productVisibilityEnum = pgEnum("product_visibility", PRODUCT_VISIBILITIES);
 
 export const products = pgTable(
   "products",
@@ -93,7 +95,7 @@ export const products = pgTable(
     volume: text("volume"),
     /** Link to the product page on the existing shop (japanaceshop.com). */
     externalUrl: text("external_url"),
-    isPublished: boolean("is_published").notNull().default(false),
+    visibility: productVisibilityEnum("visibility").notNull().default("draft"),
     isFeatured: boolean("is_featured").notNull().default(false),
     badge: productBadgeEnum("badge"),
     sortOrder: integer("sort_order").notNull().default(0),
@@ -101,7 +103,7 @@ export const products = pgTable(
   },
   (t) => [
     index("products_category_idx").on(t.categoryId),
-    index("products_published_idx").on(t.isPublished),
+    index("products_visibility_idx").on(t.visibility),
   ],
 );
 

@@ -1,12 +1,14 @@
 import "server-only";
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
 import { categories, productImages, products, productVideos } from "@/db/schema";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getSiteSettings } from "@/lib/settings";
 
-const PUBLISHED = eq(products.isPublished, true);
+const PUBLISHED = eq(products.visibility, "published");
+/** Detail pages are also reachable for hidden products (direct link only). */
+const REACHABLE = inArray(products.visibility, ["published", "hidden"]);
 
 const productListWith = {
   category: { with: { parent: true as const } },
@@ -53,7 +55,7 @@ export async function getPublishedProductBySlug(slug: string) {
   cacheLife("hours");
   cacheTag(CACHE_TAGS.products);
   const product = await db.query.products.findFirst({
-    where: and(PUBLISHED, eq(products.slug, slug)),
+    where: and(REACHABLE, eq(products.slug, slug)),
     with: {
       category: { with: { parent: true } },
       images: { orderBy: [asc(productImages.sortOrder)] },
