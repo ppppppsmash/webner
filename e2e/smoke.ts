@@ -93,9 +93,20 @@ async function main() {
       page.waitForEvent("filechooser"),
       page.getByRole("button", { name: "上傳圖片" }).click(),
     ]);
-    await chooser.setFiles({ name: "e2e.png", mimeType: "image/png", buffer: png });
+    await chooser.setFiles({ name: `e2e-${stamp}.png`, mimeType: "image/png", buffer: png });
     await page.locator('img[src^="/uploads/images/"]').first().waitFor();
     log("image uploaded");
+
+    // pick an existing image from the media library (the one just uploaded is marked 已加入)
+    await page.getByRole("button", { name: "從媒體庫選擇" }).click();
+    const picker = page.getByRole("dialog");
+    await picker.getByRole("button", { name: `e2e-${stamp}.png` }).waitFor();
+    if (!(await picker.getByRole("button", { name: `e2e-${stamp}.png` }).isDisabled())) throw new Error("uploaded image should be marked as already added");
+    await picker.getByRole("list", { name: "從媒體庫選擇圖片" }).getByRole("button").filter({ hasNot: page.getByText("已加入") }).first().click();
+    await picker.getByRole("button", { name: "加入 1 張" }).click();
+    await picker.waitFor({ state: "hidden" });
+    if ((await page.locator('img[src^="/uploads/images/"]').count()) !== 2) throw new Error("library image was not added");
+    log("image picked from library");
 
     // embed video
     await page.getByPlaceholder("https://www.youtube.com/watch?v=…").fill("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
@@ -191,6 +202,18 @@ async function main() {
     await page.getByRole("alertdialog").getByRole("button", { name: "刪除" }).click();
     await page.getByText("商品已刪除").waitFor();
     log("product deleted");
+
+    // media library: uploaded file survives product deletion, is unused, and can be deleted there
+    await page.goto(`${BASE_URL}/management/media`);
+    await page.getByPlaceholder("搜尋檔名").fill(`e2e-${stamp}.png`);
+    const card = page.getByTestId("media-card").filter({ hasText: `e2e-${stamp}.png` });
+    await card.getByText("未使用").waitFor();
+    await card.getByRole("button", { name: `刪除 e2e-${stamp}.png` }).click();
+    await page.getByRole("alertdialog").getByRole("button", { name: "刪除" }).click();
+    await page.getByText("檔案已刪除").waitFor();
+    await card.waitFor({ state: "hidden" });
+    await shot(page, "06-media");
+    log("media library lists uploads and deletes unused files");
 
     // delete category
     await page.goto(`${BASE_URL}/management/categories`);

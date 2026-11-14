@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon, ImagePlusIcon, StarIcon, TrashIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, ImagePlusIcon, ImagesIcon, StarIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { MediaPickerDialog } from "@/components/management/media-picker-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { t } from "@/lib/i18n/admin";
@@ -22,6 +23,7 @@ interface ImagesFieldProps {
 export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const move = (from: number, to: number) => {
     if (to < 0 || to >= value.length) return;
@@ -125,10 +127,20 @@ export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
         </ul>
       ) : null}
 
-      <div className="flex items-center gap-3">
+      <MediaPickerDialog
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        exclude={value.map((v) => v.url)}
+        onPick={(urls) => onChange([...value, ...urls.filter((u) => !value.some((v) => v.url === u)).map((url) => ({ url, alt: "" }))])}
+      />
+      <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" disabled={disabled || progress !== null} onClick={() => fileInput.current?.click()}>
           <ImagePlusIcon data-icon="inline-start" />
           {t.products.uploadImage}
+        </Button>
+        <Button type="button" variant="outline" disabled={disabled || progress !== null} onClick={() => setPickerOpen(true)}>
+          <ImagesIcon data-icon="inline-start" />
+          {t.media.pickFromLibrary}
         </Button>
         {progress ? (
           <span className="text-xs text-muted-foreground">
