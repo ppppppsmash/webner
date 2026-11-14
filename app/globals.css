@@ -378,34 +378,3 @@
 .tiptap:focus {
   outline: none;
 }
-
-/* Management page titles */
-@keyframes page-title-reveal {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-@keyframes page-title-rule {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-.page-title {
-  animation: page-title-reveal 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) both;
-}
-.page-title-rule {
-  transform-origin: left;
-  animation: page-title-rule 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) 0.3s both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .page-title,
-  .page-title-rule {
-    animation: none;
-  }
-}
