@@ -30,6 +30,7 @@ async function ProductsContent() {
     scheduledAt: p.visibility === "published" && p.publishAt && p.publishAt > new Date() ? formatDateTime(p.publishAt) : null,
     isFeatured: p.isFeatured,
     badge: p.badge ? t.products.badges[p.badge] : null,
+    tags: p.tags,
     sortOrder: p.sortOrder,
     updatedAt: formatDateTime(p.updatedAt),
   }));

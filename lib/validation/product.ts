@@ -17,7 +17,7 @@ export const productVideoSchema = z.object({
 });
 
 /** Character limits shown as counters in the form */
-export const PRODUCT_LIMITS = { summary: 300, seoTitle: 60, seoDescription: 160 } as const;
+export const PRODUCT_LIMITS = { summary: 300, seoTitle: 60, seoDescription: 160, tag: 30, tags: 20 } as const;
 const SUMMARY_MAX = PRODUCT_LIMITS.summary;
 
 export const productFormSchema = z.object({
@@ -50,6 +50,8 @@ export const productFormSchema = z.object({
     .default(""),
   isFeatured: z.boolean().default(false),
   badge: z.enum(PRODUCT_BADGES).nullable().default(null),
+  /** Management-only tags (search / grouping) */
+  tags: z.array(z.string().trim().min(1).max(PRODUCT_LIMITS.tag)).max(PRODUCT_LIMITS.tags).default([]),
   sortOrder: z.number().int().min(0).max(100000).default(0),
   /** Ordered; first = main image */
   images: z.array(productImageSchema).max(30).default([]),

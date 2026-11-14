@@ -25,6 +25,7 @@ export type ProductColumn = {
   scheduledAt: string | null;
   isFeatured: boolean;
   badge: string | null;
+  tags: string[];
   sortOrder: number;
   updatedAt: string;
 };
@@ -46,7 +47,9 @@ const columns: ColumnDef<ProductColumn>[] = [
     ),
   },
   {
-    accessorKey: "name",
+    id: "name",
+    // Search box matches names in both languages and the management tags.
+    accessorFn: (row) => [row.name, row.nameDe, ...row.tags].join(" "),
     header: t.products.name,
     cell: ({ row }) => (
       <div className="flex flex-col">
@@ -58,6 +61,15 @@ const columns: ColumnDef<ProductColumn>[] = [
             .filter(Boolean)
             .join(" · ")}
         </span>
+        {row.original.tags.length ? (
+          <span className="mt-1 flex flex-wrap gap-1">
+            {row.original.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="h-5 px-1.5 text-[11px] font-normal text-muted-foreground">
+                {tag}
+              </Badge>
+            ))}
+          </span>
+        ) : null}
       </div>
     ),
   },

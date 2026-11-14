@@ -13,6 +13,7 @@ import { LocalizedField } from "@/components/management/localized-field";
 import { PageHeader } from "@/components/management/page-header";
 import { type RelatedProductOption, RelatedProductsField } from "@/components/management/related-products-field";
 import { RichTextEditor } from "@/components/management/rich-text-editor";
+import { type TagOption, TagsField } from "@/components/management/tags-field";
 import { VideosField } from "@/components/management/videos-field";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,7 +52,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   media: ["images", "videos"],
   category: ["categoryId", "volume", "relatedIds"],
   seo: ["slug", "seoTitle", "seoDescription"],
-  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge"],
+  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge", "tags"],
 };
 
 const TABS: Array<{ key: TabKey; label: string }> = [
@@ -73,6 +74,8 @@ interface ProductFormProps {
   initialData: ProductWithMedia | null;
   categories: Array<Category & { depth: number }>;
   productOptions: RelatedProductOption[];
+  /** Existing management tags for suggestions */
+  tagOptions: TagOption[];
 }
 
 /** SHOPLINE-style save bar: hint, publish switch, cancel and save. Rendered above (sticky) and below the form. */
@@ -140,7 +143,7 @@ function SaveBar({
   );
 }
 
-export function ProductForm({ initialData, categories, productOptions }: ProductFormProps) {
+export function ProductForm({ initialData, categories, productOptions, tagOptions }: ProductFormProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<TabKey>("basic");
@@ -178,6 +181,7 @@ export function ProductForm({ initialData, categories, productOptions }: Product
       publishAt: toDateTimeLocal(initialData?.publishAt ?? null),
       isFeatured: initialData?.isFeatured ?? false,
       badge: initialData?.badge ?? null,
+      tags: initialData?.tags ?? [],
       sortOrder: initialData?.sortOrder ?? 0,
       images: initialData?.images.map((i) => ({ url: i.url, alt: i.alt ?? "" })) ?? [],
       videos: initialData?.videos.map((v) => ({ kind: v.kind, url: v.url, title: v.title ?? "" })) ?? [],
@@ -610,6 +614,19 @@ export function ProductForm({ initialData, categories, productOptions }: Product
                           </SelectContent>
                         </Select>
                         <FieldDescription>{t.products.badgeHint}</FieldDescription>
+                        <FieldError errors={[fieldState.error]} />
+                      </Field>
+                    )}
+                  />
+
+                  <Controller
+                    control={form.control}
+                    name="tags"
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid || undefined}>
+                        <FieldLabel>{t.products.tags}</FieldLabel>
+                        <TagsField value={field.value ?? []} onChange={field.onChange} options={tagOptions} disabled={pending} />
+                        <FieldDescription>{t.products.tagsHint}</FieldDescription>
                         <FieldError errors={[fieldState.error]} />
                       </Field>
                     )}

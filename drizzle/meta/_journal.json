@@ -43,6 +43,13 @@
       "when": 1794647502559,
       "tag": "0005_regular_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794655812539,
+      "tag": "0006_clammy_richard_fisk",
+      "breakpoints": true
     }
   ]
 }

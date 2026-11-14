@@ -140,6 +140,10 @@ async function main() {
 
     // scheduled go-live: published + future publishAt must not be reachable yet
     await page.getByRole("tab", { name: "設定" }).click();
+    // management tag: Enter adds a chip
+    await page.getByPlaceholder("輸入標籤後按 Enter 加入").fill(`e2e-tag-${stamp}`);
+    await page.getByPlaceholder("輸入標籤後按 Enter 加入").press("Enter");
+    await page.getByRole("list", { name: "管理標籤" }).getByText(`e2e-tag-${stamp}`).waitFor();
     const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
     const pad = (n: number) => String(n).padStart(2, "0");
     await page.fill(
@@ -164,6 +168,12 @@ async function main() {
     await page.goto(`${BASE_URL}/management/products`);
     await page.getByText(`測試商品 ${stamp}`).waitFor();
     const row = page.getByRole("row").filter({ hasText: `測試商品 ${stamp}` });
+    await row.getByText(`e2e-tag-${stamp}`).waitFor();
+    await page.getByPlaceholder("搜尋商品名稱或管理標籤").fill(`e2e-tag-${stamp}`);
+    await row.waitFor();
+    if ((await page.getByRole("row").count()) !== 2) throw new Error("tag search should match exactly one product row");
+    await page.getByPlaceholder("搜尋商品名稱或管理標籤").fill("");
+    log("management tag saved, shown in list and searchable");
     await row.getByRole("combobox", { name: "狀態" }).click();
     await page.getByRole("option", { name: "隱藏" }).click();
     await row.getByRole("combobox", { name: "狀態" }).filter({ hasText: "隱藏" }).waitFor();

@@ -101,6 +101,8 @@ export const products = pgTable(
     publishAt: timestamp("publish_at", { withTimezone: true }),
     isFeatured: boolean("is_featured").notNull().default(false),
     badge: productBadgeEnum("badge"),
+    /** Internal tags for searching / grouping in the management panel (never shown on the public site) */
+    tags: text("tags").array().notNull().default(sql`'{}'::text[]`),
     sortOrder: integer("sort_order").notNull().default(0),
     ...timestamps,
   },

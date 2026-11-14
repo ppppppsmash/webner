@@ -1,5 +1,5 @@
 import "server-only";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { pickText } from "@/lib/i18n/locales";
 import { productImages, productRelations, products, productVideos } from "@/db/schema";
@@ -40,6 +40,14 @@ export async function listProductOptions(excludeId?: string) {
       nameDe: pickText(r.name, "de"),
       imageUrl: r.images[0]?.url ?? null,
     }));
+}
+
+/** Distinct management tags with usage counts, most used first (for suggestions). */
+export async function listProductTags() {
+  const rows = await db.execute<{ tag: string; n: number }>(
+    sql`select tag, count(*)::int as n from ${products}, unnest(${products.tags}) as tag group by tag order by n desc, tag asc`,
+  );
+  return rows.map((r) => ({ tag: r.tag, count: Number(r.n) }));
 }
 
 export type ProductWithMedia = NonNullable<Awaited<ReturnType<typeof getProduct>>>;

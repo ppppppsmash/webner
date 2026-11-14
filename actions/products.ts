@@ -49,6 +49,7 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
     publishAt: data.publishAt ? new Date(data.publishAt) : null,
     isFeatured: data.isFeatured,
     badge: data.badge,
+    tags: [...new Set(data.tags.map((tag) => tag.trim()).filter(Boolean))],
     sortOrder: data.sortOrder,
   };
 
