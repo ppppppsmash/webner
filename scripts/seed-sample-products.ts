@@ -10,7 +10,7 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { chromium } from "playwright";
 import { db } from "../db";
-import { categories, productImages, products, productVideos } from "../db/schema";
+import { categories, media, productImages, products, productVideos } from "../db/schema";
 import type { LocalizedText } from "../lib/i18n/locales";
 
 type Sample = {
@@ -183,8 +183,13 @@ async function main() {
       for (const [j, tone] of [s.tone, [s.tone[1], s.tone[0]] as [string, string]].entries()) {
         const file = `${s.slug}-${j + 1}.png`;
         await page.setContent(`<html><body style="margin:0">${bottleSvg(s.name.en ?? s.slug, tone, i * 3 + j)}</body></html>`);
-        await page.screenshot({ path: path.join(dir, file), clip: { x: 0, y: 0, width: 1200, height: 1200 } });
-        urls.push(`/uploads/images/samples/${file}`);
+        const shot = await page.screenshot({ path: path.join(dir, file), clip: { x: 0, y: 0, width: 1200, height: 1200 } });
+        const url = `/uploads/images/samples/${file}`;
+        urls.push(url);
+        await db
+          .insert(media)
+          .values({ kind: "image", key: `images/samples/${file}`, url, fileName: file, contentType: "image/png", size: shot.byteLength })
+          .onConflictDoNothing();
       }
 
       const [row] = await db

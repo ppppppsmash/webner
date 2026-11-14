@@ -7,6 +7,8 @@ export interface StoredFile {
   url: string;
   contentType: string;
   size: number;
+  /** Media library row id (set by /api/upload) */
+  id?: string;
 }
 
 export interface StorageDriver {

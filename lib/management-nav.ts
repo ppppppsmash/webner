@@ -1,4 +1,4 @@
-import { FolderTreeIcon, LayoutDashboardIcon, type LucideIcon, PackageIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import { FolderTreeIcon, ImagesIcon, LayoutDashboardIcon, type LucideIcon, PackageIcon, SettingsIcon, UsersIcon } from "lucide-react";
 import { t } from "@/lib/i18n/admin";
 
 export interface NavSubItem {
@@ -33,6 +33,7 @@ export const managementNav: NavItem[] = [
       { title: t.categories.addNew, url: "/management/categories/new" },
     ],
   },
+  { title: t.nav.media, url: "/management/media", icon: ImagesIcon },
   { title: t.nav.admins, url: "/management/admins", icon: UsersIcon },
   { title: t.nav.settings, url: "/management/settings", icon: SettingsIcon },
 ];

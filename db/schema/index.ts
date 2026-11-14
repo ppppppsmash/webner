@@ -163,6 +163,31 @@ export const productRelations = pgTable(
 );
 
 // ---------------------------------------------------------------------------
+// Media library: every uploaded file. Products reference files by URL, so one
+// file can be reused by several products; a file is deleted from the library,
+// never together with a product.
+// ---------------------------------------------------------------------------
+export const mediaKindEnum = pgEnum("media_kind", ["image", "video"]);
+
+export const media = pgTable(
+  "media",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: mediaKindEnum("kind").notNull(),
+    /** Storage key (path inside the bucket / upload dir) */
+    key: text("key").notNull().unique(),
+    /** Public URL as stored in product_images.url / product_videos.url */
+    url: text("url").notNull().unique(),
+    /** Original file name as uploaded */
+    fileName: text("file_name"),
+    contentType: text("content_type").notNull(),
+    size: integer("size").notNull().default(0),
+    createdAt: timestamps.createdAt,
+  },
+  (t) => [index("media_kind_created_idx").on(t.kind, t.createdAt)],
+);
+
+// ---------------------------------------------------------------------------
 // Site settings: simple key/value store (e.g. shop link on/off).
 // ---------------------------------------------------------------------------
 export const siteSettings = pgTable("site_settings", {
@@ -210,3 +235,5 @@ export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type ProductVideo = typeof productVideos.$inferSelect;
 export type ProductRelation = typeof productRelations.$inferSelect;
+export type Media = typeof media.$inferSelect;
+export type MediaKind = (typeof mediaKindEnum.enumValues)[number];

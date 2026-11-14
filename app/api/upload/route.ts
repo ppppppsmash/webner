@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
+import { db } from "@/db";
+import { media } from "@/db/schema";
 import { buildKey, getStorage, UPLOAD_LIMITS, type UploadKind } from "@/lib/storage";
 
 /**
@@ -39,5 +41,10 @@ export async function POST(req: NextRequest) {
 
   const data = new Uint8Array(await file.arrayBuffer());
   const stored = await getStorage().put(buildKey(kind as UploadKind, ext), data, file.type);
-  return Response.json(stored, { status: 201 });
+  // Every upload is registered in the media library so it can be reused by other products.
+  const [row] = await db
+    .insert(media)
+    .values({ kind, key: stored.key, url: stored.url, fileName: file.name || null, contentType: file.type, size: stored.size })
+    .returning({ id: media.id });
+  return Response.json({ ...stored, id: row.id }, { status: 201 });
 }

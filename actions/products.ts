@@ -9,7 +9,6 @@ import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth/guard";
 import { t } from "@/lib/i18n/admin";
 import { slugFromName } from "@/lib/slug";
-import { getStorage, keyFromLocalUrl } from "@/lib/storage";
 import type { ProductVisibility } from "@/lib/product-visibility";
 import { PRODUCT_VISIBILITIES } from "@/lib/product-visibility";
 import { compactLocalized, compactRichText } from "@/lib/validation/localized";
@@ -106,20 +105,9 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
 export async function deleteProduct(id: string): Promise<ActionResult> {
   await requireAdmin();
 
-  const product = await db.query.products.findFirst({
-    where: eq(products.id, id),
-    with: { images: true, videos: true },
-  });
-  if (!product) return ok(undefined);
-
+  // Uploaded files stay in the media library (they may be reused by other products);
+  // they are removed from the library page instead.
   await db.delete(products).where(eq(products.id, id));
-
-  // Best-effort cleanup of uploaded files (local driver only knows /uploads/… URLs).
-  const storage = getStorage();
-  const keys = [...product.images.map((i) => i.url), ...product.videos.filter((v) => v.kind === "file").map((v) => v.url)]
-    .map(keyFromLocalUrl)
-    .filter((k): k is string => Boolean(k));
-  await Promise.allSettled(keys.map((k) => storage.delete(k)));
 
   revalidatePath(PATH);
   updateTag(CACHE_TAGS.products);
