@@ -81,6 +81,10 @@ export const products = pgTable(
     description: localizedJson("description"),
     /** Short tagline per locale (optional) */
     summary: localizedJson("summary"),
+    /** SEO <title> per locale (falls back to name) */
+    seoTitle: localizedJson("seo_title"),
+    /** SEO meta description per locale (falls back to summary) */
+    seoDescription: localizedJson("seo_description"),
     categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
     /** e.g. "100ml" */
     volume: text("volume"),

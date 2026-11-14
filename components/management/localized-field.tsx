@@ -11,6 +11,9 @@ interface LocalizedFieldProps {
   children: (locale: Locale, value: string) => React.ReactNode;
   /** Shows "n / max" for the active locale (counts text without HTML tags). */
   max?: number;
+  /** Controlled active locale (optional) */
+  locale?: Locale;
+  onLocaleChange?: (locale: Locale) => void;
   className?: string;
 }
 
@@ -20,13 +23,25 @@ const plainLength = (v: string) => v.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, 
  * Tab strip (de / en / zh-TW / zh-CN) around any per-locale input.
  * A dot on the tab shows that the locale already has content.
  */
-export function LocalizedField({ value, children, max, className }: LocalizedFieldProps) {
-  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+export function LocalizedField({
+  value,
+  children,
+  max,
+  locale: controlledLocale,
+  onLocaleChange,
+  className,
+}: LocalizedFieldProps) {
+  const [ownLocale, setOwnLocale] = useState<Locale>(DEFAULT_LOCALE);
+  const locale = controlledLocale ?? ownLocale;
+  const setLocale = (l: Locale) => {
+    setOwnLocale(l);
+    onLocaleChange?.(l);
+  };
   const count = max ? plainLength(value[locale] ?? "") : 0;
 
   return (
     <Tabs value={locale} onValueChange={(v) => setLocale(v as Locale)} className={cn("gap-2", className)}>
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <TabsList variant="line" className="h-8">
           {LOCALES.map((l) => {
             const filled = plainLength(value[l] ?? "") > 0;

@@ -15,13 +15,15 @@ export const productVideoSchema = z.object({
 });
 
 /** Character limits shown as counters in the form */
-export const PRODUCT_LIMITS = { summary: 300 } as const;
+export const PRODUCT_LIMITS = { summary: 300, seoTitle: 60, seoDescription: 160 } as const;
 const SUMMARY_MAX = PRODUCT_LIMITS.summary;
 
 export const productFormSchema = z.object({
   id: z.uuid().optional(),
   name: localizedTextSchema.refine(hasAnyText, { message: t.products.nameRequired }),
   summary: localizedTextSchemaWithMax(SUMMARY_MAX),
+  seoTitle: localizedTextSchemaWithMax(PRODUCT_LIMITS.seoTitle),
+  seoDescription: localizedTextSchemaWithMax(PRODUCT_LIMITS.seoDescription),
   description: localizedRichTextSchema,
   slug: z
     .string()

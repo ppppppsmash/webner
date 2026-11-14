@@ -23,7 +23,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Category } from "@/db/schema";
 import { t } from "@/lib/i18n/admin";
-import { emptyLocalizedText, pickText } from "@/lib/i18n/locales";
+import { DEFAULT_LOCALE, emptyLocalizedText, type Locale, pickText } from "@/lib/i18n/locales";
+import { localePath } from "@/lib/i18n/paths";
 import type { ProductWithMedia } from "@/lib/queries/products";
 import { cn } from "@/lib/utils";
 import { PRODUCT_LIMITS, productFormSchema, type ProductFormInput } from "@/lib/validation/product";
@@ -37,7 +38,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   basic: ["name", "summary", "description"],
   media: ["images", "videos"],
   category: ["categoryId", "volume"],
-  seo: ["slug"],
+  seo: ["slug", "seoTitle", "seoDescription"],
   settings: ["externalUrl", "sortOrder", "isFeatured", "isPublished"],
 };
 
@@ -114,6 +115,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<TabKey>("basic");
+  const [seoLocale, setSeoLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(initialData);
 
@@ -131,6 +133,8 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       id: initialData?.id,
       name: { ...emptyLocalizedText(), ...(initialData?.name ?? {}) },
       summary: { ...emptyLocalizedText(), ...(initialData?.summary ?? {}) },
+      seoTitle: { ...emptyLocalizedText(), ...(initialData?.seoTitle ?? {}) },
+      seoDescription: { ...emptyLocalizedText(), ...(initialData?.seoDescription ?? {}) },
       description: { ...emptyLocalizedText(), ...(initialData?.description ?? {}) },
       slug: initialData?.slug ?? "",
       categoryId: initialData?.categoryId ?? null,
@@ -191,6 +195,12 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
   const nameValue = form.watch("name") ?? emptyLocalizedText();
   const summaryValue = form.watch("summary") ?? emptyLocalizedText();
   const descriptionValue = form.watch("description") ?? emptyLocalizedText();
+  const seoTitleValue = form.watch("seoTitle") ?? emptyLocalizedText();
+  const seoDescriptionValue = form.watch("seoDescription") ?? emptyLocalizedText();
+  const slugValue = form.watch("slug") ?? "";
+  const previewTitle = seoTitleValue[seoLocale] || nameValue[seoLocale] || pickText(nameValue, seoLocale);
+  const previewDescription =
+    seoDescriptionValue[seoLocale] || summaryValue[seoLocale] || pickText(summaryValue, seoLocale);
 
   return (
     <>
@@ -377,6 +387,64 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                     <FieldDescription>{t.common.slugHint}</FieldDescription>
                     <FieldError errors={[errors.slug]} />
                   </Field>
+
+                  <Field data-invalid={Boolean(errors.seoTitle) || undefined}>
+                    <FieldLabel>
+                      {t.products.seoTitle}
+                      <span className="font-normal text-muted-foreground">（{t.common.optional}）</span>
+                    </FieldLabel>
+                    <LocalizedField
+                      value={seoTitleValue}
+                      max={PRODUCT_LIMITS.seoTitle}
+                      locale={seoLocale}
+                      onLocaleChange={setSeoLocale}
+                    >
+                      {(locale) => (
+                        <Input {...form.register(`seoTitle.${locale}`)} disabled={pending} placeholder={nameValue[locale] || ""} />
+                      )}
+                    </LocalizedField>
+                    <FieldDescription>{t.products.seoTitleHint}</FieldDescription>
+                    <FieldError errors={[errors.seoTitle as { message?: string } | undefined]} />
+                  </Field>
+
+                  <Field data-invalid={Boolean(errors.seoDescription) || undefined}>
+                    <FieldLabel>
+                      {t.products.seoDescription}
+                      <span className="font-normal text-muted-foreground">（{t.common.optional}）</span>
+                    </FieldLabel>
+                    <LocalizedField
+                      value={seoDescriptionValue}
+                      max={PRODUCT_LIMITS.seoDescription}
+                      locale={seoLocale}
+                      onLocaleChange={setSeoLocale}
+                    >
+                      {(locale) => (
+                        <Textarea
+                          {...form.register(`seoDescription.${locale}`)}
+                          rows={3}
+                          disabled={pending}
+                          placeholder={summaryValue[locale] || ""}
+                        />
+                      )}
+                    </LocalizedField>
+                    <FieldDescription>{t.products.seoDescriptionHint}</FieldDescription>
+                    <FieldError errors={[errors.seoDescription as { message?: string } | undefined]} />
+                  </Field>
+
+                  <div className="rounded-lg border bg-muted/40 p-4">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">{t.products.seoPreview}</p>
+                    {previewTitle ? (
+                      <div className="space-y-0.5">
+                        <p className="truncate text-xs text-muted-foreground">
+                          {localePath(seoLocale, `/products/${slugValue || "…"}`)}
+                        </p>
+                        <p className="truncate text-base font-medium text-blue-700 dark:text-blue-400">{previewTitle}</p>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">{previewDescription}</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{t.products.seoPreviewEmpty}</p>
+                    )}
+                  </div>
                 </FieldGroup>
               </CardContent>
             </Card>

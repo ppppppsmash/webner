@@ -18,10 +18,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/products
   const product = await getPublishedProductBySlug(slug);
   if (!product) return {};
   const image = product.images[0]?.url;
+  const title = product.seoTitle[locale] || pickText(product.name, locale);
+  const description = product.seoDescription[locale] || pickText(product.summary, locale) || undefined;
   return {
-    title: pickText(product.name, locale),
-    description: pickText(product.summary, locale) || undefined,
-    openGraph: image ? { images: [{ url: image }] } : undefined,
+    title,
+    description,
+    openGraph: { title, description, images: image ? [{ url: image }] : undefined },
   };
 }
 

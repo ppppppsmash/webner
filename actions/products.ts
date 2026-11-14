@@ -36,6 +36,8 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
   const values = {
     name,
     summary: compactLocalized(data.summary),
+    seoTitle: compactLocalized(data.seoTitle),
+    seoDescription: compactLocalized(data.seoDescription),
     description: compactRichText(data.description),
     slug,
     categoryId: data.categoryId,

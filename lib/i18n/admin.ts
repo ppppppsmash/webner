@@ -155,6 +155,12 @@ export const t = {
     tabSettings: "設定",
     saveBarHint: "填寫商品資料後，按下「建立」或「儲存變更」儲存。",
     tabHasError: "此分頁有待修正的欄位",
+    seoTitle: "SEO 標題",
+    seoTitleHint: "搜尋結果顯示的標題，建議 60 字以內。留空時使用商品名稱。",
+    seoDescription: "SEO 簡介",
+    seoDescriptionHint: "搜尋結果顯示的說明文字，建議 160 字以內。留空時使用簡短介紹。",
+    seoPreview: "搜尋結果預覽",
+    seoPreviewEmpty: "請先輸入商品名稱，以預覽搜尋結果",
   },
   categories: {
     title: "分類",
