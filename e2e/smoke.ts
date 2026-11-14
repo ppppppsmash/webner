@@ -76,6 +76,12 @@ async function main() {
     await page.keyboard.type("這是商品說明。");
     await page.getByRole("button", { name: "粗體" }).first().click();
     await page.keyboard.type("重點");
+    // HTML source toggle shows the markup and restores the editor
+    await page.getByRole("button", { name: "HTML 原始碼" }).first().click();
+    const source = await page.getByRole("textbox", { name: "HTML 原始碼" }).inputValue();
+    if (!source.includes("<strong>重點</strong>")) throw new Error(`html source unexpected: ${source}`);
+    await page.getByRole("button", { name: "HTML 原始碼" }).first().click();
+    await page.locator(".tiptap").first().waitFor();
 
     // image upload (圖片與影片 tab)
     await page.getByRole("tab", { name: "圖片與影片" }).click();

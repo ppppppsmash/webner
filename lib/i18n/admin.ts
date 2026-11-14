@@ -264,6 +264,8 @@ export const t = {
     undo: "復原",
     redo: "重做",
     linkPrompt: "請輸入連結網址",
+    html: "HTML 原始碼",
+    htmlHint: "可直接貼上從 SHOPLINE 複製的 HTML。切回編輯模式時會整理成支援的格式。",
     placeholder: "輸入商品說明…",
   },
 } as const;

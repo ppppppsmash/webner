@@ -5,6 +5,7 @@ import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
   BoldIcon,
+  CodeIcon,
   Heading2Icon,
   Heading3Icon,
   ImagePlusIcon,
@@ -21,6 +22,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
 import { t } from "@/lib/i18n/admin";
 import { uploadFile, UploadError } from "@/lib/upload-client";
 import { cn } from "@/lib/utils";
@@ -36,6 +38,8 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, disabled, placeholder, className }: RichTextEditorProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [htmlMode, setHtmlMode] = useState(false);
+  const [html, setHtml] = useState("");
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -93,6 +97,24 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
 
   const openImagePicker = () => fileInput.current?.click();
 
+  /** Visual ⇄ HTML source. Leaving HTML mode re-parses the source so the stored HTML stays normalised. */
+  const toggleHtmlMode = () => {
+    if (htmlMode) {
+      editor.commands.setContent(html, { emitUpdate: true });
+      setHtmlMode(false);
+      return;
+    }
+    setHtml(editor.isEmpty ? "" : editor.getHTML());
+    setHtmlMode(true);
+  };
+
+  const onHtmlChange = (next: string) => {
+    setHtml(next);
+    onChange(next);
+  };
+
+  const tools = disabled || htmlMode;
+
   const onPickImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -117,51 +139,78 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
       )}
     >
       <div className="flex flex-wrap items-center gap-0.5 border-b p-1">
-        <ToolButton label={t.editor.bold} active={state.bold} disabled={disabled} onClick={() => editor.chain().focus().toggleBold().run()}>
+        <ToolButton label={t.editor.bold} active={state.bold} disabled={tools} onClick={() => editor.chain().focus().toggleBold().run()}>
           <BoldIcon />
         </ToolButton>
-        <ToolButton label={t.editor.italic} active={state.italic} disabled={disabled} onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <ToolButton label={t.editor.italic} active={state.italic} disabled={tools} onClick={() => editor.chain().focus().toggleItalic().run()}>
           <ItalicIcon />
         </ToolButton>
-        <ToolButton label={t.editor.underline} active={state.underline} disabled={disabled} onClick={() => editor.chain().focus().toggleUnderline().run()}>
+        <ToolButton label={t.editor.underline} active={state.underline} disabled={tools} onClick={() => editor.chain().focus().toggleUnderline().run()}>
           <UnderlineIcon />
         </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        <ToolButton label={t.editor.heading2} active={state.h2} disabled={disabled} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+        <ToolButton label={t.editor.heading2} active={state.h2} disabled={tools} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
           <Heading2Icon />
         </ToolButton>
-        <ToolButton label={t.editor.heading3} active={state.h3} disabled={disabled} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+        <ToolButton label={t.editor.heading3} active={state.h3} disabled={tools} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
           <Heading3Icon />
         </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        <ToolButton label={t.editor.bulletList} active={state.bulletList} disabled={disabled} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <ToolButton label={t.editor.bulletList} active={state.bulletList} disabled={tools} onClick={() => editor.chain().focus().toggleBulletList().run()}>
           <ListIcon />
         </ToolButton>
-        <ToolButton label={t.editor.orderedList} active={state.orderedList} disabled={disabled} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <ToolButton label={t.editor.orderedList} active={state.orderedList} disabled={tools} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           <ListOrderedIcon />
         </ToolButton>
         <Separator orientation="vertical" className="mx-1 h-5!" />
-        <ToolButton label={t.editor.link} active={state.link} disabled={disabled} onClick={setLink}>
+        <ToolButton label={t.editor.link} active={state.link} disabled={tools} onClick={setLink}>
           <Link2Icon />
         </ToolButton>
         {state.link ? (
-          <ToolButton label={t.editor.unlink} disabled={disabled} onClick={() => editor.chain().focus().unsetLink().run()}>
+          <ToolButton label={t.editor.unlink} disabled={tools} onClick={() => editor.chain().focus().unsetLink().run()}>
             <Link2OffIcon />
           </ToolButton>
         ) : null}
-        <ToolButton label={t.editor.image} disabled={disabled || uploading} onClick={openImagePicker}>
+        <ToolButton label={t.editor.image} disabled={tools || uploading} onClick={openImagePicker}>
           <ImagePlusIcon />
         </ToolButton>
         <span className="ml-auto" />
-        <ToolButton label={t.editor.undo} disabled={disabled || !state.canUndo} onClick={() => editor.chain().focus().undo().run()}>
+        <Button
+          type="button"
+          variant={htmlMode ? "secondary" : "ghost"}
+          size="sm"
+          aria-pressed={htmlMode}
+          disabled={disabled}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={toggleHtmlMode}
+        >
+          <CodeIcon />
+          {t.editor.html}
+        </Button>
+        <ToolButton label={t.editor.undo} disabled={tools || !state.canUndo} onClick={() => editor.chain().focus().undo().run()}>
           <UndoIcon />
         </ToolButton>
-        <ToolButton label={t.editor.redo} disabled={disabled || !state.canRedo} onClick={() => editor.chain().focus().redo().run()}>
+        <ToolButton label={t.editor.redo} disabled={tools || !state.canRedo} onClick={() => editor.chain().focus().redo().run()}>
           <RedoIcon />
         </ToolButton>
         <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={onPickImage} />
       </div>
-      <EditorContent editor={editor} />
+      {htmlMode ? (
+        <div className="p-2">
+          <Textarea
+            value={html}
+            onChange={(e) => onHtmlChange(e.target.value)}
+            disabled={disabled}
+            rows={12}
+            spellCheck={false}
+            aria-label={t.editor.html}
+            className="min-h-48 font-mono text-xs"
+          />
+          <p className="mt-1 text-xs text-muted-foreground">{t.editor.htmlHint}</p>
+        </div>
+      ) : (
+        <EditorContent editor={editor} />
+      )}
     </div>
   );
 }
