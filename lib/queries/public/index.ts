@@ -1,8 +1,8 @@
 import "server-only";
-import { and, asc, count, desc, eq, gt, isNull, lte, ne, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray, isNull, lte, ne, or, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
-import { categories, productImages, products, productVideos } from "@/db/schema";
+import { categories, productImages, productRelations, products, productVideos } from "@/db/schema";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getSiteSettings } from "@/lib/settings";
 
@@ -83,6 +83,22 @@ export async function getRelatedProducts(productId: string, categoryId: string |
   "use cache";
   await productsCacheLife();
   cacheTag(CACHE_TAGS.products);
+  cacheTag(CACHE_TAGS.product(productId));
+  // Manual picks first (keeping their order), only those currently visible.
+  const picks = await db.query.productRelations.findMany({
+    where: eq(productRelations.productId, productId),
+    orderBy: [asc(productRelations.sortOrder)],
+    columns: { relatedId: true },
+  });
+  if (picks.length) {
+    const ids = picks.map((p) => p.relatedId);
+    const rows = await db.query.products.findMany({
+      where: and(PUBLISHED, inArray(products.id, ids)),
+      with: productListWith,
+    });
+    const order = new Map(ids.map((id, i) => [id, i]));
+    return rows.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)).slice(0, limit);
+  }
   if (!categoryId) return [];
   return db.query.products.findMany({
     where: and(PUBLISHED, eq(products.categoryId, categoryId), ne(products.id, productId)),

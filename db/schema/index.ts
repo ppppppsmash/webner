@@ -7,6 +7,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uuid,
@@ -144,6 +145,21 @@ export const productVideos = pgTable(
   (t) => [index("product_videos_product_idx").on(t.productId)],
 );
 
+/** Manually picked related products (max 4 in the UI). Falls back to same-category products when empty. */
+export const productRelations = pgTable(
+  "product_relations",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    relatedId: uuid("related_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.productId, t.relatedId] }), index("product_relations_product_idx").on(t.productId)],
+);
+
 // ---------------------------------------------------------------------------
 // Site settings: simple key/value store (e.g. shop link on/off).
 // ---------------------------------------------------------------------------
@@ -170,6 +186,12 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, { fields: [products.categoryId], references: [categories.id] }),
   images: many(productImages),
   videos: many(productVideos),
+  related: many(productRelations, { relationName: "relationOwner" }),
+}));
+
+export const productRelationsRelations = relations(productRelations, ({ one }) => ({
+  product: one(products, { fields: [productRelations.productId], references: [products.id], relationName: "relationOwner" }),
+  relatedProduct: one(products, { fields: [productRelations.relatedId], references: [products.id], relationName: "relationTarget" }),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -185,3 +207,4 @@ export type Category = typeof categories.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type ProductImage = typeof productImages.$inferSelect;
 export type ProductVideo = typeof productVideos.$inferSelect;
+export type ProductRelation = typeof productRelations.$inferSelect;

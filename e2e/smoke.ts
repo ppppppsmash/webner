@@ -107,6 +107,10 @@ async function main() {
     await page.locator('[data-slot="tabs-content"]:not([hidden])').getByRole("combobox").first().click();
     await page.getByRole("option", { name: `測試分類 ${stamp}` }).click();
     await page.fill("#volume", "100ml");
+    // related products: pick the first candidate, chip appears with counter 1 / 4
+    const relatedList = page.locator('[data-slot="tabs-content"]:not([hidden]) ul.max-h-56');
+    await relatedList.getByRole("button").first().click();
+    await page.getByText("1 / 4").waitFor();
     await page.getByRole("combobox", { name: "狀態" }).first().click(); // visibility in the save bar
     await page.getByRole("option", { name: "公開" }).click();
     await shot(page, "04-product-form");
@@ -147,6 +151,8 @@ async function main() {
     // not-found renders inside the streamed shell (status stays 200), so check the body instead
     const scheduledHtml = await (await page.request.get(`${BASE_URL}/de/products/${productSlug}`)).text();
     if (scheduledHtml.includes(`E2E Produkt ${stamp}`)) throw new Error("scheduled product is visible before its publish time");
+    // let the first toast disappear so the next wait sees the new one
+    await page.getByText("商品已更新").waitFor({ state: "hidden", timeout: 15000 });
     await page.getByRole("button", { name: "清除" }).click();
     await page.getByRole("button", { name: "儲存變更" }).first().click();
     await page.getByText("商品已更新").waitFor();

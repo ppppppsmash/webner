@@ -11,6 +11,7 @@ import { AlertModal } from "@/components/management/alert-modal";
 import { ImagesField } from "@/components/management/images-field";
 import { LocalizedField } from "@/components/management/localized-field";
 import { PageHeader } from "@/components/management/page-header";
+import { type RelatedProductOption, RelatedProductsField } from "@/components/management/related-products-field";
 import { RichTextEditor } from "@/components/management/rich-text-editor";
 import { VideosField } from "@/components/management/videos-field";
 import { Button } from "@/components/ui/button";
@@ -48,7 +49,7 @@ type TabKey = "basic" | "media" | "category" | "seo" | "settings";
 const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   basic: ["name", "summary", "description"],
   media: ["images", "videos"],
-  category: ["categoryId", "volume"],
+  category: ["categoryId", "volume", "relatedIds"],
   seo: ["slug", "seoTitle", "seoDescription"],
   settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge"],
 };
@@ -71,6 +72,7 @@ function firstTabWithError(errors: FieldErrors<ProductFormInput>): TabKey | null
 interface ProductFormProps {
   initialData: ProductWithMedia | null;
   categories: Array<Category & { depth: number }>;
+  productOptions: RelatedProductOption[];
 }
 
 /** SHOPLINE-style save bar: hint, publish switch, cancel and save. Rendered above (sticky) and below the form. */
@@ -138,7 +140,7 @@ function SaveBar({
   );
 }
 
-export function ProductForm({ initialData, categories }: ProductFormProps) {
+export function ProductForm({ initialData, categories, productOptions }: ProductFormProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<TabKey>("basic");
@@ -179,6 +181,7 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
       sortOrder: initialData?.sortOrder ?? 0,
       images: initialData?.images.map((i) => ({ url: i.url, alt: i.alt ?? "" })) ?? [],
       videos: initialData?.videos.map((v) => ({ kind: v.kind, url: v.url, title: v.title ?? "" })) ?? [],
+      relatedIds: initialData?.related.map((r) => r.relatedId) ?? [],
     },
   });
 
@@ -406,6 +409,19 @@ export function ProductForm({ initialData, categories }: ProductFormProps) {
                     <Input id="volume" {...form.register("volume")} disabled={pending} placeholder={t.products.volumePlaceholder} />
                     <FieldError errors={[errors.volume]} />
                   </Field>
+
+                  <Controller
+                    control={form.control}
+                    name="relatedIds"
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid || undefined}>
+                        <FieldLabel>{t.products.related}</FieldLabel>
+                        <RelatedProductsField options={productOptions} value={field.value ?? []} onChange={field.onChange} disabled={pending} />
+                        <FieldDescription>{t.products.relatedHint}</FieldDescription>
+                        <FieldError errors={[fieldState.error as { message?: string } | undefined]} />
+                      </Field>
+                    )}
+                  />
                 </FieldGroup>
               </CardContent>
             </Card>

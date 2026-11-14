@@ -36,6 +36,13 @@
       "when": 1794647251267,
       "tag": "0004_shocking_luckman",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794647502559,
+      "tag": "0005_regular_mesmero",
+      "breakpoints": true
     }
   ]
 }

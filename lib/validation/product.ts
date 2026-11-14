@@ -54,6 +54,8 @@ export const productFormSchema = z.object({
   /** Ordered; first = main image */
   images: z.array(productImageSchema).max(30).default([]),
   videos: z.array(productVideoSchema).max(10).default([]),
+  /** Manually chosen related products (ordered). Empty = automatic. */
+  relatedIds: z.array(z.uuid()).max(4).default([]),
 });
 
 export type ProductFormInput = z.input<typeof productFormSchema>;

@@ -4,7 +4,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { db } from "@/db";
-import { productImages, products, productVideos } from "@/db/schema";
+import { productImages, productRelations, products, productVideos } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth/guard";
 import { t } from "@/lib/i18n/admin";
@@ -58,6 +58,7 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
       await tx.update(products).set(values).where(eq(products.id, productId));
       await tx.delete(productImages).where(eq(productImages.productId, productId));
       await tx.delete(productVideos).where(eq(productVideos.productId, productId));
+      await tx.delete(productRelations).where(eq(productRelations.productId, productId));
     } else {
       const [row] = await tx.insert(products).values(values).returning({ id: products.id });
       productId = row.id;
@@ -83,6 +84,12 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
           title: v.title || null,
           sortOrder: i,
         })),
+      );
+    }
+    const relatedIds = [...new Set(data.relatedIds)].filter((rid) => rid !== productId);
+    if (relatedIds.length) {
+      await tx.insert(productRelations).values(
+        relatedIds.map((rid, i) => ({ productId: productId as string, relatedId: rid, sortOrder: i })),
       );
     }
     return productId as string;
