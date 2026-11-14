@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: LayoutProps<"/management">
       <SidebarInset className="min-h-0">
         <AppHeader />
         <div className="flex flex-1 flex-col">
-          <div className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6 lg:px-6">{children}</div>
+          <div className="w-full flex-1 space-y-6 px-4 py-6 lg:px-6">{children}</div>
         </div>
       </SidebarInset>
     </SidebarProvider>
