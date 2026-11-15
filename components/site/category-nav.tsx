@@ -52,7 +52,7 @@ export function CategoryNav({
   );
 
   return (
-    <nav aria-label={heading} className="min-w-0 lg:sticky lg:top-6">
+    <nav aria-label={heading} className="min-w-0 lg:sticky lg:top-38 lg:self-start">
       <h2 className="footer-title hidden border-b border-line pb-2 lg:block">{heading}</h2>
       <div className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-2 [touch-action:pan-y] [scrollbar-width:none] lg:hidden">
         {chip("all", localePath(locale, "/products"), allLabel, activeSlug === null)}
