@@ -57,6 +57,13 @@
       "when": 1794655948187,
       "tag": "0007_misty_master_mold",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795276145308,
+      "tag": "0008_heavy_leo",
+      "breakpoints": true
     }
   ]
 }

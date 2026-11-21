@@ -17,7 +17,7 @@ export const productVideoSchema = z.object({
 });
 
 /** Character limits shown as counters in the form */
-export const PRODUCT_LIMITS = { summary: 300, seoTitle: 60, seoDescription: 160, tag: 30, tags: 20 } as const;
+export const PRODUCT_LIMITS = { summary: 300, seoTitle: 60, seoDescription: 160, tag: 30, tags: 20, categories: 20 } as const;
 const SUMMARY_MAX = PRODUCT_LIMITS.summary;
 
 export const productFormSchema = z.object({
@@ -33,7 +33,8 @@ export const productFormSchema = z.object({
     .max(80)
     .refine((v) => v === "" || SLUG_PATTERN.test(v), { message: t.common.slugHint })
     .default(""),
-  categoryId: z.uuid().nullable().default(null),
+  /** Ordered; first = main category (breadcrumbs). Empty = uncategorised. */
+  categoryIds: z.array(z.uuid()).max(PRODUCT_LIMITS.categories).default([]),
   volume: z.string().trim().max(100).default(""),
   externalUrl: z
     .string()

@@ -91,7 +91,6 @@ export const products = pgTable(
     seoTitle: localizedJson("seo_title"),
     /** SEO meta description per locale (falls back to summary) */
     seoDescription: localizedJson("seo_description"),
-    categoryId: uuid("category_id").references(() => categories.id, { onDelete: "set null" }),
     /** e.g. "100ml" */
     volume: text("volume"),
     /** Link to the product page on the existing shop (japanaceshop.com). */
@@ -106,10 +105,22 @@ export const products = pgTable(
     sortOrder: integer("sort_order").notNull().default(0),
     ...timestamps,
   },
-  (t) => [
-    index("products_category_idx").on(t.categoryId),
-    index("products_visibility_idx").on(t.visibility),
-  ],
+  (t) => [index("products_visibility_idx").on(t.visibility)],
+);
+
+/** A product can sit in several categories (ordered; the first one is the main category used for breadcrumbs). */
+export const productCategories = pgTable(
+  "product_categories",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.productId, t.categoryId] }), index("product_categories_category_idx").on(t.categoryId)],
 );
 
 export const productImages = pgTable(
@@ -206,14 +217,19 @@ export const categoriesRelations = relations(categories, ({ one, many }) => ({
     relationName: "categoryTree",
   }),
   children: many(categories, { relationName: "categoryTree" }),
-  products: many(products),
+  products: many(productCategories),
 }));
 
-export const productsRelations = relations(products, ({ one, many }) => ({
-  category: one(categories, { fields: [products.categoryId], references: [categories.id] }),
+export const productsRelations = relations(products, ({ many }) => ({
+  categories: many(productCategories),
   images: many(productImages),
   videos: many(productVideos),
   related: many(productRelations, { relationName: "relationOwner" }),
+}));
+
+export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
+  product: one(products, { fields: [productCategories.productId], references: [products.id] }),
+  category: one(categories, { fields: [productCategories.categoryId], references: [categories.id] }),
 }));
 
 export const productRelationsRelations = relations(productRelations, ({ one }) => ({

@@ -1,7 +1,7 @@
 import "server-only";
-import { count, desc, eq } from "drizzle-orm";
+import { asc, count, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { admins, categories, products } from "@/db/schema";
+import { admins, categories, productCategories, products } from "@/db/schema";
 
 export async function getDashboardStats() {
   const [[p], [pub], [c], [a]] = await Promise.all([
@@ -22,6 +22,6 @@ export async function getRecentProducts(limit = 5) {
   return db.query.products.findMany({
     orderBy: [desc(products.updatedAt)],
     limit,
-    with: { category: true },
+    with: { categories: { orderBy: [asc(productCategories.sortOrder)], limit: 1, with: { category: true } } },
   });
 }

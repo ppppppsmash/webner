@@ -4,7 +4,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { db } from "@/db";
-import { productImages, productRelations, products, productVideos } from "@/db/schema";
+import { productCategories, productImages, productRelations, products, productVideos } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
 import { requireAdmin } from "@/lib/auth/guard";
 import { t } from "@/lib/i18n/admin";
@@ -41,7 +41,6 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
     seoDescription: compactLocalized(data.seoDescription),
     description: compactRichText(data.description),
     slug,
-    categoryId: data.categoryId,
     volume: data.volume || null,
     externalUrl: data.externalUrl || null,
     visibility: data.visibility,
@@ -59,6 +58,7 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
       await tx.delete(productImages).where(eq(productImages.productId, productId));
       await tx.delete(productVideos).where(eq(productVideos.productId, productId));
       await tx.delete(productRelations).where(eq(productRelations.productId, productId));
+      await tx.delete(productCategories).where(eq(productCategories.productId, productId));
     } else {
       const [row] = await tx.insert(products).values(values).returning({ id: products.id });
       productId = row.id;
@@ -84,6 +84,12 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
           title: v.title || null,
           sortOrder: i,
         })),
+      );
+    }
+    const categoryIds = [...new Set(data.categoryIds)];
+    if (categoryIds.length) {
+      await tx.insert(productCategories).values(
+        categoryIds.map((cid, i) => ({ productId: productId as string, categoryId: cid, sortOrder: i })),
       );
     }
     const relatedIds = [...new Set(data.relatedIds)].filter((rid) => rid !== productId);

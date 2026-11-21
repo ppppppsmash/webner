@@ -113,10 +113,13 @@ async function main() {
     await page.getByRole("button", { name: "加入影片網址" }).click();
     await page.getByText("外部連結").waitFor();
 
-    // category select + volume (分類與規格 tab), publish switch in the save bar
+    // categories (checkbox tree, several allowed) + volume (分類與規格 tab), publish switch in the save bar
     await page.getByRole("tab", { name: "分類與規格" }).click();
-    await page.locator('[data-slot="tabs-content"]:not([hidden])').getByRole("combobox").first().click();
-    await page.getByRole("option", { name: `測試分類 ${stamp}` }).click();
+    const categoryTab = page.locator('[data-slot="tabs-content"]:not([hidden])');
+    await categoryTab.locator("label", { hasText: `測試分類 ${stamp}` }).click();
+    // a second category: the first ticked one stays the main category
+    await categoryTab.locator("label:has([role=checkbox][aria-checked=false])").first().click();
+    await categoryTab.getByText("主要", { exact: true }).waitFor();
     await page.fill("#volume", "100ml");
     // related products: pick the first candidate, chip appears with counter 1 / 4
     const relatedList = page.locator('[data-slot="tabs-content"]:not([hidden]) ul.max-h-56');
@@ -146,7 +149,10 @@ async function main() {
     await page.getByRole("tab", { name: "圖片與影片" }).click();
     await page.locator('img[src^="/uploads/images/"]').first().waitFor();
     if (!html.includes("<strong>重點</strong>")) throw new Error(`rich text not persisted: ${html}`);
-    log("product persisted (name, image, rich text)");
+    await page.getByRole("tab", { name: "分類與規格" }).click();
+    const tickedCategories = await page.locator('[data-slot="tabs-content"]:not([hidden]) [role=checkbox][aria-checked=true]').count();
+    if (tickedCategories !== 2) throw new Error(`expected 2 categories to persist, got ${tickedCategories}`);
+    log("product persisted (name, image, rich text, 2 categories)");
     await shot(page, "05-product-edit");
 
     // scheduled go-live: published + future publishAt must not be reachable yet

@@ -2,12 +2,12 @@ import "server-only";
 import { asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { pickText } from "@/lib/i18n/locales";
-import { productImages, productRelations, products, productVideos } from "@/db/schema";
+import { productCategories, productImages, productRelations, products, productVideos } from "@/db/schema";
 
 export async function listProducts() {
   return db.query.products.findMany({
     with: {
-      category: { with: { parent: true } },
+      categories: { orderBy: [asc(productCategories.sortOrder)], with: { category: { with: { parent: true } } } },
       images: { orderBy: [asc(productImages.sortOrder)], limit: 1 },
     },
     orderBy: [asc(products.sortOrder), desc(products.updatedAt)],
@@ -21,6 +21,7 @@ export async function getProduct(id: string) {
       images: { orderBy: [asc(productImages.sortOrder)] },
       videos: { orderBy: [asc(productVideos.sortOrder)] },
       related: { orderBy: [asc(productRelations.sortOrder)] },
+      categories: { orderBy: [asc(productCategories.sortOrder)], columns: { categoryId: true } },
     },
   });
 }

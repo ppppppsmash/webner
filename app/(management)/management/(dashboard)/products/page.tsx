@@ -20,11 +20,9 @@ async function ProductsContent() {
     nameDe: pickText(p.name, "de"),
     slug: p.slug,
     imageUrl: p.images[0]?.url ?? null,
-    category: p.category
-      ? [p.category.parent ? pickText(p.category.parent.name, "zh-TW") : null, pickText(p.category.name, "zh-TW")]
-          .filter(Boolean)
-          .join(" › ")
-      : "",
+    category: p.categories
+      .map(({ category: c }) => [c.parent ? pickText(c.parent.name, "zh-TW") : null, pickText(c.name, "zh-TW")].filter(Boolean).join(" › "))
+      .join("、"),
     volume: p.volume ?? "",
     visibility: p.visibility,
     scheduledAt: p.visibility === "published" && p.publishAt && p.publishAt > new Date() ? formatDateTime(p.publishAt) : null,

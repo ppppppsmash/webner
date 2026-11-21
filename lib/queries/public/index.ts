@@ -2,7 +2,7 @@ import "server-only";
 import { and, asc, count, desc, eq, gt, inArray, isNull, lte, ne, or, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { db } from "@/db";
-import { categories, productImages, productRelations, products, productVideos } from "@/db/schema";
+import { categories, productCategories, productImages, productRelations, products, productVideos } from "@/db/schema";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { getSiteSettings } from "@/lib/settings";
 
@@ -23,8 +23,14 @@ async function productsCacheLife() {
   else cacheLife("hours");
 }
 
+/** A product's categories in the order chosen in the form (first = main). */
+const categoriesWith = {
+  orderBy: [asc(productCategories.sortOrder)],
+  with: { category: { with: { parent: true as const } } },
+};
+
 const productListWith = {
-  category: { with: { parent: true as const } },
+  categories: categoriesWith,
   images: { orderBy: [asc(productImages.sortOrder)], limit: 2 },
 };
 
@@ -70,7 +76,7 @@ export async function getPublishedProductBySlug(slug: string) {
   const product = await db.query.products.findFirst({
     where: and(REACHABLE, eq(products.slug, slug)),
     with: {
-      category: { with: { parent: true } },
+      categories: categoriesWith,
       images: { orderBy: [asc(productImages.sortOrder)] },
       videos: { orderBy: [asc(productVideos.sortOrder)] },
     },
@@ -79,7 +85,8 @@ export async function getPublishedProductBySlug(slug: string) {
   return product ?? null;
 }
 
-export async function getRelatedProducts(productId: string, categoryId: string | null, limit = 4) {
+/** Manual picks if any, otherwise products sharing at least one of the given categories. */
+export async function getRelatedProducts(productId: string, categoryIds: string[], limit = 4) {
   "use cache";
   await productsCacheLife();
   cacheTag(CACHE_TAGS.products);
@@ -99,9 +106,13 @@ export async function getRelatedProducts(productId: string, categoryId: string |
     const order = new Map(ids.map((id, i) => [id, i]));
     return rows.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0)).slice(0, limit);
   }
-  if (!categoryId) return [];
+  if (!categoryIds.length) return [];
+  const sameCategory = db
+    .select({ id: productCategories.productId })
+    .from(productCategories)
+    .where(inArray(productCategories.categoryId, categoryIds));
   return db.query.products.findMany({
-    where: and(PUBLISHED, eq(products.categoryId, categoryId), ne(products.id, productId)),
+    where: and(PUBLISHED, inArray(products.id, sameCategory), ne(products.id, productId)),
     with: productListWith,
     orderBy: [asc(products.sortOrder), desc(products.createdAt)],
     limit,
@@ -115,19 +126,24 @@ export async function getCategoryTree() {
   cacheTag(CACHE_TAGS.categories, CACHE_TAGS.products);
   const [rows, published] = await Promise.all([
     db.query.categories.findMany({ orderBy: [asc(categories.sortOrder), asc(categories.createdAt)] }),
-    db.query.products.findMany({ where: PUBLISHED, columns: { categoryId: true } }),
+    db.query.products.findMany({ where: PUBLISHED, columns: { id: true }, with: { categories: { columns: { categoryId: true } } } }),
   ]);
-  const counts = new Map<string, number>();
+  // Sets of product ids, so a product in two sub-categories counts once for their parent.
+  const members = new Map<string, Set<string>>();
   for (const p of published) {
-    if (p.categoryId) counts.set(p.categoryId, (counts.get(p.categoryId) ?? 0) + 1);
+    for (const { categoryId } of p.categories) {
+      if (!members.has(categoryId)) members.set(categoryId, new Set());
+      members.get(categoryId)?.add(p.id);
+    }
   }
   const parents = rows.filter((r) => !r.parentId);
   return parents.map((parent) => {
     const children = rows
       .filter((r) => r.parentId === parent.id)
-      .map((c) => ({ ...c, count: counts.get(c.id) ?? 0 }));
-    const own = counts.get(parent.id) ?? 0;
-    return { ...parent, count: own + children.reduce((n, c) => n + c.count, 0), children };
+      .map((c) => ({ ...c, count: members.get(c.id)?.size ?? 0 }));
+    const all = new Set(members.get(parent.id));
+    for (const c of children) for (const id of members.get(c.id) ?? []) all.add(id);
+    return { ...parent, count: all.size, children };
   });
 }
 
@@ -156,7 +172,7 @@ export async function getProductsByCategory(categoryId: string, childIds: string
     with: productListWith,
     orderBy: [asc(products.sortOrder), desc(products.createdAt)],
   });
-  return rows.filter((p) => p.categoryId && ids.has(p.categoryId));
+  return rows.filter((p) => p.categories.some((c) => ids.has(c.categoryId)));
 }
 
 export async function getPublicSettings() {

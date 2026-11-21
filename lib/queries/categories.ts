@@ -1,7 +1,7 @@
 import "server-only";
 import { asc, count, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { categories, products } from "@/db/schema";
+import { categories, productCategories } from "@/db/schema";
 import type { Category } from "@/db/schema";
 
 export type CategoryRow = Category & { productCount: number; parent: Category | null };
@@ -12,9 +12,9 @@ export async function listCategories(): Promise<CategoryRow[]> {
     orderBy: [asc(categories.sortOrder), asc(categories.createdAt)],
   });
   const counts = await db
-    .select({ categoryId: products.categoryId, n: count() })
-    .from(products)
-    .groupBy(products.categoryId);
+    .select({ categoryId: productCategories.categoryId, n: count() })
+    .from(productCategories)
+    .groupBy(productCategories.categoryId);
   const byId = new Map(counts.map((c) => [c.categoryId, Number(c.n)]));
 
   // Order: parent, then its children, so the list reads as a tree.

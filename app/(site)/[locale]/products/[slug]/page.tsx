@@ -35,17 +35,24 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
   const [product, settings] = await Promise.all([getPublishedProductBySlug(slug), getPublicSettings()]);
   if (!product) notFound();
-  const related = await getRelatedProducts(product.id, product.categoryId, 4);
+  const related = await getRelatedProducts(
+    product.id,
+    product.categories.map((c) => c.categoryId),
+    4,
+  );
 
   const name = pickText(product.name, locale);
   const summary = pickText(product.summary, locale);
   const description = pickText(product.description, locale);
   const shopUrl = settings.showShopLink ? product.externalUrl || settings.shopUrl : null;
 
-  const crumbs = [
-    product.category?.parent ? { slug: product.category.parent.slug, label: pickText(product.category.parent.name, locale) } : null,
-    product.category ? { slug: product.category.slug, label: pickText(product.category.name, locale) } : null,
-  ].filter((c): c is { slug: string; label: string } => Boolean(c));
+  // One path (parent › child) per category; the first category is the main one (breadcrumbs).
+  const paths = product.categories.map(({ category: c }) =>
+    [c.parent ? { slug: c.parent.slug, label: pickText(c.parent.name, locale) } : null, { slug: c.slug, label: pickText(c.name, locale) }].filter(
+      (x): x is { slug: string; label: string } => Boolean(x),
+    ),
+  );
+  const crumbs = paths[0] ?? [];
 
   return (
     <article className="mx-auto max-w-6xl px-6 pt-6 pb-8 md:pt-8">
@@ -77,7 +84,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
                 {d.products.badges[product.badge]}
               </span>
             ) : null}
-            {product.category ? <p className="text-sm text-ink-2">{crumbs.map((c) => c.label).join(" › ")}</p> : null}
+            {crumbs.length ? <p className="text-sm text-ink-2">{crumbs.map((c) => c.label).join(" › ")}</p> : null}
           </div>
           <h1 className="rise mt-2 text-3xl leading-tight text-brand md:text-[2.6rem]" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
             {name}
@@ -95,10 +102,23 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
                 <dd className="font-medium">{product.volume}</dd>
               </>
             ) : null}
-            {product.category ? (
+            {paths.length ? (
               <>
                 <dt className="text-ink-2">{d.products.category}</dt>
-                <dd className="font-medium">{crumbs.map((c) => c.label).join(" › ")}</dd>
+                <dd className="font-medium">
+                  <ul className="space-y-1">
+                    {paths.map((path) => {
+                      const leaf = path[path.length - 1];
+                      return (
+                        <li key={leaf.slug}>
+                          <Link href={localePath(locale, `/categories/${leaf.slug}`)} className="hover:text-brand">
+                            {path.map((c) => c.label).join(" › ")}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </dd>
               </>
             ) : null}
           </dl>

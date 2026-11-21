@@ -24,7 +24,8 @@ export function ProductCard({
 }) {
   const [main, alt] = product.images;
   const name = pickText(product.name, locale);
-  const category = product.category ? pickText(product.category.name, locale) : null;
+  const mainCategory = product.categories[0]?.category;
+  const category = mainCategory ? pickText(mainCategory.name, locale) : null;
   const badge = product.badge ? getDictionary(locale).products.badges[product.badge] : null;
 
   return (

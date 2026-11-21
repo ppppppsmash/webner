@@ -8,6 +8,7 @@ import { Controller, type Control, type FieldErrors, useForm } from "react-hook-
 import { toast } from "sonner";
 import { deleteProduct, saveProduct } from "@/actions/products";
 import { AlertModal } from "@/components/management/alert-modal";
+import { CategoriesField } from "@/components/management/categories-field";
 import { ImagesField } from "@/components/management/images-field";
 import { LocalizedField } from "@/components/management/localized-field";
 import { PageHeader } from "@/components/management/page-header";
@@ -50,7 +51,7 @@ type TabKey = "basic" | "media" | "category" | "seo" | "settings";
 const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   basic: ["name", "summary", "description"],
   media: ["images", "videos"],
-  category: ["categoryId", "volume", "relatedIds"],
+  category: ["categoryIds", "volume", "relatedIds"],
   seo: ["slug", "seoTitle", "seoDescription"],
   settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge", "tags"],
 };
@@ -156,13 +157,7 @@ export function ProductForm({ initialData, categories, productOptions, tagOption
     ...PRODUCT_BADGES.map((b) => ({ value: b, label: t.products.badges[b] })),
   ];
 
-  const categoryItems = [
-    { value: NONE, label: t.products.noCategory },
-    ...categories.map((c) => ({
-      value: c.id,
-      label: `${c.depth ? "— " : ""}${pickText(c.name, "zh-TW")}`,
-    })),
-  ];
+  const categoryOptions = categories.map((c) => ({ id: c.id, label: pickText(c.name, "zh-TW") || c.slug, depth: c.depth }));
 
   const form = useForm<ProductFormInput>({
     resolver: zodResolver(productFormSchema),
@@ -174,7 +169,7 @@ export function ProductForm({ initialData, categories, productOptions, tagOption
       seoDescription: { ...emptyLocalizedText(), ...(initialData?.seoDescription ?? {}) },
       description: { ...emptyLocalizedText(), ...(initialData?.description ?? {}) },
       slug: initialData?.slug ?? "",
-      categoryId: initialData?.categoryId ?? null,
+      categoryIds: initialData?.categories.map((c) => c.categoryId) ?? [],
       volume: initialData?.volume ?? "",
       externalUrl: initialData?.externalUrl ?? "",
       visibility: initialData?.visibility ?? "draft",
@@ -382,28 +377,13 @@ export function ProductForm({ initialData, categories, productOptions, tagOption
                 <FieldGroup className="max-w-xl">
                   <Controller
                     control={form.control}
-                    name="categoryId"
+                    name="categoryIds"
                     render={({ field, fieldState }) => (
                       <Field data-invalid={fieldState.invalid || undefined}>
                         <FieldLabel>{t.products.category}</FieldLabel>
-                        <Select
-                          items={categoryItems}
-                          value={field.value ?? NONE}
-                          onValueChange={(v) => field.onChange(v === NONE || v == null ? null : String(v))}
-                          disabled={pending}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder={t.products.selectCategory} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {categoryItems.map((item) => (
-                              <SelectItem key={item.value} value={item.value}>
-                                {item.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FieldError errors={[fieldState.error]} />
+                        <CategoriesField options={categoryOptions} value={field.value ?? []} onChange={field.onChange} disabled={pending} />
+                        <FieldDescription>{t.products.categoryHint}</FieldDescription>
+                        <FieldError errors={[fieldState.error as { message?: string } | undefined]} />
                       </Field>
                     )}
                   />

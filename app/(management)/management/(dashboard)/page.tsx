@@ -59,7 +59,7 @@ async function DashboardContent() {
                       {pickText(p.name, "zh-TW") || p.slug}
                     </Link>
                     <span className="text-xs text-muted-foreground">
-                      {[p.category ? pickText(p.category.name, "zh-TW") : null, formatDateTime(p.updatedAt)]
+                      {[p.categories[0] ? pickText(p.categories[0].category.name, "zh-TW") : null, formatDateTime(p.updatedAt)]
                         .filter(Boolean)
                         .join(" · ")}
                     </span>

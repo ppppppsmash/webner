@@ -12,7 +12,7 @@ export function CategoryTiles({ d, locale, tree, products }: { d: PublicDictiona
   const parents = tree.filter((c) => c.count > 0 || c.children.length > 0);
   if (!parents.length) return null;
 
-  const imageFor = (ids: Set<string>) => products.find((p) => p.categoryId && ids.has(p.categoryId))?.images[0]?.url ?? null;
+  const imageFor = (ids: Set<string>) => products.find((p) => p.categories.some((c) => ids.has(c.categoryId)))?.images[0]?.url ?? null;
 
   return (
     <section className="bg-paper-2">

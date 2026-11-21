@@ -10,7 +10,7 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 import { chromium } from "playwright";
 import { db } from "../db";
-import { categories, media, productImages, products, productVideos } from "../db/schema";
+import { categories, media, productCategories, productImages, products, productVideos } from "../db/schema";
 import type { LocalizedText } from "../lib/i18n/locales";
 
 type Sample = {
@@ -199,7 +199,6 @@ async function main() {
           name: s.name,
           summary: s.summary,
           description: s.description,
-          categoryId: cat?.id ?? null,
           volume: s.volume,
           externalUrl: "https://www.japanaceshop.com/categories/webner",
           visibility: "published",
@@ -208,6 +207,7 @@ async function main() {
         })
         .returning({ id: products.id });
 
+      if (cat) await db.insert(productCategories).values({ productId: row.id, categoryId: cat.id, sortOrder: 0 });
       await db.insert(productImages).values(urls.map((url, j) => ({ productId: row.id, url, sortOrder: j, isMain: j === 0 })));
       if (s.video) {
         await db.insert(productVideos).values({ productId: row.id, kind: "embed", url: s.video, title: s.name.en ?? null, sortOrder: 0 });
