@@ -6,7 +6,8 @@ export default defineConfig({
   schema: "./db/schema/index.ts",
   out: "./drizzle",
   dbCredentials: {
-    url: process.env.DATABASE_URL ?? "",
+    // Migrations need a direct connection; hosted poolers (Neon "-pooler" host) are for the app only.
+    url: process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL || "",
   },
   strict: true,
   verbose: true,

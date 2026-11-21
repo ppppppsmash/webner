@@ -394,7 +394,7 @@
 - [x] 各言語の翻訳文は依頼元から支給されるか、こちらで翻訳するか → 依頼元が管理画面から 4 言語とも自分で登録する（2026-11-22）
 - [x] SHOPLINE 上に組み込むのか、独立したサイトとして構築するのか → Next.js で独立構築
 - [x] フレームワーク → Next.js（4.3 参照）
-- [ ] インフラ構成の最終決定（推奨案は 4.4: Vercel Pro ＋ Neon ＋ Cloudflare R2）と費用負担者 ※開発の最後に決める
+- [ ] インフラ構成の最終決定（推奨案は 4.4: Vercel Pro ＋ Neon ＋ Cloudflare R2）と費用負担者 ※開発の最後に決める。DB は Neon Free で接続済み（2026-11-22、8. 参照）。画像・動画の保存先（R2 か Neon Object Storage）とホスティングは未決定
 - [ ] 動画のアップロード上限（1ファイルあたりの容量・本数）
 - [ ] 本番ドメイン
 - [x] ギャラリーから既存ショップへのリンク → 置く（将来外す可能性あり）
@@ -443,11 +443,27 @@ pnpm dev                      # http://localhost:3000/management
 | `pnpm dev` / `pnpm build` / `pnpm start` | Next.js |
 | `pnpm typecheck` | `next typegen` ＋ `tsc --noEmit` |
 | `pnpm lint` | ESLint（React Compiler ルール含む） |
-| `pnpm db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle Kit |
+| `pnpm db:generate` / `db:migrate` / `db:push` / `db:studio` | Drizzle Kit（ローカル DB） |
+| `pnpm db:migrate:neon` / `pnpm dev:neon` | Neon に対して実行（下記「Neon への接続」） |
 | `pnpm seed:admin` / `pnpm seed:categories` | 初期データ投入 |
 | `pnpm e2e` | Playwright によるスモークテスト（dev サーバー起動中に実行。ログイン→分類→商品→設定→招待まで一通り操作し、`e2e/output/` にスクリーンショットを保存） |
 
 Google ログインを使う場合は Google Cloud Console で OAuth クライアントを作り、`AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` を `.env` に設定する。リダイレクト URI は `http://localhost:3000/api/auth/callback/google`（本番はドメインを追加）。未設定の間はログイン画面に Google ボタンが出ない。
+
+### Neon（ホスト型 PostgreSQL）への接続（2026-11-22）
+
+Neon の Free プラン（US East / N. Virginia、PostgreSQL 18）にプロジェクトを作成し、マイグレーション 0000〜0008・オーナーアカウント・初期分類 15 件を投入済み。商品は 0 件（画像の保存先が決まってから登録する）。ローカルの Docker DB と `.env` は開発用にそのまま使う。
+
+- 設定は git 管理外の `.env.neon`（`.env` と同じ項目）。`DATABASE_URL` に pooled 接続（ホスト名に `-pooler`）、`DATABASE_URL_UNPOOLED` に direct 接続を書く
+- `drizzle.config.ts` は `DATABASE_URL_UNPOOLED` があればそちらを使う（マイグレーションは direct 接続で流す）。アプリは `DATABASE_URL`（pooled、`prepare: false`）
+
+| コマンド | 内容 |
+|---|---|
+| `pnpm db:migrate:neon` | Neon にマイグレーションを適用 |
+| `pnpm dev:neon` | Neon に繋いで dev サーバーを起動（ローカルの `pnpm dev` とは同時に動かせない） |
+| `npx tsx --env-file=.env.neon scripts/seed-admin.ts` | Neon のオーナーを作成／パスワード再設定（`seed-categories.ts` も同様） |
+
+Free プランの上限（2026-11-22 時点）: DB 1 GB、計算 100 CU 時間／月、転送 5 GB／月、履歴 6 時間。5 分アクセスが無いと自動停止し、次のアクセスで起動待ちが入る（実測: 初回接続 約 1.3 秒、以降 約 0.2 秒）。リージョンは作成後に変更できない（東京リージョンは無い）。
 
 ### 管理画面の構成（2026-11-12 時点）
 
@@ -608,3 +624,4 @@ locale は `de` / `en` / `zh-TW` / `zh-CN`。文言は `lib/i18n/public/*.ts` �
 | 2026-11-22 | 依頼元から SHOPLINE のエクスポート（見本 3 件）と一括登録テンプレートを受領し確認（4.6）。説明文・各言語は依頼元が登録、分類は SHOPLINE を引き継ぐ、取り込み・容量まとめ・規格表は見送りで確定。複数分類を実装（`product_categories`、マイグレーション 0008） |
 | 2026-11-22 | 商品の並び順を数字の手入力からドラッグ＆ドロップに変更。商品一覧の左端の把手で並べ替え、放すと自動保存（キーボード操作、行メニューの「移到最前／移到最後」も可）。番号は自動で振り直し、新規商品は先頭に入る。商品フォームの「排序」欄は削除 |
 | 2026-11-22 | 残りの並び替えもドラッグ＆ドロップに統一: 分類一覧（同じ階層内で移動、番号は 1 / 1.1 形式で表示、新規分類は階層の末尾）、商品フォームの画像（サムネイルをドラッグ）・動画（把手）・相關商品（チップ）。分類フォームの「排序」欄と矢印ボタンは削除 |
+| 2026-11-22 | Neon（Free プラン、US East）に接続。マイグレーション・オーナー・初期分類を投入し、`.env.neon`、`pnpm db:migrate:neon`、`pnpm dev:neon` を追加（8. 参照） |

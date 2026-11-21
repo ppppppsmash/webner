@@ -1,18 +1,19 @@
 import path from "node:path";
 import { LocalStorageDriver } from "./local";
+import { S3StorageDriver, s3ConfigFromEnv } from "./s3";
 import type { StorageDriver, UploadKind } from "./types";
 
 export * from "./types";
 
-// The upload directory is configured by env (development only; production uses R2),
+// The upload directory is configured by env (development only; production uses S3-compatible storage),
 // so the path cannot be statically scoped for the bundler.
 export const UPLOAD_ROOT = path.resolve(/* turbopackIgnore: true */ process.cwd(), process.env.UPLOAD_DIR || "./uploads");
 
 let driver: StorageDriver | undefined;
 
 /**
- * Storage is swapped by env, so production (Cloudflare R2 / S3) only needs a
- * new driver here; the rest of the app talks to this interface.
+ * Storage is swapped by env (STORAGE_DRIVER=local | s3); the rest of the app talks to this interface.
+ * "s3" covers any S3-compatible service: Cloudflare R2, Neon Object Storage, MinIO, AWS S3.
  */
 export function getStorage(): StorageDriver {
   if (driver) return driver;
@@ -22,7 +23,8 @@ export function getStorage(): StorageDriver {
       driver = new LocalStorageDriver(UPLOAD_ROOT);
       return driver;
     case "s3":
-      throw new Error("STORAGE_DRIVER=s3 is not implemented yet (planned for production: Cloudflare R2)");
+      driver = new S3StorageDriver(s3ConfigFromEnv());
+      return driver;
     default:
       throw new Error(`Unknown STORAGE_DRIVER: ${name}`);
   }

@@ -27,6 +27,7 @@
 - 並び替えはすべて dnd-kit のドラッグ＆ドロップ（数字入力・矢印ボタンは置かない）。一覧は `DragHandle`（components/management/drag-handle.tsx）＋ `useOptimistic` で放した時点で保存、フォーム内（画像・動画・相關商品）はフォームの値を入れ替えるだけ。分類は同じ階層内だけ動かせる（`reorderCategories`）。新規分類はその階層の末尾に入る
 - 管理用タグは `products.tags`（text[]、公開側には出さない）。候補は `listProductTags()`、入力 UI は `TagsField`
 - 商品フォームは 5 タブ＋上下の固定保存バー。項目を増やすときは `TAB_FIELDS`（product-form.tsx）にフィールド名を登録するとエラー時にそのタブへ切り替わる。`LocalizedField` は `max` で字数カウンタ、`locale`/`onLocaleChange` で言語タブを外から制御できる
+- Neon（ホスト型 DB）は git 管理外の `.env.neon` で切り替える。スキーマを変えたらローカルの `pnpm db:migrate` に加えて `pnpm db:migrate:neon` も流す。`pnpm dev:neon` で Neon に繋いだ dev サーバー。接続文字列やパスワードは出力・コミットしない
 - スキーマ変更は `pnpm db:generate` → 生成 SQL を確認（データ移行が要るなら UPDATE を挟む）→ `pnpm db:migrate`。generate が列の作成／リネームを聞いてくる場合は TTY が要る
 - 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白・紺・水色、Lora＋Libre Franklin、長方形ボタン、中央揃え）。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ
