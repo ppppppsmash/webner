@@ -21,7 +21,6 @@ async function CategoriesContent() {
     parentId: r.parentId,
     parentName: r.parent ? pickText(r.parent.name, "zh-TW") : null,
     productCount: r.productCount,
-    sortOrder: r.sortOrder,
   }));
 
   return (

@@ -13,7 +13,6 @@ export const categoryFormSchema = z.object({
     .refine((v) => v === "" || SLUG_PATTERN.test(v), { message: t.common.slugHint })
     .default(""),
   parentId: z.uuid().nullable().default(null),
-  sortOrder: z.number().int().min(0).max(100000).default(0),
 });
 
 export type CategoryFormInput = z.input<typeof categoryFormSchema>;

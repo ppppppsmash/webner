@@ -1,8 +1,11 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon, ImagePlusIcon, ImagesIcon, StarIcon, TrashIcon } from "lucide-react";
+import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { ImagePlusIcon, ImagesIcon, StarIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 import { MediaPickerDialog } from "@/components/management/media-picker-dialog";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +22,95 @@ interface ImagesFieldProps {
   disabled?: boolean;
 }
 
-/** Multi-image upload with ordering. The first image is the main image. */
+interface ImageTileProps {
+  image: ImageValue;
+  index: number;
+  disabled?: boolean;
+  onSetMain: () => void;
+  onRemove: () => void;
+}
+
+/** One thumbnail; the picture itself is the drag handle. */
+function ImageTile({ image, index, disabled, onSetMain, onRemove }: ImageTileProps) {
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id: image.url,
+    disabled,
+  });
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={cn(
+        "group relative overflow-hidden rounded-lg border bg-muted/30",
+        index === 0 && "ring-2 ring-primary/60",
+        isDragging && "z-10 shadow-lg",
+      )}
+    >
+      <div
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        aria-label={t.products.dragImage(index + 1)}
+        className={cn(
+          "relative aspect-square touch-none outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset",
+          disabled ? "cursor-not-allowed" : isDragging ? "cursor-grabbing" : "cursor-grab",
+        )}
+      >
+        <Image src={image.url} alt={image.alt ?? ""} fill unoptimized draggable={false} className="object-cover" sizes="200px" />
+      </div>
+      {index === 0 ? (
+        <Badge className="pointer-events-none absolute top-2 left-2 gap-1">
+          <StarIcon />
+          {t.products.mainImage}
+        </Badge>
+      ) : null}
+      <div className="flex items-center justify-between gap-1 border-t bg-background p-1">
+        <div className="flex items-center">
+          <span className="px-1.5 text-xs text-muted-foreground tabular-nums">{index + 1}</span>
+          {index !== 0 ? (
+            <Button
+              type="button"
+              size="icon-xs"
+              variant="ghost"
+              aria-label={t.products.setMain}
+              title={t.products.setMain}
+              disabled={disabled}
+              onClick={onSetMain}
+            >
+              <StarIcon />
+            </Button>
+          ) : null}
+        </div>
+        <Button
+          type="button"
+          size="icon-xs"
+          variant="ghost"
+          className="text-destructive"
+          aria-label={t.common.remove}
+          disabled={disabled}
+          onClick={onRemove}
+        >
+          <TrashIcon />
+        </Button>
+      </div>
+    </li>
+  );
+}
+
+/** Multi-image upload; drag the thumbnails to reorder. The first image is the main image. */
 export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
+  const dndId = useId();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const from = value.findIndex((v) => v.url === active.id);
+    const to = value.findIndex((v) => v.url === over.id);
+    if (from >= 0 && to >= 0) onChange(arrayMove(value, from, to));
+  };
   const fileInput = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -56,75 +146,22 @@ export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
   return (
     <div className="space-y-3">
       {value.length ? (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {value.map((img, index) => (
-            <li
-              key={img.url}
-              className={cn(
-                "group relative overflow-hidden rounded-lg border bg-muted/30",
-                index === 0 && "ring-2 ring-primary/60",
-              )}
-            >
-              <div className="relative aspect-square">
-                <Image src={img.url} alt={img.alt ?? ""} fill unoptimized className="object-cover" sizes="200px" />
-              </div>
-              {index === 0 ? (
-                <Badge className="absolute top-2 left-2 gap-1">
-                  <StarIcon />
-                  {t.products.mainImage}
-                </Badge>
-              ) : null}
-              <div className="flex items-center justify-between gap-1 border-t bg-background p-1">
-                <div className="flex items-center">
-                  <Button
-                    type="button"
-                    size="icon-xs"
-                    variant="ghost"
-                    aria-label={t.common.moveUp}
-                    disabled={disabled || index === 0}
-                    onClick={() => move(index, index - 1)}
-                  >
-                    <ArrowLeftIcon />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon-xs"
-                    variant="ghost"
-                    aria-label={t.common.moveDown}
-                    disabled={disabled || index === value.length - 1}
-                    onClick={() => move(index, index + 1)}
-                  >
-                    <ArrowRightIcon />
-                  </Button>
-                  {index !== 0 ? (
-                    <Button
-                      type="button"
-                      size="icon-xs"
-                      variant="ghost"
-                      aria-label={t.products.setMain}
-                      title={t.products.setMain}
-                      disabled={disabled}
-                      onClick={() => move(index, 0)}
-                    >
-                      <StarIcon />
-                    </Button>
-                  ) : null}
-                </div>
-                <Button
-                  type="button"
-                  size="icon-xs"
-                  variant="ghost"
-                  className="text-destructive"
-                  aria-label={t.common.remove}
+        <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={value.map((v) => v.url)} strategy={rectSortingStrategy}>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {value.map((img, index) => (
+                <ImageTile
+                  key={img.url}
+                  image={img}
+                  index={index}
                   disabled={disabled}
-                  onClick={() => onChange(value.filter((_, i) => i !== index))}
-                >
-                  <TrashIcon />
-                </Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  onSetMain={() => move(index, 0)}
+                  onRemove={() => onChange(value.filter((_, i) => i !== index))}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       ) : null}
 
       <MediaPickerDialog

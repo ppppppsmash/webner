@@ -45,7 +45,6 @@ export function CategoryForm({ initialData, parents }: CategoryFormProps) {
       name: { ...emptyLocalizedText(), ...(initialData?.name ?? {}) },
       slug: initialData?.slug ?? "",
       parentId: initialData?.parentId ?? null,
-      sortOrder: initialData?.sortOrder ?? 0,
     },
   });
 
@@ -140,19 +139,6 @@ export function CategoryForm({ initialData, parents }: CategoryFormProps) {
                 </Field>
               )}
             />
-
-            <Field data-invalid={Boolean(form.formState.errors.sortOrder) || undefined}>
-              <FieldLabel htmlFor="sortOrder">{t.common.sortOrder}</FieldLabel>
-              <Input
-                id="sortOrder"
-                type="number"
-                min={0}
-                {...form.register("sortOrder", { valueAsNumber: true })}
-                disabled={pending}
-              />
-              <FieldDescription>{t.common.sortOrderHint}</FieldDescription>
-              <FieldError errors={[form.formState.errors.sortOrder]} />
-            </Field>
           </div>
 
           <Controller

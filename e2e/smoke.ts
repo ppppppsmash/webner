@@ -62,6 +62,22 @@ async function main() {
     await page.waitForURL(/\/management\/categories$/);
     await page.getByText(`測試分類 ${stamp}`).waitFor();
     log("category created");
+
+    // ordering: a new category is the last top-level one; moving it up with the keyboard is saved
+    const catRow = page.getByRole("row").filter({ hasText: `測試分類 ${stamp}` });
+    const catPosition = catRow.getByTestId("category-position");
+    const lastPosition = Number((await catPosition.innerText()).trim());
+    if (!Number.isInteger(lastPosition) || lastPosition < 2) throw new Error(`unexpected category position: ${lastPosition}`);
+    await catRow.getByRole("button", { name: /拖曳調整排序/ }).focus();
+    await page.keyboard.press("Space");
+    await page.keyboard.press("ArrowUp");
+    await page.waitForTimeout(300);
+    await page.keyboard.press("Space");
+    await page.getByText("排序已更新").waitFor();
+    await page.reload();
+    await catRow.waitFor();
+    if (Number((await catPosition.innerText()).trim()) !== lastPosition - 1) throw new Error("category order was not saved");
+    log("category order: new category last, drag & drop is saved");
     await shot(page, "03-categories");
 
     // --- product ------------------------------------------------------------

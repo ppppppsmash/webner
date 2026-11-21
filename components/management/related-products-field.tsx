@@ -1,8 +1,11 @@
 "use client";
 
+import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, rectSortingStrategy, SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { SearchIcon, XIcon } from "lucide-react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { t } from "@/lib/i18n/admin";
@@ -13,6 +16,38 @@ export interface RelatedProductOption {
   name: string;
   nameDe: string;
   imageUrl: string | null;
+}
+
+/** A picked product; the chip (thumbnail + name) is dragged to change the order shown on the site. */
+function RelatedChip({ option, disabled, onRemove }: { option: RelatedProductOption; disabled?: boolean; onRemove: () => void }) {
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
+    id: option.id,
+    disabled,
+  });
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={cn("flex items-center gap-1 rounded-md border bg-muted/40 py-1 pr-1 pl-1.5 text-sm", isDragging && "z-10 shadow-md")}
+    >
+      <span
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        aria-label={t.products.dragRelated(option.name)}
+        className={cn(
+          "flex touch-none items-center gap-2 rounded outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          disabled ? "cursor-not-allowed" : isDragging ? "cursor-grabbing" : "cursor-grab",
+        )}
+      >
+        <Thumb src={option.imageUrl} />
+        <span className="max-w-48 truncate">{option.name}</span>
+      </span>
+      <Button type="button" variant="ghost" size="icon-xs" aria-label={t.common.remove} disabled={disabled} onClick={onRemove}>
+        <XIcon />
+      </Button>
+    </li>
+  );
 }
 
 /** Pick up to `max` related products from a searchable list; empty = automatic (same category). */
@@ -38,27 +73,30 @@ export function RelatedProductsField({
   );
   const full = value.length >= max;
 
+  const dndId = useId();
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const from = value.indexOf(String(active.id));
+    const to = value.indexOf(String(over.id));
+    if (from >= 0 && to >= 0) onChange(arrayMove(value, from, to));
+  };
+
   return (
     <div className="space-y-3">
       {selected.length ? (
-        <ul className="flex flex-wrap gap-2">
-          {selected.map((o) => (
-            <li key={o.id} className="flex items-center gap-2 rounded-md border bg-muted/40 py-1 pr-1 pl-1.5 text-sm">
-              <Thumb src={o.imageUrl} />
-              <span className="max-w-48 truncate">{o.name}</span>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                aria-label={t.common.remove}
-                disabled={disabled}
-                onClick={() => onChange(value.filter((id) => id !== o.id))}
-              >
-                <XIcon />
-              </Button>
-            </li>
-          ))}
-        </ul>
+        <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={selected.map((o) => o.id)} strategy={rectSortingStrategy}>
+            <ul className="flex flex-wrap gap-2">
+              {selected.map((o) => (
+                <RelatedChip key={o.id} option={o} disabled={disabled} onRemove={() => onChange(value.filter((id) => id !== o.id))} />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       ) : (
         <p className="text-sm text-muted-foreground">{t.products.relatedAuto}</p>
       )}

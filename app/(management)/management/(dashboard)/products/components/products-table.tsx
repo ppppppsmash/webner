@@ -18,6 +18,7 @@ import Link from "next/link";
 import { useId, useMemo, useOptimistic, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { reorderProducts } from "@/actions/products";
+import { DragHandle } from "@/components/management/drag-handle";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -73,20 +74,14 @@ function SortableRow({ row, position, isFirst, isLast, disabled, onMove }: RowPr
     >
       <TableCell className="w-px px-3">
         <div className="flex items-center gap-1.5">
-          <button
-            type="button"
+          <DragHandle
             ref={setActivatorNodeRef}
             {...attributes}
             {...listeners}
-            aria-label={t.products.dragHandle(title)}
-            className={cn(
-              "flex size-7 cursor-grab touch-none items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
-              isDragging && "cursor-grabbing",
-              disabled && "cursor-not-allowed opacity-50",
-            )}
-          >
-            <GripVerticalIcon className="size-4" />
-          </button>
+            label={t.products.dragHandle(title)}
+            dragging={isDragging}
+            disabled={disabled}
+          />
           <span data-testid="product-position" className="min-w-5 text-right text-xs text-muted-foreground tabular-nums">
             {position}
           </span>
