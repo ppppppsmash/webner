@@ -53,7 +53,7 @@ const TAB_FIELDS: Record<TabKey, Array<keyof ProductFormInput>> = {
   media: ["images", "videos"],
   category: ["categoryIds", "volume", "relatedIds"],
   seo: ["slug", "seoTitle", "seoDescription"],
-  settings: ["externalUrl", "sortOrder", "isFeatured", "visibility", "publishAt", "badge", "tags"],
+  settings: ["externalUrl", "isFeatured", "visibility", "publishAt", "badge", "tags"],
 };
 
 const TABS: Array<{ key: TabKey; label: string }> = [
@@ -177,7 +177,6 @@ export function ProductForm({ initialData, categories, productOptions, tagOption
       isFeatured: initialData?.isFeatured ?? false,
       badge: initialData?.badge ?? null,
       tags: initialData?.tags ?? [],
-      sortOrder: initialData?.sortOrder ?? 0,
       images: initialData?.images.map((i) => ({ url: i.url, alt: i.alt ?? "" })) ?? [],
       videos: initialData?.videos.map((v) => ({ kind: v.kind, url: v.url, title: v.title ?? "" })) ?? [],
       relatedIds: initialData?.related.map((r) => r.relatedId) ?? [],
@@ -623,13 +622,6 @@ export function ProductForm({ initialData, categories, productOptions, tagOption
                     />
                     <FieldDescription>{t.products.externalUrlHint}</FieldDescription>
                     <FieldError errors={[errors.externalUrl]} />
-                  </Field>
-
-                  <Field data-invalid={Boolean(errors.sortOrder) || undefined}>
-                    <FieldLabel htmlFor="sortOrder">{t.common.sortOrder}</FieldLabel>
-                    <Input id="sortOrder" type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} disabled={pending} />
-                    <FieldDescription>{t.common.sortOrderHint}</FieldDescription>
-                    <FieldError errors={[errors.sortOrder]} />
                   </Field>
                 </FieldGroup>
               </CardContent>

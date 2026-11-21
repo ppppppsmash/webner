@@ -53,7 +53,6 @@ export const productFormSchema = z.object({
   badge: z.enum(PRODUCT_BADGES).nullable().default(null),
   /** Management-only tags (search / grouping) */
   tags: z.array(z.string().trim().min(1).max(PRODUCT_LIMITS.tag)).max(PRODUCT_LIMITS.tags).default([]),
-  sortOrder: z.number().int().min(0).max(100000).default(0),
   /** Ordered; first = main image */
   images: z.array(productImageSchema).max(30).default([]),
   videos: z.array(productVideoSchema).max(10).default([]),

@@ -29,7 +29,6 @@ async function ProductsContent() {
     isFeatured: p.isFeatured,
     badge: p.badge ? t.products.badges[p.badge] : null,
     tags: p.tags,
-    sortOrder: p.sortOrder,
     updatedAt: formatDateTime(p.updatedAt),
   }));
 

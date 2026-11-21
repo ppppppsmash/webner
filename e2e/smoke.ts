@@ -191,6 +191,27 @@ async function main() {
     if ((await page.getByRole("row").count()) !== 2) throw new Error("tag search should match exactly one product row");
     await page.getByPlaceholder("搜尋商品名稱或管理標籤").fill("");
     log("management tag saved, shown in list and searchable");
+
+    // ordering: a new product is first; moving it with the keyboard (Space, ArrowDown, Space) saves position 2
+    const position = row.getByTestId("product-position");
+    if ((await position.innerText()).trim() !== "1") throw new Error("a new product should be first in the list");
+    await row.getByRole("button", { name: /拖曳調整排序/ }).focus();
+    await page.keyboard.press("Space");
+    await page.keyboard.press("ArrowDown");
+    await page.waitForTimeout(300);
+    await page.keyboard.press("Space");
+    await page.getByText("排序已更新").waitFor();
+    await page.reload();
+    await row.waitFor();
+    if ((await position.innerText()).trim() !== "2") throw new Error("drag & drop order was not saved");
+    // row menu: back to the top
+    await row.getByRole("button", { name: "操作" }).click();
+    await page.getByRole("menuitem", { name: "移到最前" }).click();
+    await page.getByText("排序已更新").first().waitFor();
+    await page.reload();
+    await row.waitFor();
+    if ((await position.innerText()).trim() !== "1") throw new Error("move to top was not saved");
+    log("list order: new product first, drag & drop and move-to-top are saved");
     await row.getByRole("combobox", { name: "狀態" }).click();
     await page.getByRole("option", { name: "隱藏" }).click();
     await row.getByRole("combobox", { name: "狀態" }).filter({ hasText: "隱藏" }).waitFor();

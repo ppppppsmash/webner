@@ -1,6 +1,6 @@
 "use client";
 
-import { CopyIcon, ExternalLinkIcon, LinkIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from "lucide-react";
+import { ArrowDownToLineIcon, ArrowUpToLineIcon, CopyIcon, ExternalLinkIcon, LinkIcon, MoreHorizontalIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -18,7 +18,14 @@ import { t } from "@/lib/i18n/admin";
 import { publicProductUrl } from "@/lib/public-url";
 import type { ProductColumn } from "./products-table";
 
-export function ProductCellActions({ data }: { data: ProductColumn }) {
+interface ProductCellActionsProps {
+  data: ProductColumn;
+  /** Move to the first / last position of the list (omitted when already there) */
+  onMoveTop?: () => void;
+  onMoveBottom?: () => void;
+}
+
+export function ProductCellActions({ data, onMoveTop, onMoveBottom }: ProductCellActionsProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -70,6 +77,15 @@ export function ProductCellActions({ data }: { data: ProductColumn }) {
           <DropdownMenuItem onClick={() => window.open(publicProductUrl(data.slug), "_blank", "noopener")}>
             <ExternalLinkIcon />
             {t.products.openUrl}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem disabled={!onMoveTop} onClick={() => onMoveTop?.()}>
+            <ArrowUpToLineIcon />
+            {t.products.moveTop}
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled={!onMoveBottom} onClick={() => onMoveBottom?.()}>
+            <ArrowDownToLineIcon />
+            {t.products.moveBottom}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onClick={() => setOpen(true)}>

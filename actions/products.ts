@@ -1,7 +1,8 @@
 "use server";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
+import { z } from "zod";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { db } from "@/db";
 import { productCategories, productImages, productRelations, products, productVideos } from "@/db/schema";
@@ -48,7 +49,6 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
     isFeatured: data.isFeatured,
     badge: data.badge,
     tags: [...new Set(data.tags.map((tag) => tag.trim()).filter(Boolean))],
-    sortOrder: data.sortOrder,
   };
 
   const id = await db.transaction(async (tx) => {
@@ -60,7 +60,12 @@ export async function saveProduct(input: ProductFormInput): Promise<ActionResult
       await tx.delete(productRelations).where(eq(productRelations.productId, productId));
       await tx.delete(productCategories).where(eq(productCategories.productId, productId));
     } else {
-      const [row] = await tx.insert(products).values(values).returning({ id: products.id });
+      // A new product goes to the top of the list; the position is changed by dragging in the list.
+      const [first] = await tx.select({ min: sql<number>`coalesce(min(${products.sortOrder}), 1)` }).from(products);
+      const [row] = await tx
+        .insert(products)
+        .values({ ...values, sortOrder: Number(first?.min ?? 1) - 1 })
+        .returning({ id: products.id });
       productId = row.id;
     }
 
@@ -118,6 +123,42 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
   revalidatePath(PATH);
   updateTag(CACHE_TAGS.products);
   updateTag(CACHE_TAGS.product(id));
+  return ok(undefined);
+}
+
+/**
+ * Save the list order (drag & drop in the product list). `orderedIds` is the whole list, first = first on the site.
+ * Positions are renumbered 0..n-1, so there are never gaps or duplicates.
+ */
+export async function reorderProducts(orderedIds: string[]): Promise<ActionResult> {
+  await requireAdmin();
+  const parsed = z.array(z.uuid()).max(5000).safeParse(orderedIds);
+  if (!parsed.success) return fail(t.common.somethingWentWrong);
+  const given = [...new Set(parsed.data)];
+
+  await db.transaction(async (tx) => {
+    const current = await tx
+      .select({ id: products.id })
+      .from(products)
+      .orderBy(asc(products.sortOrder), desc(products.createdAt));
+    const known = new Set(current.map((r) => r.id));
+    const wanted = given.filter((id) => known.has(id));
+    const listed = new Set(wanted);
+    // Products the list did not know about (created in the meantime) stay in front, like any new product.
+    const next = [...current.map((r) => r.id).filter((id) => !listed.has(id)), ...wanted];
+    if (!next.length) return;
+    const rows = sql.join(
+      next.map((id, i) => sql`(${id}::uuid, ${i}::int)`),
+      sql`, `,
+    );
+    // Raw SQL on purpose: only rows whose position changed are touched, and updated_at stays as it is.
+    await tx.execute(
+      sql`update ${products} set sort_order = v.ord from (values ${rows}) as v(id, ord) where ${products.id} = v.id and ${products.sortOrder} <> v.ord`,
+    );
+  });
+
+  revalidatePath(PATH);
+  updateTag(CACHE_TAGS.products);
   return ok(undefined);
 }
 

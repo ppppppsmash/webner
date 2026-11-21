@@ -4,13 +4,16 @@ import { db } from "@/db";
 import { pickText } from "@/lib/i18n/locales";
 import { productCategories, productImages, productRelations, products, productVideos } from "@/db/schema";
 
+/** Same order as the public site: manual position first, newest first among equals. */
+const PRODUCT_ORDER = [asc(products.sortOrder), desc(products.createdAt)];
+
 export async function listProducts() {
   return db.query.products.findMany({
     with: {
       categories: { orderBy: [asc(productCategories.sortOrder)], with: { category: { with: { parent: true } } } },
       images: { orderBy: [asc(productImages.sortOrder)], limit: 1 },
     },
-    orderBy: [asc(products.sortOrder), desc(products.updatedAt)],
+    orderBy: PRODUCT_ORDER,
   });
 }
 
@@ -31,7 +34,7 @@ export async function listProductOptions(excludeId?: string) {
   const rows = await db.query.products.findMany({
     columns: { id: true, name: true },
     with: { images: { orderBy: [asc(productImages.sortOrder)], limit: 1, columns: { url: true } } },
-    orderBy: [asc(products.sortOrder), desc(products.updatedAt)],
+    orderBy: PRODUCT_ORDER,
   });
   return rows
     .filter((r) => r.id !== excludeId)
