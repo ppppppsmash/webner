@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 /** Files on S3-compatible storage are read from S3_PUBLIC_URL (or `<endpoint>/<bucket>`); next/image must allow that host. */
 function storageImagePattern() {
-  const base = process.env.S3_PUBLIC_URL || (process.env.S3_ENDPOINT && process.env.S3_BUCKET ? `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET}` : "");
+  const endpoint = process.env.S3_ENDPOINT || process.env.AWS_ENDPOINT_URL_S3;
+  const base = process.env.S3_PUBLIC_URL || (endpoint && process.env.S3_BUCKET ? `${endpoint}/${process.env.S3_BUCKET}` : "");
   if (!base) return [];
   const url = new URL(base);
   return [

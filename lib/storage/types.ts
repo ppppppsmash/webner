@@ -16,7 +16,17 @@ export interface StorageDriver {
   delete(key: string): Promise<void>;
   /** Public URL for a key */
   urlFor(key: string): string;
+  /**
+   * Short-lived URL the browser can PUT the file to directly (skips the app server, so no request-size limit).
+   * Drivers without it (local) are uploaded through /api/upload instead.
+   */
+  presignPut?(key: string, contentType: string): Promise<{ url: string; headers: Record<string, string> }>;
+  /** Size and type of a stored object, or null when it does not exist (used to confirm a direct upload). */
+  stat?(key: string): Promise<{ size: number; contentType: string | null } | null>;
 }
+
+/** Key layout produced by `buildKey`: images/2026/11/<uuid>.png */
+export const STORAGE_KEY_PATTERN = /^(image|video)s\/\d{4}\/\d{2}\/[0-9a-f-]{36}\.([a-z0-9]+)$/;
 
 export const UPLOAD_LIMITS: Record<UploadKind, { maxBytes: number; mimeTypes: Record<string, string> }> = {
   image: {

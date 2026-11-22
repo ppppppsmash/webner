@@ -415,7 +415,7 @@ Cloudflare Workers（OpenNext）で分かったこと:
 - [x] 各言語の翻訳文は依頼元から支給されるか、こちらで翻訳するか → 依頼元が管理画面から 4 言語とも自分で登録する（2026-11-22）
 - [x] SHOPLINE 上に組み込むのか、独立したサイトとして構築するのか → Next.js で独立構築
 - [x] フレームワーク → Next.js（4.3 参照）
-- [ ] インフラ構成の最終決定（推奨案は 4.4: Vercel Pro ＋ Neon ＋ Cloudflare R2）と費用負担者 ※開発の最後に決める。ホスティングは Vercel、DB は Neon に決定（2026-11-22、4.4 と 8. 参照）。画像・動画の保存先（R2 か Neon Object Storage）と費用負担者は未決定
+- [ ] インフラ構成の最終決定（推奨案は 4.4: Vercel Pro ＋ Neon ＋ Cloudflare R2）と費用負担者 ※開発の最後に決める。ホスティングは Vercel、DB は Neon に決定（2026-11-22、4.4 と 8. 参照）。画像・動画の保存先は Neon Object Storage（8. 参照）。費用負担者は未決定
 - [ ] 動画のアップロード上限（1ファイルあたりの容量・本数）
 - [ ] 本番ドメイン
 - [x] ギャラリーから既存ショップへのリンク → 置く（将来外す可能性あり）
@@ -485,6 +485,22 @@ Neon の Free プラン（US East / N. Virginia、PostgreSQL 18）にプロジ�
 | `npx tsx --env-file=.env.neon scripts/seed-admin.ts` | Neon のオーナーを作成／パスワード再設定（`seed-categories.ts` も同様） |
 
 Free プランの上限（2026-11-22 時点）: DB 1 GB、計算 100 CU 時間／月、転送 5 GB／月、履歴 6 時間。5 分アクセスが無いと自動停止し、次のアクセスで起動待ちが入る（実測: 初回接続 約 1.3 秒、以降 約 0.2 秒）。リージョンは作成後に変更できない（東京リージョンは無い）。
+
+### 画像・動画の保存先: Neon Object Storage（2026-11-22）
+
+保存先は `STORAGE_DRIVER` で切り替える。`local`（開発用、`uploads/`）と `s3`（S3 互換）。本番は Neon Object Storage のバケット `webner-media`（公開読み取り `public_read`、Neon プロジェクトと同じ US East）。Free プランは 1 プロジェクト 5 GB まで。R2 など他の S3 互換ストレージへは設定の差し替えだけで移れる。
+
+| 環境変数 | 内容 |
+|---|---|
+| `STORAGE_DRIVER` | `s3` |
+| `S3_BUCKET` | `webner-media` |
+| `AWS_ENDPOINT_URL_S3` / `AWS_REGION` / `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` | Neon コンソールの Connect → Storage → Parameters only に出る値（`S3_ENDPOINT` などの名前でも可） |
+| `S3_PUBLIC_URL` | 任意。独自ドメインなどから配信するときの公開 URL。省略時は エンドポイント/バケット名 |
+
+- アップロードは署名付き URL でブラウザからストレージへ直接送る（`/api/upload/sign` → PUT → `/api/upload/complete`）。ホスティング側の受信上限（Vercel は約 4.5 MB）に当たらない。上限は画像 10 MB、動画 500 MB のまま
+- `complete` で実際に保存されたファイルの種類とサイズを確認し、上限超過や対象外の形式は削除して拒否する
+- 公開サイトの `next/image` 用に、ビルド時の環境変数からストレージのホストを許可リストに入れる（`next.config.ts`）。**ビルド時にも上の環境変数が必要**
+- 確認済み（2026-11-22、Neon ＋ Neon Storage に繋いだ本番ビルドをローカルで起動）: 6 MB の画像のアップロード、表示、媒體庫からの削除。途中からの読み出し（動画のシーク用）と CORS も確認。動画ファイルの実アップロードは未確認
 
 ### 管理画面の構成（2026-11-12 時点）
 
@@ -648,3 +664,4 @@ locale は `de` / `en` / `zh-TW` / `zh-CN`。文言は `lib/i18n/public/*.ts` �
 | 2026-11-22 | Neon（Free プラン、US East）に接続。マイグレーション・オーナー・初期分類を投入し、`.env.neon`、`pnpm db:migrate:neon`、`pnpm dev:neon` を追加（8. 参照） |
 | 2026-11-22 | ホスティングを検討（Cloudflare Workers に実デプロイ、Netlify をローカル再現、他社の料金調査）し、Vercel に決定。経緯を 4.4 に記録 |
 | 2026-11-22 | アップロード箇所にファイルのドラッグ＆ドロップを追加（商品画像、商品動画、説明文エディタ、設定のヒーロー画像、媒體庫）。複数ファイル可、対象外の形式は拒否 |
+| 2026-11-22 | 画像・動画の保存先を Neon Object Storage に設定（バケット `webner-media`）。ブラウザからストレージへ直接送るアップロード方式を実装し、6 MB の画像で動作確認（8. 参照） |
