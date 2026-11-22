@@ -296,6 +296,11 @@ export const t = {
     tooLarge: (mb: number) => `檔案過大（上限 ${mb}MB）`,
     invalidType: "不支援的檔案格式",
     uploading: "上傳中…",
+    dropToUpload: "放開以上傳",
+    dropImagesHint: "也可以把圖片從電腦直接拖曳到這裡",
+    dropImageHint: "也可以把圖片從電腦直接拖曳到這裡",
+    dropVideosHint: "也可以把影片檔從電腦直接拖曳到這裡",
+    dropMediaHint: "也可以把圖片或影片從電腦直接拖曳到這個區域",
   },
   editor: {
     bold: "粗體",

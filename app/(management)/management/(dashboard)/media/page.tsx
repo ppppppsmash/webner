@@ -5,7 +5,7 @@ import { formatBytes, formatDateTime } from "@/lib/format";
 import { t } from "@/lib/i18n/admin";
 import { listMedia } from "@/lib/queries/media";
 import { MediaGrid, type MediaItem } from "./components/media-grid";
-import { MediaUploadButton } from "./components/media-upload-button";
+import { MediaDropArea, MediaUploadButton } from "./components/media-upload-button";
 
 export const metadata: Metadata = { title: t.media.title };
 
@@ -25,7 +25,9 @@ async function MediaContent() {
   return (
     <>
       <PageHeader title={t.media.count(items.length)} description={t.media.listDescription} action={<MediaUploadButton />} />
-      <MediaGrid items={items} />
+      <MediaDropArea>
+        <MediaGrid items={items} />
+      </MediaDropArea>
     </>
   );
 }

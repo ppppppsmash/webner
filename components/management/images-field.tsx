@@ -7,6 +7,7 @@ import { ImagePlusIcon, ImagesIcon, StarIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
+import { FileDropZone } from "@/components/management/file-drop-zone";
 import { MediaPickerDialog } from "@/components/management/media-picker-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -123,10 +124,15 @@ export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
     onChange(next);
   };
 
-  const onPick = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPick = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (!files.length) return;
+    void addFiles(files);
+  };
+
+  /** Upload picked or dropped files and append them. */
+  const addFiles = async (files: File[]) => {
+    if (!files.length || progress !== null) return;
 
     setProgress({ done: 0, total: files.length });
     const added: ImageValue[] = [];
@@ -144,7 +150,7 @@ export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
   };
 
   return (
-    <div className="space-y-3">
+    <FileDropZone accept={["image"]} disabled={disabled || progress !== null} onFiles={addFiles} hint={t.upload.dropImagesHint} className="space-y-3">
       {value.length ? (
         <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
           <SortableContext items={value.map((v) => v.url)} strategy={rectSortingStrategy}>
@@ -186,6 +192,6 @@ export function ImagesField({ value, onChange, disabled }: ImagesFieldProps) {
         ) : null}
         <input ref={fileInput} type="file" accept="image/*" multiple className="hidden" onChange={onPick} />
       </div>
-    </div>
+    </FileDropZone>
   );
 }

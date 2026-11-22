@@ -8,6 +8,7 @@ import { FilmIcon, LinkIcon, TrashIcon, UploadIcon } from "lucide-react";
 import Image from "next/image";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
+import { FileDropZone } from "@/components/management/file-drop-zone";
 import { DragHandle } from "@/components/management/drag-handle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -112,19 +113,27 @@ export function VideosField({ value, onChange, disabled }: VideosFieldProps) {
   const update = (index: number, patch: Partial<VideoValue>) =>
     onChange(value.map((v, i) => (i === index ? { ...v, ...patch } : v)));
 
-  const onPick = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const onPick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
     event.target.value = "";
-    if (!file) return;
-    setProgress(0);
-    try {
-      const stored = await uploadFile(file, "video", (ratio) => setProgress(ratio));
-      onChange([...value, { kind: "file", url: stored.url, title: file.name.replace(/\.[^.]+$/, "") }]);
-    } catch (err) {
-      toast.error(err instanceof UploadError ? err.message : t.upload.failed);
-    } finally {
-      setProgress(null);
+    void addFiles(files);
+  };
+
+  /** Upload picked or dropped video files one after another and append them. */
+  const addFiles = async (files: File[]) => {
+    if (!files.length || progress !== null) return;
+    const added: VideoValue[] = [];
+    for (const file of files) {
+      setProgress(0);
+      try {
+        const stored = await uploadFile(file, "video", (ratio) => setProgress(ratio));
+        added.push({ kind: "file", url: stored.url, title: file.name.replace(/\.[^.]+$/, "") });
+      } catch (err) {
+        toast.error(`${file.name}: ${err instanceof UploadError ? err.message : t.upload.failed}`);
+      }
     }
+    setProgress(null);
+    if (added.length) onChange([...value, ...added]);
   };
 
   const addEmbed = () => {
@@ -165,7 +174,8 @@ export function VideosField({ value, onChange, disabled }: VideosFieldProps) {
         </DndContext>
       ) : null}
 
-      <div className="flex flex-col gap-3 rounded-lg border border-dashed p-3 md:flex-row md:items-center">
+      <FileDropZone accept={["video"]} disabled={disabled || progress !== null} onFiles={addFiles} hint={t.upload.dropVideosHint}>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <Button type="button" variant="outline" disabled={disabled || progress !== null} onClick={() => fileInput.current?.click()}>
           <UploadIcon data-icon="inline-start" />
           {progress !== null ? `${t.upload.uploading} ${Math.round(progress * 100)}%` : t.products.uploadVideo}
@@ -198,6 +208,7 @@ export function VideosField({ value, onChange, disabled }: VideosFieldProps) {
           </Button>
         </div>
       </div>
+      </FileDropZone>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { FileDropZone } from "@/components/management/file-drop-zone";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
@@ -115,19 +116,25 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
 
   const tools = disabled || htmlMode;
 
-  const onPickImage = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPickImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file) return;
+    if (file) void insertImages([file]);
+  };
+
+  /** Upload picked or dropped images and insert them at the cursor, in order. */
+  const insertImages = async (files: File[]) => {
+    if (!files.length || uploading) return;
     setUploading(true);
-    try {
-      const stored = await uploadFile(file, "image");
-      editor.chain().focus().setImage({ src: stored.url, alt: file.name }).run();
-    } catch (err) {
-      toast.error(err instanceof UploadError ? err.message : t.upload.failed);
-    } finally {
-      setUploading(false);
+    for (const file of files) {
+      try {
+        const stored = await uploadFile(file, "image");
+        editor.chain().focus().setImage({ src: stored.url, alt: file.name }).run();
+      } catch (err) {
+        toast.error(`${file.name}: ${err instanceof UploadError ? err.message : t.upload.failed}`);
+      }
     }
+    setUploading(false);
   };
 
   return (
@@ -209,7 +216,9 @@ export function RichTextEditor({ value, onChange, disabled, placeholder, classNa
           <p className="mt-1 text-xs text-muted-foreground">{t.editor.htmlHint}</p>
         </div>
       ) : (
-        <EditorContent editor={editor} />
+        <FileDropZone accept={["image"]} disabled={disabled || uploading} onFiles={insertImages} framed={false} className="rounded-t-none">
+          <EditorContent editor={editor} />
+        </FileDropZone>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { ImagePlusIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { FileDropZone } from "@/components/management/file-drop-zone";
 import { Button } from "@/components/ui/button";
 import { t } from "@/lib/i18n/admin";
 import { uploadFile, UploadError } from "@/lib/upload-client";
@@ -25,10 +26,14 @@ export function SingleImageField({
   const fileInput = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
 
-  const onPick = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onPick = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file) return;
+    if (file) void upload(file);
+  };
+
+  const upload = async (file: File) => {
+    if (progress !== null) return;
     setProgress(0);
     try {
       const stored = await uploadFile(file, "image", setProgress);
@@ -41,7 +46,14 @@ export function SingleImageField({
   };
 
   return (
-    <div className="space-y-3">
+    <FileDropZone
+      accept={["image"]}
+      multiple={false}
+      disabled={disabled || progress !== null}
+      onFiles={(files) => void upload(files[0])}
+      hint={t.upload.dropImageHint}
+      className="max-w-xl space-y-3"
+    >
       {value ? (
         <div className={`relative w-full max-w-xl overflow-hidden rounded-lg border bg-muted ${aspect}`}>
           <Image src={value} alt="" fill unoptimized className="object-cover" sizes="600px" />
@@ -60,6 +72,6 @@ export function SingleImageField({
         ) : null}
         <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={onPick} />
       </div>
-    </div>
+    </FileDropZone>
   );
 }
