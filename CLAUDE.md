@@ -23,6 +23,7 @@
 - `loading.tsx` のある公開ページでは `notFound()` が Suspense 内で起きるため HTTP ステータスは 200 のまま。e2e で存在チェックをするときは本文の内容で判定する
 - クライアントからも使う定数（商品ラベル `lib/product-badges.ts`、公開状態 `lib/product-visibility.ts`）は `db/schema` に置かず `lib/` に置き、schema 側がそれを import する（drizzle をクライアントに持ち込まないため）
 - 保存先は `STORAGE_DRIVER`（local / s3）。s3 は S3 互換（Neon Object Storage、R2 など）で、設定は `S3_ENDPOINT` `S3_REGION` `S3_BUCKET` `S3_ACCESS_KEY_ID` `S3_SECRET_ACCESS_KEY`（Neon が配る `AWS_ENDPOINT_URL_S3` `AWS_REGION` `AWS_ACCESS_KEY_ID` `AWS_SECRET_ACCESS_KEY` も読む。`S3_BUCKET` は必須）。s3 のときブラウザは署名付き URL でストレージへ直接 PUT する（`/api/upload/sign` → PUT → `/api/upload/complete`。Vercel の約 4.5 MB の受信上限を避けるため）。local は従来どおり `/api/upload` 経由。クライアントは `uploadFile`（lib/upload-client.ts）だけを使う
+- 画像はアップロード前にブラウザ側で縮小・再圧縮する（`lib/image-compress.ts`、`uploadFile` から呼ぶ）。長辺 2560px、WebP（WebP を書き出せないブラウザは JPEG / PNG）、200KB 未満で縮小不要なもの・GIF・AVIF・1 割以上小さくならないものは原本のまま。10MB の上限は圧縮後のサイズにかかる。既存のファイルは変換されない
 - アップロードは `/api/upload` が `media` テーブルに登録する（媒體庫 `/management/media`）。商品側は URL で参照するだけなので、商品削除でファイルを消さない。ファイルの削除は `actions/media.ts` の `deleteMedia`（使用中なら拒否）。商品フォームの画像欄は `MediaPickerDialog` で既存画像を選べる
 - 商品の並び順は商品一覧のドラッグ＆ドロップ（dnd-kit）で決める。`reorderProducts`（actions/products.ts）が `sort_order` を 0 から振り直す（`updated_at` を動かさないよう生 SQL）。新規商品は先頭に入る。商品フォームに排序の数字欄は無い。管理側・公開側とも `sort_order` 昇順 → `created_at` 降順
 - 並び替えはすべて dnd-kit のドラッグ＆ドロップ（数字入力・矢印ボタンは置かない）。一覧は `DragHandle`（components/management/drag-handle.tsx）＋ `useOptimistic` で放した時点で保存、フォーム内（画像・動画・相關商品）はフォームの値を入れ替えるだけ。分類は同じ階層内だけ動かせる（`reorderCategories`）。新規分類はその階層の末尾に入る
