@@ -54,10 +54,14 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
           <SearchForm locale={locale} placeholder={d.products.searchPlaceholder} className="hidden flex-1 md:block md:max-w-md lg:mx-auto" />
           <div className="ml-auto flex items-center gap-3">
             {shopUrl ? (
-              <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-outline hidden md:inline-flex">
-                {d.nav.shop}
-                <ArrowUpRightIcon className="size-4" />
-              </a>
+              // The wrapper hides it on phones (the menu has the same link): `.btn-outline` sets its own
+              // display outside the utilities layer, so `hidden` on the button itself has no effect.
+              <span className="hidden md:block">
+                <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-outline">
+                  {d.nav.shop}
+                  <ArrowUpRightIcon className="size-4" />
+                </a>
+              </span>
             ) : null}
             <Suspense fallback={<span className="size-10 lg:hidden" />}>
               <MobileMenu items={mobileItems} openLabel={d.nav.menu} closeLabel={d.nav.close}>
