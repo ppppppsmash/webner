@@ -20,7 +20,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
   return (
     <>
       <section className="bg-tint-soft">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
+        <div className="mx-auto max-w-3xl px-6 py-20 text-center md:py-28">
           <h1 className="rise text-4xl text-brand md:text-5xl">
             {d.about.title}
           </h1>
@@ -30,7 +30,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-16 md:py-20">
+      <section className="mx-auto max-w-4xl px-6 py-20 md:py-28">
         {/* Topics, not steps: title on the left, text on the right, no numbering. */}
         <ul className="divide-y divide-line">
           {d.about.sections.map((s) => (

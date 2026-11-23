@@ -55,7 +55,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
   const crumbs = paths[0] ?? [];
 
   return (
-    <article className="mx-auto max-w-6xl px-6 pt-6 pb-8 md:pt-8">
+    <article className="mx-auto max-w-6xl px-6 pt-6 pb-24 md:pt-8 md:pb-32">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-ink-2">
         <Link href={localePath(locale)} className="py-1 hover:text-brand">
           {d.nav.home}
@@ -152,7 +152,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
       ) : null}
 
       {related.length ? (
-        <Reveal as="section" className="mt-20">
+        <Reveal as="section" className="mt-24 md:mt-32">
           <h2 className="section-title">{d.products.related}</h2>
           {/* Flex instead of a grid so fewer than four cards sit centred under the centred heading. */}
           <ul className="-mx-2 mt-12 flex flex-wrap justify-center gap-y-10 md:-mx-3">

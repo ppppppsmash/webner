@@ -32,7 +32,7 @@ export function CatalogLayout({
   const eyebrow = lead ?? (title === d.products.title ? null : d.products.title);
   const countLine = <p className="mt-2 text-sm text-ink-2">{d.products.count(count)}</p>;
   return (
-    <section className="mx-auto max-w-6xl px-6 pt-10 pb-8 md:pt-14">
+    <section className="mx-auto max-w-6xl px-6 pt-12 pb-24 md:pt-16 md:pb-32">
       <div className="text-center">
         {eyebrow ? <p className="eyebrow mb-2">{eyebrow}</p> : null}
         <h1 className="text-4xl text-brand md:text-5xl">{title}</h1>
@@ -46,7 +46,7 @@ export function CatalogLayout({
         )}
         <span aria-hidden className="mx-auto mt-4 block h-px w-12 bg-tint" />
       </div>
-      <div className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
+      <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
         <CategoryNav locale={locale} tree={tree} activeSlug={activeSlug} allLabel={d.products.all} heading={d.products.filterBy} />
         <div className="min-w-0">{children}</div>
       </div>

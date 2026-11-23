@@ -14,7 +14,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
   const shopUrl = settings.showShopLink && settings.shopUrl ? settings.shopUrl : null;
 
   return (
-    <footer className="mt-20 bg-tint text-ink">
+    <footer className="bg-tint text-ink">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
         <div className="space-y-4">
           <Wordmark onTint />

@@ -24,7 +24,7 @@ export function ProductSection({
 }) {
   if (!products.length) return null;
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+    <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
       <Reveal>
         <SectionHeading title={title} lead={lead} />
       </Reveal>
@@ -36,7 +36,7 @@ export function ProductSection({
         ))}
       </ul>
       {showAllLink ? (
-        <div className="mt-10 text-center">
+        <div className="mt-14 text-center">
           <Link href={localePath(locale, "/products")} className="btn-outline">
             {d.home.viewAll}
           </Link>

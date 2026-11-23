@@ -10,8 +10,8 @@ const ICONS = [LeafIcon, FlaskConicalIcon, DropletIcon, MapPinIcon];
 export function Values({ d, withTitle = false }: { d: PublicDictionary; withTitle?: boolean }) {
   const items = [...d.values.items, { title: d.footer.distributor, body: d.footer.distributorBody }];
   return (
-    <section className="border-b border-line">
-      <div className="mx-auto max-w-6xl px-6 py-10 md:py-12">
+    <section className={withTitle ? "border-t border-line pb-10 md:pb-16" : "border-b border-line"}>
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-14">
         {withTitle ? <h2 className="section-title mb-10">{d.values.title}</h2> : null}
         <ul className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
           {items.map((item, i) => {

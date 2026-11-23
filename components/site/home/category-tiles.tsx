@@ -16,11 +16,11 @@ export function CategoryTiles({ d, locale, tree, products }: { d: PublicDictiona
 
   return (
     <section className="bg-paper-2">
-      <div className="mx-auto max-w-6xl px-6 py-16 md:py-20">
+      <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <Reveal>
           <SectionHeading title={d.home.categoriesTitle} lead={d.home.categoriesLead} />
         </Reveal>
-        <ul className="mt-10 grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+        <ul className="mt-12 grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           {parents.map((c, i) => {
             const image = imageFor(new Set([c.id, ...c.children.map((ch) => ch.id)]));
             return (

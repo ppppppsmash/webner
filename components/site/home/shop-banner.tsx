@@ -6,7 +6,7 @@ import type { PublicDictionary } from "@/lib/i18n/public";
 export function ShopBanner({ d, shopUrl }: { d: PublicDictionary; shopUrl: string }) {
   return (
     <section className="bg-tint-soft">
-      <Reveal className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-14 text-center md:py-16">
+      <Reveal className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-20 text-center md:py-24">
         <h2 className="section-title">{d.home.shopBannerTitle}</h2>
         <p className="max-w-xl text-ink-2">{d.home.shopBannerBody}</p>
         <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary">
