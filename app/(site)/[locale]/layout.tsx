@@ -3,6 +3,7 @@ import { Libre_Franklin, Lora, Noto_Sans_TC, Noto_Serif_TC } from "next/font/goo
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { ThemePreview } from "@/components/site/theme-preview";
 import { HTML_LANG, isLocale, LOCALES, type Locale } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
@@ -58,7 +59,9 @@ export default async function SiteLayout({ children, params }: LayoutProps<"/[lo
       lang={HTML_LANG[locale as Locale]}
       className={`${lora.variable} ${franklin.variable} ${notoSansTC.variable} ${notoSerifTC.variable} h-full`}
     >
-      <body className="site flex min-h-full flex-col">
+      {/* suppressHydrationWarning + <ThemePreview />: temporary palette review, see components/site/theme-preview */}
+      <body className="site flex min-h-full flex-col" suppressHydrationWarning>
+        <ThemePreview />
         <SiteHeader locale={locale} />
         <main className="flex-1">{children}</main>
         <SiteFooter locale={locale} />
