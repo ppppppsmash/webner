@@ -28,12 +28,14 @@ export function CatalogLayout({
   searchable?: boolean;
   children: React.ReactNode;
 }) {
+  // Parent category, or "Products" above a top-level category — never a repeat of the title itself.
+  const eyebrow = lead ?? (title === d.products.title ? null : d.products.title);
   const countLine = <p className="mt-2 text-sm text-ink-2">{d.products.count(count)}</p>;
   return (
     <section className="mx-auto max-w-6xl px-6 pt-10 pb-8 md:pt-14">
       <div className="text-center">
-        {lead ? <p className="eyebrow">{lead}</p> : <p className="eyebrow">{d.products.title}</p>}
-        <h1 className="mt-2 text-3xl text-brand md:text-4xl">{title}</h1>
+        {eyebrow ? <p className="eyebrow mb-2">{eyebrow}</p> : null}
+        <h1 className="text-3xl text-brand md:text-4xl">{title}</h1>
         {searchable ? (
           // The total would contradict "0 results" while a search is shown.
           <Suspense fallback={countLine}>

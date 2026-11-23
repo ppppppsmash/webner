@@ -21,11 +21,10 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
     <>
       <section className="bg-tint-soft">
         <div className="mx-auto max-w-3xl px-6 py-16 text-center md:py-20">
-          <p className="eyebrow rise">{d.story.eyebrow}</p>
-          <h1 className="rise mt-3 text-4xl text-brand md:text-5xl" style={{ "--rise-delay": "100ms" } as React.CSSProperties}>
+          <h1 className="rise text-4xl text-brand md:text-5xl">
             {d.about.title}
           </h1>
-          <p className="rise mt-5 text-lg text-ink-2" style={{ "--rise-delay": "200ms" } as React.CSSProperties}>
+          <p className="rise mt-5 text-lg text-ink-2" style={{ "--rise-delay": "100ms" } as React.CSSProperties}>
             {d.about.lead}
           </p>
         </div>
