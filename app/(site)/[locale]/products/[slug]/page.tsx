@@ -154,9 +154,10 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
       {related.length ? (
         <Reveal as="section" className="mt-20">
           <h2 className="section-title">{d.products.related}</h2>
-          <ul className="mt-8 grid grid-cols-2 gap-x-2 gap-y-6 md:gap-x-4 lg:grid-cols-4">
+          {/* Flex instead of a grid so fewer than four cards sit centred under the centred heading. */}
+          <ul className="-mx-1 mt-8 flex flex-wrap justify-center gap-y-6 md:-mx-2">
             {related.map((p) => (
-              <li key={p.id}>
+              <li key={p.id} className="w-1/2 px-1 md:px-2 lg:w-1/4">
                 <ProductCard product={p} locale={locale} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />
               </li>
             ))}
