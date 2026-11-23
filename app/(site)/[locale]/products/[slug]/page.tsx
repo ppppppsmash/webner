@@ -78,15 +78,13 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
         <ProductGallery images={product.images.map((i) => ({ url: i.url, alt: i.alt }))} name={name} noImageLabel={d.products.noImage} />
 
         <div className="lg:pt-4">
-          <div className="rise flex flex-wrap items-center gap-3">
-            {product.badge ? (
-              <span className="bg-brand px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-paper uppercase">
-                {d.products.badges[product.badge]}
-              </span>
-            ) : null}
-            {crumbs.length ? <p className="text-sm text-ink-2">{crumbs.map((c) => c.label).join(" › ")}</p> : null}
-          </div>
-          <h1 className="rise mt-2 text-3xl leading-tight text-brand md:text-[2.6rem]" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
+          {/* The category path is already in the breadcrumb above and in the facts below. */}
+          {product.badge ? (
+            <p className="rise mb-3">
+              <span className="bg-brand px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-paper uppercase">{d.products.badges[product.badge]}</span>
+            </p>
+          ) : null}
+          <h1 className="rise text-3xl leading-tight text-brand md:text-[2.6rem]" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
             {name}
           </h1>
           {summary ? (
