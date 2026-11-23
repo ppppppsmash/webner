@@ -81,7 +81,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
           {/* The category path is already in the breadcrumb above and in the facts below. */}
           {product.badge ? (
             <p className="rise mb-3">
-              <span className="bg-brand px-2.5 py-1 text-xs font-semibold tracking-wide text-paper uppercase">{d.products.badges[product.badge]}</span>
+              <span className="bg-brand px-2.5 py-1 text-xs font-semibold tracking-wider text-paper uppercase">{d.products.badges[product.badge]}</span>
             </p>
           ) : null}
           <h1 className="rise text-3xl leading-tight text-brand md:text-[2.6rem]" style={{ "--rise-delay": "80ms" } as React.CSSProperties}>
@@ -97,7 +97,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
             {product.volume ? (
               <>
                 <dt className="text-ink-2">{d.products.volume}</dt>
-                <dd className="font-medium">{product.volume}</dd>
+                <dd className="tabular font-medium">{product.volume}</dd>
               </>
             ) : null}
             {paths.length ? (

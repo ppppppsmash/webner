@@ -43,7 +43,7 @@ export function ProductCard({
               fill
               priority={priority}
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-              className={cn("object-cover transition-[opacity,scale] duration-500 ease-out", alt ? "group-hover:opacity-0" : "group-hover:scale-[1.03]")}
+              className={cn("object-cover transition-[opacity,scale] duration-300 ease-out", alt ? "group-hover:opacity-0" : "group-hover:scale-[1.03]")}
             />
             {alt ? (
               <Image
@@ -51,7 +51,7 @@ export function ProductCard({
                 alt=""
                 fill
                 sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                className="object-cover opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
               />
             ) : null}
           </>
@@ -59,7 +59,7 @@ export function ProductCard({
           <div className="flex size-full items-center justify-center text-sm text-ink-2">{noImageLabel}</div>
         )}
         {badge ? (
-          <span className="absolute top-2 left-2 bg-brand px-2.5 py-1 text-xs font-semibold tracking-wide text-paper uppercase">
+          <span className="absolute top-2 left-2 bg-brand px-2.5 py-1 text-xs font-semibold tracking-wider text-paper uppercase">
             {badge}
           </span>
         ) : null}
@@ -68,7 +68,7 @@ export function ProductCard({
         <h3 className="text-base leading-snug text-ink underline-offset-4 group-hover:text-brand group-hover:underline" style={{ fontFamily: "var(--font-body)", fontWeight: 500 }}>
           {name}
         </h3>
-        <p className="mt-1.5 text-sm text-ink-2">{[category, product.volume].filter(Boolean).join(" · ")}</p>
+        <p className="tabular mt-1.5 text-sm text-ink-2">{[category, product.volume].filter(Boolean).join(" · ")}</p>
       </div>
     </Link>
   );

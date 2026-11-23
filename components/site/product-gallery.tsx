@@ -20,7 +20,7 @@ export function ProductGallery({ images, name, noImageLabel }: { images: Gallery
         <Image key={current.url} src={current.url} alt={current.alt ?? name} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="rise object-cover" />
       </div>
       {images.length > 1 ? (
-        <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none]" aria-label={name}>
+        <ul className="flex gap-2 overflow-x-auto overscroll-x-contain p-1 -m-1 [scrollbar-width:none]" aria-label={name}>
           {images.map((img, i) => (
             <li key={img.url} className="shrink-0">
               <button

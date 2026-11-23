@@ -194,15 +194,23 @@
   font-weight: 500;
   letter-spacing: 0;
   word-break: auto-phrase;
+  text-wrap: balance;
+}
+.site p {
+  text-wrap: pretty;
+}
+/* Counts and volumes line up digit under digit */
+.site .tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* One-time reveal: initial state in CSS so nothing flashes before JS */
 [data-reveal] {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(12px);
   transition:
-    opacity 0.7s var(--ease-out-expo),
-    transform 0.7s var(--ease-out-expo);
+    opacity 0.5s var(--ease-out-expo),
+    transform 0.5s var(--ease-out-expo);
   transition-delay: var(--reveal-delay, 0ms);
 }
 [data-reveal="in"] {
@@ -220,7 +228,7 @@
   }
 }
 .rise {
-  animation: rise 0.8s var(--ease-out-expo) both;
+  animation: rise 0.6s var(--ease-out-expo) both;
   animation-delay: var(--rise-delay, 0ms);
 }
 /* Without JavaScript nothing flips data-reveal, so the content must not stay hidden. */
@@ -258,44 +266,57 @@
   letter-spacing: 0.01em;
   line-height: 1;
   transition:
-    background-color 0.2s,
-    color 0.2s,
-    border-color 0.2s;
+    background-color 0.2s ease-out,
+    color 0.2s ease-out,
+    border-color 0.2s ease-out,
+    scale 0.15s ease-out;
+}
+/* Pressed: the button gives slightly under the finger */
+.site :is(.btn-primary, .btn-outline, .btn-light, .btn-ghost-light):active {
+  scale: 0.97;
 }
 .site .btn-primary {
   background: var(--brand);
   color: #fff;
   border: 1px solid var(--brand);
 }
-.site .btn-primary:hover {
-  background: var(--brand-deep);
-  border-color: var(--brand-deep);
+@media (hover: hover) {
+  .site .btn-primary:hover {
+    background: var(--brand-deep);
+    border-color: var(--brand-deep);
+  }
 }
 .site .btn-outline {
   border: 1px solid var(--brand);
   color: var(--brand);
   background: transparent;
 }
-.site .btn-outline:hover {
-  background: var(--brand);
-  color: #fff;
+@media (hover: hover) {
+  .site .btn-outline:hover {
+    background: var(--brand);
+    color: #fff;
+  }
 }
 .site .btn-light {
   background: #fff;
   color: var(--brand);
   border: 1px solid #fff;
 }
-.site .btn-light:hover {
-  background: var(--tint-soft);
+@media (hover: hover) {
+  .site .btn-light:hover {
+    background: var(--tint-soft);
+  }
 }
 .site .btn-ghost-light {
   border: 1px solid rgba(255, 255, 255, 0.7);
   color: #fff;
   background: transparent;
 }
-.site .btn-ghost-light:hover {
-  background: #fff;
-  color: var(--brand);
+@media (hover: hover) {
+  .site .btn-ghost-light:hover {
+    background: #fff;
+    color: var(--brand);
+  }
 }
 
 /* Navigation strip links */
@@ -339,7 +360,7 @@
 .site .eyebrow {
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-2);
 }
@@ -354,10 +375,12 @@
   padding: 0.25rem 0; /* 28px tall: comfortable to tap */
   color: var(--ink);
 }
-.site .footer-link:hover {
-  color: var(--brand);
-  text-decoration: underline;
-  text-underline-offset: 4px;
+@media (hover: hover) {
+  .site .footer-link:hover {
+    color: var(--brand);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }
 
 /* Rich text from the management editor */

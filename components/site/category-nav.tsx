@@ -48,7 +48,7 @@ export function CategoryNav({
       )}
     >
       <span className={cn(active && "underline decoration-tint decoration-2 underline-offset-4")}>{label}</span>
-      {count !== undefined ? <span className="text-xs text-ink-2">{count}</span> : null}
+      {count !== undefined ? <span className="tabular text-xs text-ink-2">{count}</span> : null}
     </Link>
   );
 
@@ -59,7 +59,7 @@ export function CategoryNav({
   return (
     <nav aria-label={heading} className="min-w-0 lg:sticky lg:top-38 lg:self-start">
       <h2 className="footer-title hidden border-b border-line pb-2 lg:block">{heading}</h2>
-      <ChipScroller activeKey={activeSlug} className="-mx-6 flex gap-2 overflow-x-auto px-6 py-1 [scrollbar-width:none] lg:hidden">
+      <ChipScroller activeKey={activeSlug} className="-mx-6 flex gap-2 overflow-x-auto overscroll-x-contain px-6 py-1 [scrollbar-width:none] lg:hidden">
         {chip("all", localePath(locale, "/products"), allLabel, activeSlug === null)}
         {tree.filter(shown).flatMap((c) => [
           chip(c.id, localePath(locale, `/categories/${c.slug}`), pickText(c.name, locale), activeSlug === c.slug),

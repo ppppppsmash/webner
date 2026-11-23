@@ -24,16 +24,16 @@ export function CategoryTiles({ d, locale, tree, products }: { d: PublicDictiona
           {parents.map((c, i) => {
             const image = imageFor(new Set([c.id, ...c.children.map((ch) => ch.id)]));
             return (
-              <Reveal as="li" key={c.id} delay={i * 70}>
+              <Reveal as="li" key={c.id} delay={i * 50}>
                 <Link href={localePath(locale, `/categories/${c.slug}`)} className="group flex h-full flex-col bg-paper transition-shadow hover:shadow-[0_14px_30px_-18px_rgba(20,30,60,0.35)]">
                   <div className="relative aspect-[4/3] overflow-hidden bg-tint-soft">
                     {image ? (
-                      <Image src={image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                      <Image src={image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]" />
                     ) : null}
                   </div>
                   <div className="flex flex-1 flex-col px-2 py-4 text-center sm:p-5">
                     <h3 className="text-lg leading-snug text-brand sm:text-xl">{pickText(c.name, locale)}</h3>
-                    <p className="mt-1 text-xs text-ink-2">{d.products.count(c.count)}</p>
+                    <p className="tabular mt-1 text-xs text-ink-2">{d.products.count(c.count)}</p>
                     {c.children.length ? (
                       <p className="mt-3 hidden text-xs leading-relaxed text-ink-2 sm:block">{c.children.map((ch) => pickText(ch.name, locale)).join(" · ")}</p>
                     ) : null}

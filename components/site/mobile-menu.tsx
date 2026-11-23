@@ -87,7 +87,7 @@ export function MobileMenu({
         aria-modal="true"
         aria-label={openLabel}
         hidden={!open}
-        className={cn("fixed inset-0 z-50 flex flex-col overflow-y-auto bg-paper text-ink", !open && "hidden")}
+        className={cn("fixed inset-0 z-50 flex flex-col overflow-y-auto overscroll-contain bg-paper text-ink", !open && "hidden")}
       >
         <div className="flex h-14 items-center justify-end border-b border-line px-4">
           <button
