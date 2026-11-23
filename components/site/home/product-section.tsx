@@ -7,7 +7,21 @@ import { localePath } from "@/lib/i18n/paths";
 import type { PublicDictionary } from "@/lib/i18n/public";
 import type { PublicProduct } from "@/lib/queries/public";
 
-export function ProductSection({ d, locale, title, lead, products }: { d: PublicDictionary; locale: Locale; title: string; lead?: string; products: PublicProduct[] }) {
+export function ProductSection({
+  d,
+  locale,
+  title,
+  lead,
+  products,
+  showAllLink = true,
+}: {
+  d: PublicDictionary;
+  locale: Locale;
+  title: string;
+  lead?: string;
+  products: PublicProduct[];
+  showAllLink?: boolean;
+}) {
   if (!products.length) return null;
   return (
     <section className="mx-auto max-w-6xl px-6 py-16 md:py-20">
@@ -21,11 +35,13 @@ export function ProductSection({ d, locale, title, lead, products }: { d: Public
           </Reveal>
         ))}
       </ul>
-      <div className="mt-10 text-center">
-        <Link href={localePath(locale, "/products")} className="btn-outline">
-          {d.home.viewAll}
-        </Link>
-      </div>
+      {showAllLink ? (
+        <div className="mt-10 text-center">
+          <Link href={localePath(locale, "/products")} className="btn-outline">
+            {d.home.viewAll}
+          </Link>
+        </div>
+      ) : null}
     </section>
   );
 }

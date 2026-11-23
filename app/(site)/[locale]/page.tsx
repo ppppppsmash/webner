@@ -30,10 +30,19 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     <>
       <Hero d={d} locale={locale} imageUrl={heroImage} />
       <Values d={d} />
-      <Story d={d} />
-      <ProductSection d={d} locale={locale} title={d.home.featuredTitle} lead={d.home.featuredLead} products={featured} />
+      {/* Products come before the brand text: this is a gallery, the bottles are the content. */}
+      <ProductSection
+        d={d}
+        locale={locale}
+        title={d.home.featuredTitle}
+        lead={d.home.featuredLead}
+        products={featured}
+        // One "view all" per page: it sits under the last product row.
+        showAllLink={!latestWithoutFeatured.length}
+      />
       <CategoryTiles d={d} locale={locale} tree={tree} products={all} />
       <ProductSection d={d} locale={locale} title={d.home.latestTitle} products={latestWithoutFeatured} />
+      <Story d={d} />
       {settings.showShopLink && settings.shopUrl ? <ShopBanner d={d} shopUrl={settings.shopUrl} /> : null}
     </>
   );
