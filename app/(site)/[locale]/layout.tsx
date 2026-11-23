@@ -58,9 +58,10 @@ export default async function SiteLayout({ children, params }: LayoutProps<"/[lo
     <html
       lang={HTML_LANG[locale as Locale]}
       className={`${lora.variable} ${franklin.variable} ${notoSansTC.variable} ${notoSerifTC.variable} h-full`}
+      suppressHydrationWarning
     >
-      {/* suppressHydrationWarning + <ThemePreview />: temporary palette review, see components/site/theme-preview */}
-      <body className="site flex min-h-full flex-col" suppressHydrationWarning>
+      <body className="site flex min-h-full flex-col">
+        {/* Temporary palette review (also the reason for suppressHydrationWarning on <html>): see components/site/theme-preview */}
         <ThemePreview />
         <SiteHeader locale={locale} />
         <main className="flex-1">{children}</main>

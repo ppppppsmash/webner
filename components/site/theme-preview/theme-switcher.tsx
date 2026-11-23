@@ -14,17 +14,17 @@ export interface SwitcherTheme {
   soft: string;
 }
 
-// The applied theme lives on <body data-theme>, set before paint by the inline script in ThemePreview.
+// The applied theme lives on <html data-theme>, set before paint by the inline script in ThemePreview.
 const listeners = new Set<() => void>();
 const subscribe = (cb: () => void) => {
   listeners.add(cb);
   return () => void listeners.delete(cb);
 };
-const readTheme = () => document.body.dataset.theme ?? "";
+const readTheme = () => document.documentElement.dataset.theme ?? "";
 
 function applyTheme(id: string) {
-  if (id) document.body.dataset.theme = id;
-  else delete document.body.dataset.theme;
+  if (id) document.documentElement.dataset.theme = id;
+  else delete document.documentElement.dataset.theme;
   try {
     if (id) localStorage.setItem(THEME_STORAGE_KEY, id);
     else localStorage.removeItem(THEME_STORAGE_KEY);
@@ -32,6 +32,15 @@ function applyTheme(id: string) {
     // private mode: the choice simply lasts for this page view
   }
   for (const l of listeners) l();
+}
+
+/**
+ * Inline script that restores the saved palette. It must execute only from the server-rendered HTML:
+ * React never runs scripts it creates on the client and warns about them, so there it is rendered as
+ * an inert data block (the differing `type` is why the hydration warning is suppressed).
+ */
+export function RestoreScript({ code }: { code: string }) {
+  return <script type={typeof window === "undefined" ? "text/javascript" : "application/json"} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: code }} />;
 }
 
 /** TEMPORARY review tool: floating palette picker. UI text is Traditional Chinese like the management panel. */

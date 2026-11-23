@@ -79,10 +79,10 @@ export const PREVIEW_THEMES: PreviewTheme[] = [
   fromPair("n4-amber", BOTANICAL, "深琥珀棕 × 暖砂米", "#54392B", "#EADACA"),
 ];
 
-/** One rule per theme, scoped to `.site[data-theme="…"]` so it overrides the tokens in globals.css. */
+/** One rule per theme, scoped to `[data-theme="…"] .site` so it overrides the tokens in globals.css. */
 export function previewThemeCss(): string {
   return PREVIEW_THEMES.map((t) => {
-    const sel = `.site[data-theme="${t.id}"]`;
+    const sel = `[data-theme="${t.id}"] .site`;
     const vars = [
       `--brand:${t.brand}`,
       `--brand-deep:${t.deep}`,
