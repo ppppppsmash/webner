@@ -1,3 +1,4 @@
+import { isBasicAuthEnabled } from "@/lib/basic-auth";
 import { RestoreScript, ThemeSwitcher } from "./theme-switcher";
 import { PREVIEW_THEMES, previewThemeCss, THEME_STORAGE_KEY } from "./themes";
 
@@ -8,10 +9,13 @@ import { PREVIEW_THEMES, previewThemeCss, THEME_STORAGE_KEY } from "./themes";
  *
  * To remove: delete components/site/theme-preview/ and, in app/(site)/[locale]/layout.tsx,
  * the import, <ThemePreview /> and `suppressHydrationWarning` on <html>.
- * To hide it without removing: NEXT_PUBLIC_THEME_PREVIEW=0.
+ * To hide it without removing: NEXT_PUBLIC_THEME_PREVIEW=0. In production it is shown only while
+ * Basic auth is on (BASIC_AUTH_USER / BASIC_AUTH_PASSWORD, see lib/basic-auth.ts).
  */
 export function ThemePreview() {
   if (process.env.NEXT_PUBLIC_THEME_PREVIEW === "0") return null;
+  // A review tool must not reach the public: in production it only shows while the site is behind Basic auth.
+  if (process.env.NODE_ENV === "production" && !isBasicAuthEnabled()) return null;
 
   const ids = JSON.stringify(PREVIEW_THEMES.map((t) => t.id));
   // Runs as the HTML is parsed, before the first paint, so the page never flashes in the default colours.
