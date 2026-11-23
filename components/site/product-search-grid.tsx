@@ -15,13 +15,11 @@ export function ProductSearchGrid({
   locale,
   emptyLabel,
   noImageLabel,
-  detailsLabel,
 }: {
   products: PublicProduct[];
   locale: Locale;
   emptyLabel: string;
   noImageLabel: string;
-  detailsLabel?: string;
 }) {
   const { searchResults: resultLabel, searchEmpty, searchReset } = getDictionary(locale).products;
   const q = (useSearchParams().get("q") ?? "").trim().toLowerCase();
@@ -44,7 +42,7 @@ export function ProductSearchGrid({
           </Link>
         </div>
       ) : (
-        <ProductGrid products={filtered} locale={locale} emptyLabel={emptyLabel} noImageLabel={noImageLabel} detailsLabel={detailsLabel} />
+        <ProductGrid products={filtered} locale={locale} emptyLabel={emptyLabel} noImageLabel={noImageLabel} />
       )}
     </>
   );

@@ -28,10 +28,10 @@ export function ProductSection({
       <Reveal>
         <SectionHeading title={title} lead={lead} />
       </Reveal>
-      <ul className="mt-10 grid grid-cols-2 gap-x-2 gap-y-6 md:gap-x-4 lg:grid-cols-4">
+      <ul className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 md:gap-x-6 lg:grid-cols-4">
         {products.map((p, i) => (
           <Reveal as="li" key={p.id} delay={i * 50}>
-            <ProductCard product={p} locale={locale} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />
+            <ProductCard product={p} locale={locale} noImageLabel={d.products.noImage} />
           </Reveal>
         ))}
       </ul>

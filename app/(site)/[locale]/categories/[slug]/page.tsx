@@ -36,7 +36,7 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/cate
       lead={category.parent ? pickText(category.parent.name, locale) : undefined}
       count={products.length}
     >
-      <ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />
+      <ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} />
     </CatalogLayout>
   );
 }

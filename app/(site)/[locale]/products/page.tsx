@@ -23,13 +23,13 @@ export default async function ProductsPage({ params }: PageProps<"/[locale]/prod
 
   return (
     <CatalogLayout d={d} locale={locale} tree={tree} activeSlug={null} title={d.products.title} count={products.length} searchable>
-      <Suspense fallback={<ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />}>
+      <Suspense fallback={<ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} />}>
         <ProductSearchGrid
           products={products}
           locale={locale}
           emptyLabel={d.products.empty}
           noImageLabel={d.products.noImage}
-          detailsLabel={d.products.details}
+         
         />
       </Suspense>
     </CatalogLayout>
