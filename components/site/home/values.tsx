@@ -1,10 +1,12 @@
 import { DropletIcon, FlaskConicalIcon, LeafIcon, MapPinIcon } from "lucide-react";
-import { Reveal } from "@/components/site/reveal";
 import type { PublicDictionary } from "@/lib/i18n/public";
 
 const ICONS = [LeafIcon, FlaskConicalIcon, DropletIcon, MapPinIcon];
 
-/** USP strip under the hero (naturrein · Made in Germany · Expertise · Partner in Taiwan). */
+/**
+ * USP strip under the hero (naturrein · Made in Germany · Expertise · Partner in Taiwan).
+ * Static on purpose: it is the first thing below the hero and should simply be there.
+ */
 export function Values({ d, withTitle = false }: { d: PublicDictionary; withTitle?: boolean }) {
   const items = [...d.values.items, { title: d.footer.distributor, body: d.footer.distributorBody }];
   return (
@@ -15,7 +17,7 @@ export function Values({ d, withTitle = false }: { d: PublicDictionary; withTitl
           {items.map((item, i) => {
             const Icon = ICONS[i % ICONS.length];
             return (
-              <Reveal as="li" key={item.title} delay={i * 80} className="flex flex-col items-center text-center">
+              <li key={item.title} className="flex flex-col items-center text-center">
                 <span className="flex size-12 items-center justify-center rounded-full border border-brand text-brand">
                   <Icon className="size-5" strokeWidth={1.5} />
                 </span>
@@ -23,7 +25,7 @@ export function Values({ d, withTitle = false }: { d: PublicDictionary; withTitl
                   {item.title}
                 </h3>
                 <p className="mt-1 max-w-[16rem] text-sm leading-relaxed text-ink-2">{item.body}</p>
-              </Reveal>
+              </li>
             );
           })}
         </ul>
