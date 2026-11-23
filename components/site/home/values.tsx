@@ -13,7 +13,7 @@ export function Values({ d, withTitle = false }: { d: PublicDictionary; withTitl
     <section className="border-b border-line">
       <div className="mx-auto max-w-6xl px-6 py-10 md:py-12">
         {withTitle ? <h2 className="section-title mb-10">{d.values.title}</h2> : null}
-        <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
           {items.map((item, i) => {
             const Icon = ICONS[i % ICONS.length];
             return (

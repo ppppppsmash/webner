@@ -20,7 +20,7 @@ export function CategoryTiles({ d, locale, tree, products }: { d: PublicDictiona
         <Reveal>
           <SectionHeading title={d.home.categoriesTitle} lead={d.home.categoriesLead} />
         </Reveal>
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-10 grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
           {parents.map((c, i) => {
             const image = imageFor(new Set([c.id, ...c.children.map((ch) => ch.id)]));
             return (
@@ -31,11 +31,11 @@ export function CategoryTiles({ d, locale, tree, products }: { d: PublicDictiona
                       <Image src={image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                     ) : null}
                   </div>
-                  <div className="flex flex-1 flex-col p-5 text-center">
-                    <h3 className="text-xl text-brand">{pickText(c.name, locale)}</h3>
+                  <div className="flex flex-1 flex-col px-2 py-4 text-center sm:p-5">
+                    <h3 className="text-lg leading-snug text-brand sm:text-xl">{pickText(c.name, locale)}</h3>
                     <p className="mt-1 text-xs text-ink-2">{d.products.count(c.count)}</p>
                     {c.children.length ? (
-                      <p className="mt-3 text-xs leading-relaxed text-ink-2">{c.children.map((ch) => pickText(ch.name, locale)).join(" · ")}</p>
+                      <p className="mt-3 hidden text-xs leading-relaxed text-ink-2 sm:block">{c.children.map((ch) => pickText(ch.name, locale)).join(" · ")}</p>
                     ) : null}
                   </div>
                 </Link>
