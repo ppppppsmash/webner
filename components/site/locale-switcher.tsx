@@ -23,7 +23,7 @@ export function LocaleSwitcher({
   const pathname = usePathname();
   const light = tone === "light";
   return (
-    <nav aria-label={label} className={cn("-mx-1.5 flex items-center text-[0.75rem] tracking-wide", className)}>
+    <nav aria-label={label} className={cn("-mx-1.5 flex items-center text-xs tracking-wide", className)}>
       {LOCALES.map((locale, i) => (
         <span key={locale} className="flex items-center">
           {i > 0 ? <span aria-hidden className={cn(light ? "text-paper/40" : tone === "tint" ? "text-ink/30" : "text-line")}>|</span> : null}

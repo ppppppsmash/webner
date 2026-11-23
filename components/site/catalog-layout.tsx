@@ -35,7 +35,7 @@ export function CatalogLayout({
     <section className="mx-auto max-w-6xl px-6 pt-10 pb-8 md:pt-14">
       <div className="text-center">
         {eyebrow ? <p className="eyebrow mb-2">{eyebrow}</p> : null}
-        <h1 className="text-3xl text-brand md:text-4xl">{title}</h1>
+        <h1 className="text-4xl text-brand md:text-5xl">{title}</h1>
         {searchable ? (
           // The total would contradict "0 results" while a search is shown.
           <Suspense fallback={countLine}>

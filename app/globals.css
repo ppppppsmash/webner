@@ -253,7 +253,7 @@
   gap: 0.5rem;
   border-radius: 2px;
   padding: 0.8rem 1.5rem;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
@@ -307,7 +307,7 @@
   height: 100%;
   padding: 0 0.1rem;
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1rem;
   color: var(--ink);
 }
 .site .nav-link::after {
@@ -331,12 +331,13 @@
 /* Section titles (centered serif, WADI-style) */
 .site .section-title {
   font-family: var(--font-display);
-  font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem);
+  font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.25rem);
+  line-height: 1.2;
   color: var(--brand);
   text-align: center;
 }
 .site .eyebrow {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -344,7 +345,7 @@
 }
 .site .footer-title {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.125rem;
   color: var(--brand);
   margin-bottom: 0.9rem;
 }
@@ -370,8 +371,8 @@
   line-height: 1.25;
   color: var(--brand);
 }
-.site .rich-text h2 { font-size: 1.4rem; }
-.site .rich-text h3 { font-size: 1.15rem; }
+.site .rich-text h2 { font-size: 1.5rem; }
+.site .rich-text h3 { font-size: 1.125rem; }
 .site .rich-text p { margin: 0 0 1em; }
 .site .rich-text :is(ul, ol) { margin: 0 0 1em; padding-left: 1.4em; }
 .site .rich-text ul { list-style: disc; }

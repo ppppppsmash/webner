@@ -61,7 +61,7 @@ export function ProductCard({
           <div className="flex size-full items-center justify-center text-sm text-ink-2">{noImageLabel}</div>
         )}
         {badge ? (
-          <span className="absolute top-2 left-2 bg-brand px-2.5 py-1 text-[0.68rem] font-semibold tracking-wide text-paper uppercase">
+          <span className="absolute top-2 left-2 bg-brand px-2.5 py-1 text-xs font-semibold tracking-wide text-paper uppercase">
             {badge}
           </span>
         ) : null}
