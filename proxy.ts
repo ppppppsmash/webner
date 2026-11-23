@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 import { authConfig } from "@/auth.config";
+import { basicAuthChallenge } from "@/lib/basic-auth";
 import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/i18n/locales";
 
 const { auth } = NextAuth(authConfig);
@@ -18,6 +19,10 @@ function detectLocale(req: { cookies: { get(name: string): { value: string } | u
 }
 
 export default auth((req) => {
+  // ---- Optional Basic auth in front of everything (BASIC_AUTH_USER / BASIC_AUTH_PASSWORD) ----
+  const challenge = basicAuthChallenge(req);
+  if (challenge) return challenge;
+
   const { pathname } = req.nextUrl;
 
   // ---- Management: session required ---------------------------------------
