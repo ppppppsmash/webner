@@ -223,6 +223,14 @@
   animation: rise 0.8s var(--ease-out-expo) both;
   animation-delay: var(--rise-delay, 0ms);
 }
+/* Without JavaScript nothing flips data-reveal, so the content must not stay hidden. */
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] {
     opacity: 1;
