@@ -31,17 +31,15 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
       </section>
 
       <section className="mx-auto max-w-4xl px-6 py-16 md:py-20">
-        <ol className="divide-y divide-line">
-          {d.about.sections.map((s, i) => (
-            <Reveal as="li" key={s.title} className="grid gap-3 py-10 first:pt-0 md:grid-cols-[100px_minmax(0,1fr)] md:gap-8">
-              <span className="font-display text-4xl text-tint md:text-5xl">0{i + 1}</span>
-              <div>
-                <h2 className="text-2xl text-brand">{s.title}</h2>
-                <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-2">{s.body}</p>
-              </div>
+        {/* Topics, not steps: title on the left, text on the right, no numbering. */}
+        <ul className="divide-y divide-line">
+          {d.about.sections.map((s) => (
+            <Reveal as="li" key={s.title} className="grid gap-3 py-10 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-10">
+              <h2 className="text-2xl text-brand">{s.title}</h2>
+              <p className="text-base leading-relaxed text-ink-2">{s.body}</p>
             </Reveal>
           ))}
-        </ol>
+        </ul>
       </section>
 
       <Values d={d} withTitle />
