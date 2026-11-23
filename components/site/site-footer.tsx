@@ -47,13 +47,6 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 {d.nav.about}
               </Link>
             </li>
-            {shopUrl ? (
-              <li>
-                <a href={shopUrl} target="_blank" rel="noreferrer" className="footer-link">
-                  {d.nav.shop} ↗
-                </a>
-              </li>
-            ) : null}
           </ul>
         </div>
 
