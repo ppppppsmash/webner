@@ -4,8 +4,9 @@
  *
  *   pnpm media:recompress                 dry run on the local database: shows what would change, writes nothing
  *   pnpm media:recompress --apply         converts and repoints the database
- *   pnpm media:recompress --delete-originals=scripts/output/recompress-….json
- *                                         removes the old files listed in a manifest from an earlier --apply
+ *   pnpm media:recompress --delete-originals
+ *                                         removes the old files listed in the newest manifest written by --apply
+ *                                         (or name one: --delete-originals=scripts/output/<file>.json)
  *   pnpm media:recompress:neon …          the same against the hosted database and storage (.env.neon)
  *
  * How --apply works, per image:
@@ -16,7 +17,7 @@
  * Old files stay because public pages are cached for up to a few hours and may still point at them.
  * Delete them with --delete-originals once the site shows the new ones (after a redeploy, or the next day).
  */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import postgres from "postgres";
 import sharp, { type OutputInfo } from "sharp";
@@ -39,7 +40,10 @@ type ManifestEntry = { mediaId: string; fileName: string | null; oldKey: string;
 
 const args = process.argv.slice(2);
 const apply = args.includes("--apply");
-const manifestArg = args.find((a) => a.startsWith("--delete-originals="))?.split("=")[1];
+const deleteArg = args.find((a) => a === "--delete-originals" || a.startsWith("--delete-originals="));
+/** local / s3 — part of the manifest name, so a local run and a hosted run never pick up each other's list. */
+const driverName = process.env.STORAGE_DRIVER || "local";
+const OUTPUT_DIR = path.resolve("scripts/output");
 const mb = (n: number) => `${(n / 1048576).toFixed(2)} MB`;
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not set");
@@ -65,7 +69,18 @@ async function countReferences(url: string) {
   return found;
 }
 
+/** The manifest named on the command line, or the newest one written for this storage driver. */
+async function resolveManifest(arg: string): Promise<string> {
+  const given = arg.split("=")[1];
+  if (given) return given;
+  const names = (await readdir(OUTPUT_DIR).catch(() => [])).filter((n) => n.startsWith(`recompress-${driverName}-`) && n.endsWith(".json")).sort();
+  const latest = names.at(-1);
+  if (!latest) throw new Error(`No manifest for the "${driverName}" storage in scripts/output/. Run with --apply first.`);
+  return path.join(OUTPUT_DIR, latest);
+}
+
 async function deleteOriginals(file: string) {
+  console.log(`Manifest: ${path.relative(process.cwd(), file)}\n`);
   const entries = JSON.parse(await readFile(file, "utf8")) as ManifestEntry[];
   let removed = 0;
   for (const e of entries) {
@@ -84,11 +99,11 @@ async function deleteOriginals(file: string) {
 }
 
 async function main() {
-  if (manifestArg) return deleteOriginals(manifestArg);
+  if (deleteArg) return deleteOriginals(await resolveManifest(deleteArg));
 
   const rows = await sql<MediaRow[]>`select id, key, url, file_name, content_type, size from media where kind = 'image' order by size desc`;
   const remote = rows.some((r) => /^https?:\/\//.test(r.url));
-  const driver = process.env.STORAGE_DRIVER || "local";
+  const driver = driverName;
   if (remote && driver !== "s3") {
     throw new Error("These files live on S3-compatible storage but STORAGE_DRIVER is not \"s3\": the new files would be written to the local disk. Run with STORAGE_DRIVER=s3 (pnpm media:recompress:neon does).");
   }
@@ -165,13 +180,12 @@ async function main() {
 
   console.log(`\nTotal: ${mb(before)} → ${mb(after)}${before ? ` (−${Math.round((1 - after / before) * 100)}%)` : ""}`);
   if (apply && manifest.length) {
-    const dir = path.resolve("scripts/output");
-    await mkdir(dir, { recursive: true });
-    const file = path.join(dir, `recompress-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
+    await mkdir(OUTPUT_DIR, { recursive: true });
+    const file = path.join(OUTPUT_DIR, `recompress-${driverName}-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
     await writeFile(file, JSON.stringify(manifest, null, 2));
     console.log(`\nConverted ${manifest.length} images. The originals were kept; manifest: ${path.relative(process.cwd(), file)}`);
     console.log("Public pages are cached: redeploy (or save any product in the management panel) to show the new files now.");
-    console.log(`When the site shows them, remove the originals with:  --delete-originals=${path.relative(process.cwd(), file)}`);
+    console.log("When the site shows them, run the same command with --delete-originals instead of --apply (it uses this manifest).");
   }
 }
 
