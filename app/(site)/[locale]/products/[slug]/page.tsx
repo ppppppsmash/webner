@@ -57,17 +57,17 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
   return (
     <article className="mx-auto max-w-6xl px-6 pt-6 pb-8 md:pt-8">
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-ink-2">
-        <Link href={localePath(locale)} className="hover:text-brand">
+        <Link href={localePath(locale)} className="py-1 hover:text-brand">
           {d.nav.home}
         </Link>
         <span aria-hidden>/</span>
-        <Link href={localePath(locale, "/products")} className="hover:text-brand">
+        <Link href={localePath(locale, "/products")} className="py-1 hover:text-brand">
           {d.products.title}
         </Link>
         {crumbs.map((c) => (
           <span key={c.slug} className="flex items-center gap-1.5">
             <span aria-hidden>/</span>
-            <Link href={localePath(locale, `/categories/${c.slug}`)} className="hover:text-brand">
+            <Link href={localePath(locale, `/categories/${c.slug}`)} className="py-1 hover:text-brand">
               {c.label}
             </Link>
           </span>
@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
             </p>
           ) : null}
 
-          <dl className="rise mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-y border-line py-4 text-sm" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
+          <dl className="rise mt-6 grid grid-cols-[auto_1fr] items-baseline gap-x-6 gap-y-1 border-y border-line py-4 text-sm" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
             {product.volume ? (
               <>
                 <dt className="text-ink-2">{d.products.volume}</dt>
@@ -106,12 +106,12 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
               <>
                 <dt className="text-ink-2">{d.products.category}</dt>
                 <dd className="font-medium">
-                  <ul className="space-y-1">
+                  <ul>
                     {paths.map((path) => {
                       const leaf = path[path.length - 1];
                       return (
                         <li key={leaf.slug}>
-                          <Link href={localePath(locale, `/categories/${leaf.slug}`)} className="hover:text-brand">
+                          <Link href={localePath(locale, `/categories/${leaf.slug}`)} className="inline-block py-0.5 hover:text-brand">
                             {path.map((c) => c.label).join(" › ")}
                           </Link>
                         </li>

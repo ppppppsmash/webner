@@ -23,7 +23,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
 
         <div>
           <h2 className="footer-title">{d.footer.categories}</h2>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-0.5 text-sm">
             {tree.map((c) => (
               <li key={c.id}>
                 <Link href={localePath(locale, `/categories/${c.slug}`)} className="footer-link">
@@ -36,7 +36,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
 
         <div>
           <h2 className="footer-title">{d.footer.links}</h2>
-          <ul className="space-y-2 text-sm">
+          <ul className="space-y-0.5 text-sm">
             <li>
               <Link href={localePath(locale, "/products")} className="footer-link">
                 {d.nav.products}
@@ -77,7 +77,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
             <Suspense fallback={null}>
               <LocaleSwitcher current={locale} label={d.nav.language} tone="tint" />
             </Suspense>
-            <Link href="/management" className="hover:text-brand">
+            <Link href="/management" className="py-1.5 hover:text-brand">
               {d.footer.management}
             </Link>
           </div>

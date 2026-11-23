@@ -112,10 +112,10 @@ export function MobileMenu({
                 {item.label}
               </Link>
               {item.children?.length ? (
-                <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5 pl-1">
+                <ul className="mt-1 grid grid-cols-2 gap-x-4 pl-1">
                   {item.children.map((c) => (
                     <li key={c.href}>
-                      <Link href={c.href} className="text-sm text-ink-2 hover:text-brand">
+                      <Link href={c.href} className="block py-1.5 text-sm text-ink-2 hover:text-brand">
                         {c.label}
                       </Link>
                     </li>
