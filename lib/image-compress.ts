@@ -40,7 +40,8 @@ export async function compressImage(file: File): Promise<File> {
 
   try {
     const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
-    if (scale === 1 && file.size < SKIP_BELOW_BYTES) return file;
+    // WebP that fits is already the target format: encoding it again would only lose quality.
+    if (scale === 1 && (file.size < SKIP_BELOW_BYTES || file.type === "image/webp")) return file;
 
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(bitmap.width * scale));
