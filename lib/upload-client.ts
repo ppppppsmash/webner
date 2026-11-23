@@ -1,6 +1,7 @@
 "use client";
 
 import { t } from "@/lib/i18n/admin";
+import { compressImage } from "@/lib/image-compress";
 import type { StoredFile, UploadKind } from "@/lib/storage/types";
 
 export class UploadError extends Error {}
@@ -52,8 +53,11 @@ type SignResult = { direct: false } | { direct: true; key: string; uploadUrl: st
  * Uploads one file and registers it in the media library.
  * With S3-compatible storage the browser sends the file straight to the storage (signed URL), so the app
  * server's request-size limit does not apply; with local storage it goes through POST /api/upload.
+ * Every image upload in the management panel goes through here, so this is the one place images are compressed.
  */
-export async function uploadFile(file: File, kind: UploadKind, onProgress?: (ratio: number) => void): Promise<StoredFile> {
+export async function uploadFile(original: File, kind: UploadKind, onProgress?: (ratio: number) => void): Promise<StoredFile> {
+  // Photos are resized and re-encoded first (see lib/image-compress.ts); the size limit applies to the result.
+  const file = kind === "image" ? await compressImage(original) : original;
   const signed = await postJson<SignResult>("/api/upload/sign", { kind, contentType: file.type, size: file.size });
 
   if (signed.direct) {
