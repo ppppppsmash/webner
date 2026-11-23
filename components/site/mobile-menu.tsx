@@ -32,20 +32,36 @@ export function MobileMenu({
   const setOpen = (next: boolean) => setOpenedAt(next ? pathname : null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const openRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const id = useId();
 
   useEffect(() => {
     if (!open) return;
+    const opener = openRef.current;
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") return setOpen(false);
+      if (e.key !== "Tab") return;
+      // Keep keyboard focus inside the menu: the page behind it is covered and must not be reachable.
+      const stops = dialogRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input, select, textarea");
+      if (!stops?.length) return;
+      const first = stops[0];
+      const last = stops[stops.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !dialogRef.current?.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !dialogRef.current?.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
-      openRef.current?.focus();
+      opener?.focus();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -66,8 +82,10 @@ export function MobileMenu({
 
       <div
         id={id}
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
+        aria-label={openLabel}
         hidden={!open}
         className={cn("fixed inset-0 z-50 flex flex-col overflow-y-auto bg-paper text-ink", !open && "hidden")}
       >
