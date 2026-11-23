@@ -10,7 +10,7 @@ import type { PublicDictionary } from "@/lib/i18n/public";
  */
 export function Hero({ d, locale, imageUrl }: { d: PublicDictionary; locale: Locale; imageUrl: string | null }) {
   return (
-    <section className="on-dark relative isolate flex min-h-[32rem] items-center overflow-hidden bg-brand-deep text-paper md:min-h-[38rem]">
+    <section className="on-dark relative isolate flex min-h-[32rem] items-center overflow-hidden bg-brand-deep text-paper md:min-h-[38rem] lg:min-h-[min(46rem,calc(100svh-10.25rem))]">
       {imageUrl ? (
         <Image src={imageUrl} alt="" fill priority sizes="100vw" className="object-cover" />
       ) : (
@@ -22,14 +22,13 @@ export function Hero({ d, locale, imageUrl }: { d: PublicDictionary; locale: Loc
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-brand-deep/80 via-brand-deep/35 to-brand-deep/20" />
 
       <div className="relative z-10 mx-auto w-full max-w-6xl px-6 py-20 text-center">
-        <p className="rise text-[0.72rem] font-semibold tracking-[0.2em] text-paper/80 uppercase">{d.hero.eyebrow}</p>
-        <h1 className="rise mx-auto mt-5 max-w-3xl text-4xl leading-[1.1] text-paper md:text-6xl" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
+        <h1 className="rise mx-auto max-w-5xl text-4xl leading-[1.1] text-balance text-paper md:text-6xl lg:text-7xl lg:leading-[1.05]">
           {d.hero.title}
         </h1>
-        <p className="rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-paper/85 md:text-lg" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
+        <p className="rise mx-auto mt-6 max-w-xl text-base leading-relaxed text-pretty text-paper/85 md:mt-8 md:text-lg" style={{ "--rise-delay": "120ms" } as React.CSSProperties}>
           {d.hero.lead}
         </p>
-        <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3" style={{ "--rise-delay": "360ms" } as React.CSSProperties}>
+        <div className="rise mt-9 flex flex-wrap items-center justify-center gap-3 md:mt-10" style={{ "--rise-delay": "240ms" } as React.CSSProperties}>
           <Link href={localePath(locale, "/products")} className="btn-light">
             {d.hero.ctaProducts}
           </Link>
