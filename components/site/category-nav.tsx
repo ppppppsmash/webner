@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ChipScroller } from "@/components/site/chip-scroller";
 import { type Locale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import type { CategoryTree } from "@/lib/queries/public";
@@ -51,16 +52,22 @@ export function CategoryNav({
     </Link>
   );
 
+  // The chip row has no room for counts, so categories without products are left out of it
+  // (the desktop list keeps them, with a visible 0).
+  const shown = (c: { slug: string; count: number }) => c.count > 0 || c.slug === activeSlug;
+
   return (
     <nav aria-label={heading} className="min-w-0 lg:sticky lg:top-38 lg:self-start">
       <h2 className="footer-title hidden border-b border-line pb-2 lg:block">{heading}</h2>
-      <div className="-mx-6 flex gap-2 overflow-x-auto px-6 pb-2 [touch-action:pan-y] [scrollbar-width:none] lg:hidden">
+      <ChipScroller activeKey={activeSlug} className="-mx-6 flex gap-2 overflow-x-auto px-6 py-1 [scrollbar-width:none] lg:hidden">
         {chip("all", localePath(locale, "/products"), allLabel, activeSlug === null)}
-        {tree.flatMap((c) => [
+        {tree.filter(shown).flatMap((c) => [
           chip(c.id, localePath(locale, `/categories/${c.slug}`), pickText(c.name, locale), activeSlug === c.slug),
-          ...c.children.map((ch) => chip(ch.id, localePath(locale, `/categories/${ch.slug}`), pickText(ch.name, locale), activeSlug === ch.slug, true)),
+          ...c.children
+            .filter(shown)
+            .map((ch) => chip(ch.id, localePath(locale, `/categories/${ch.slug}`), pickText(ch.name, locale), activeSlug === ch.slug, true)),
         ])}
-      </div>
+      </ChipScroller>
       <ul className="hidden space-y-4 text-sm lg:block">
         <li>{item(localePath(locale, "/products"), allLabel, activeSlug === null)}</li>
         {tree.map((c) => (
