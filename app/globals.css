@@ -177,6 +177,15 @@
   color: var(--ink);
 }
 
+/* Keyboard focus: a solid brand ring, white inside the navy areas (.on-dark) */
+.site :focus-visible {
+  outline: 2px solid var(--focus, var(--brand));
+  outline-offset: 2px;
+}
+.site .on-dark {
+  --focus: #fff;
+}
+
 .site h1,
 .site h2,
 .site h3,

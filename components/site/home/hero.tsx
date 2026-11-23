@@ -10,7 +10,7 @@ import type { PublicDictionary } from "@/lib/i18n/public";
  */
 export function Hero({ d, locale, imageUrl }: { d: PublicDictionary; locale: Locale; imageUrl: string | null }) {
   return (
-    <section className="relative isolate flex min-h-[32rem] items-center overflow-hidden bg-brand-deep text-paper md:min-h-[38rem]">
+    <section className="on-dark relative isolate flex min-h-[32rem] items-center overflow-hidden bg-brand-deep text-paper md:min-h-[38rem]">
       {imageUrl ? (
         <Image src={imageUrl} alt="" fill priority sizes="100vw" className="object-cover" />
       ) : (

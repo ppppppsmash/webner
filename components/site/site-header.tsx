@@ -35,7 +35,7 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
   return (
     <>
       {/* tier 1: utility bar (scrolls away) */}
-      <div className="bg-brand text-paper">
+      <div className="on-dark bg-brand text-paper">
         <div className="mx-auto flex h-9 max-w-6xl items-center justify-between px-4 text-[0.72rem] tracking-wide md:px-6">
           <span className="hidden truncate sm:inline">{d.hero.eyebrow}</span>
           <Suspense fallback={null}>
