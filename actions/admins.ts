@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { and, eq, gt } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { db } from "@/db";
 import { admins } from "@/db/schema";
 import { fail, ok, type ActionResult } from "@/lib/action-result";
@@ -23,8 +24,12 @@ const PATH = "/management/admins";
 
 const newToken = () => crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
 
-function inviteUrl(token: string) {
-  const base = process.env.AUTH_URL?.replace(/\/$/, "") || "http://localhost:3000";
+/** Link on the domain the owner is using right now, so no per-environment setting is needed. */
+async function inviteUrl(token: string) {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto")?.split(",")[0] ?? (host?.startsWith("localhost") ? "http" : "https");
+  const base = host ? `${proto}://${host}` : (process.env.AUTH_URL?.replace(/\/$/, "") ?? "");
   return `${base}/management/invite/${token}`;
 }
 
@@ -58,7 +63,7 @@ export async function inviteAdmin(input: InviteAdminInput): Promise<ActionResult
     .returning({ id: admins.id });
 
   revalidatePath(PATH);
-  return ok({ id: row.id, inviteUrl: inviteUrl(token) });
+  return ok({ id: row.id, inviteUrl: await inviteUrl(token) });
 }
 
 /** Owner-only: issues a fresh invitation link (for invited accounts, or to let an active user reset a password). */
@@ -74,7 +79,7 @@ export async function regenerateInvite(id: string): Promise<ActionResult<{ invit
     .set({ inviteToken: token, inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) })
     .where(eq(admins.id, id));
   revalidatePath(PATH);
-  return ok({ inviteUrl: inviteUrl(token) });
+  return ok({ inviteUrl: await inviteUrl(token) });
 }
 
 export async function setAdminStatus(id: string, status: "active" | "disabled"): Promise<ActionResult> {
