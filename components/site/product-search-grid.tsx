@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { ProductGrid } from "@/components/site/product-grid";
 import { LOCALES, type Locale } from "@/lib/i18n/locales";
+import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import type { PublicProduct } from "@/lib/queries/public";
 
@@ -21,7 +23,7 @@ export function ProductSearchGrid({
   noImageLabel: string;
   detailsLabel?: string;
 }) {
-  const resultLabel = getDictionary(locale).products.searchResults;
+  const { searchResults: resultLabel, searchEmpty, searchReset } = getDictionary(locale).products;
   const q = (useSearchParams().get("q") ?? "").trim().toLowerCase();
   const filtered = useMemo(() => {
     if (!q) return products;
@@ -33,7 +35,17 @@ export function ProductSearchGrid({
   return (
     <>
       {q ? <p className="mb-4 text-sm text-ink-2">{resultLabel(filtered.length, q)}</p> : null}
-      <ProductGrid products={filtered} locale={locale} emptyLabel={emptyLabel} noImageLabel={noImageLabel} detailsLabel={detailsLabel} />
+      {q && !filtered.length ? (
+        // A search without hits is not an empty category: say so and offer the way back.
+        <div className="flex flex-col items-center gap-5 border border-dashed border-line px-6 py-16 text-center text-ink-2">
+          <p>{searchEmpty}</p>
+          <Link href={localePath(locale, "/products")} className="btn-outline">
+            {searchReset}
+          </Link>
+        </div>
+      ) : (
+        <ProductGrid products={filtered} locale={locale} emptyLabel={emptyLabel} noImageLabel={noImageLabel} detailsLabel={detailsLabel} />
+      )}
     </>
   );
 }

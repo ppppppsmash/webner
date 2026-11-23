@@ -70,6 +70,8 @@ export const zhTW: PublicDictionary = {
     badges: { new: "新品", limited: "限定", popular: "人氣" },
     searchResults: (n, q) => `「${q}」的搜尋結果：${n} 件`,
     searchPlaceholder: "搜尋商品…",
+    searchEmpty: "找不到符合的商品，請換個關鍵字再試一次。",
+    searchReset: "查看全部商品",
   },
   about: {
     title: "關於 webner",

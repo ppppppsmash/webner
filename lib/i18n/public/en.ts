@@ -71,6 +71,8 @@ export const en: PublicDictionary = {
     badges: { new: "New", limited: "Limited", popular: "Popular" },
     searchResults: (n, q) => `${n} results for “${q}”`,
     searchPlaceholder: "Search products …",
+    searchEmpty: "No products found. Please try a different search term.",
+    searchReset: "Show all products",
   },
   about: {
     title: "About webner",

@@ -62,6 +62,8 @@ export interface PublicDictionary {
     badges: Record<ProductBadge, string>;
     searchResults: (n: number, q: string) => string;
     searchPlaceholder: string;
+    searchEmpty: string;
+    searchReset: string;
   };
   about: {
     title: string;

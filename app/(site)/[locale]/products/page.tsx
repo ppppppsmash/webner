@@ -22,7 +22,7 @@ export default async function ProductsPage({ params }: PageProps<"/[locale]/prod
   const [products, tree] = await Promise.all([getPublishedProducts(), getCategoryTree()]);
 
   return (
-    <CatalogLayout d={d} locale={locale} tree={tree} activeSlug={null} title={d.products.title} count={products.length}>
+    <CatalogLayout d={d} locale={locale} tree={tree} activeSlug={null} title={d.products.title} count={products.length} searchable>
       <Suspense fallback={<ProductGrid products={products} locale={locale} emptyLabel={d.products.empty} noImageLabel={d.products.noImage} detailsLabel={d.products.details} />}>
         <ProductSearchGrid
           products={products}

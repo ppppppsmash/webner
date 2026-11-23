@@ -70,6 +70,8 @@ export const zhCN: PublicDictionary = {
     badges: { new: "新品", limited: "限定", popular: "人气" },
     searchResults: (n, q) => `“${q}”的搜索结果：${n} 件`,
     searchPlaceholder: "搜索商品…",
+    searchEmpty: "未找到相关商品，请换个关键词再试一次。",
+    searchReset: "查看全部商品",
   },
   about: {
     title: "关于 webner",
