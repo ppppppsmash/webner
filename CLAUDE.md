@@ -34,7 +34,8 @@
 - 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白・紺・水色、Lora＋Libre Franklin、長方形ボタン、中央揃え）。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ
 - ルートレイアウトは 2 つ（`app/(site)/[locale]/layout.tsx` と `app/(management)/management/layout.tsx`）。`app/layout.tsx` は置かない
-- 【一時的】公開サイト右下の配色切替（上司レビュー用、19 配色）は `components/site/theme-preview/` に閉じている。`<html data-theme>` で `.site` のトークンを上書きするだけで、選択は localStorage、`?theme=<id>` で指定リンクも作れる。外すときはこのフォルダを消し、`app/(site)/[locale]/layout.tsx` の import・`<ThemePreview />`・`suppressHydrationWarning` を削除、採用した色を `app/globals.css` の `.site` に書き写す。消さずに隠すなら `NEXT_PUBLIC_THEME_PREVIEW=0`
+- 【一時的】公開サイト右下の配色切替（上司レビュー用、19 配色）は `components/site/theme-preview/` に閉じている。`<html data-theme>` で `.site` のトークンを上書きするだけで、選択は localStorage、`?theme=<id>` で指定リンクも作れる。外すときはこのフォルダを消し、`app/(site)/[locale]/layout.tsx` の import・`<ThemePreview />`・`suppressHydrationWarning` を削除、採用した色を `app/globals.css` の `.site` に書き写す。消さずに隠すなら `NEXT_PUBLIC_THEME_PREVIEW=0`。本番ビルドでは Basic 認証が有効なときだけ表示される
+- Basic 認証は `BASIC_AUTH_USER` と `BASIC_AUTH_PASSWORD` の両方を設定すると有効（`lib/basic-auth.ts`、`proxy.ts` の先頭で判定）。公開ページと管理画面の両方にかかり、`/api/auth`・`/uploads`・静的ファイルは対象外（proxy の matcher 外）。未設定なら無効。公開時は 2 つの環境変数を消すだけ
 - 見た目の変更は `pnpm shoot <paths>` で 390 / 820 / 1440 幅を撮って目視し、`pnpm e2e:site` を通す
 
 ## 技術スタック
