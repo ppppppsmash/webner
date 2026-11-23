@@ -8,29 +8,13 @@ const { auth } = NextAuth(authConfig);
 const PUBLIC_MANAGEMENT_PATHS = [/^\/management\/login$/, /^\/management\/invite\/[^/]+$/];
 const LOCALE_COOKIE = "webner_locale";
 
-/** Picks the best locale from the cookie, then Accept-Language, then the default. */
-function detectLocale(req: Request & { cookies: { get(name: string): { value: string } | undefined } }): Locale {
+/**
+ * Language for a URL without a locale: the one the visitor chose before (cookie), otherwise German.
+ * The browser language is not used on purpose, so a first visit always opens in German.
+ */
+function detectLocale(req: { cookies: { get(name: string): { value: string } | undefined } }): Locale {
   const fromCookie = req.cookies.get(LOCALE_COOKIE)?.value;
-  if (fromCookie && (LOCALES as readonly string[]).includes(fromCookie)) return fromCookie as Locale;
-
-  const header = req.headers.get("accept-language") ?? "";
-  const ranked = header
-    .split(",")
-    .map((part) => {
-      const [tag, q] = part.trim().split(";q=");
-      return { tag: tag.toLowerCase(), q: q ? Number(q) : 1 };
-    })
-    .sort((a, b) => b.q - a.q);
-
-  for (const { tag } of ranked) {
-    if (tag.startsWith("zh")) {
-      // zh-TW / zh-HK / zh-Hant → Traditional; zh-CN / zh-SG / zh-Hans / plain zh → Simplified
-      return /tw|hk|mo|hant/.test(tag) ? "zh-TW" : "zh-CN";
-    }
-    if (tag.startsWith("de")) return "de";
-    if (tag.startsWith("en")) return "en";
-  }
-  return DEFAULT_LOCALE;
+  return fromCookie && (LOCALES as readonly string[]).includes(fromCookie) ? (fromCookie as Locale) : DEFAULT_LOCALE;
 }
 
 export default auth((req) => {

@@ -20,9 +20,14 @@ async function main() {
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
     page.on("console", (m) => m.type() === "error" && !/compute-pressure/.test(m.text()) && errors.push(`console: ${m.text()}`));
 
+    // A first visit opens in German even with a Chinese browser; the chosen language is remembered after that.
+    await page.goto(`${BASE_URL}/`);
+    await page.waitForURL(/\/de$/);
+    log("/ redirects to /de regardless of the browser language");
+    await page.goto(`${BASE_URL}/zh-TW`);
     await page.goto(`${BASE_URL}/`);
     await page.waitForURL(/\/zh-TW$/);
-    log("/ redirects by Accept-Language to /zh-TW");
+    log("/ redirects to the language chosen before (cookie)");
 
     await page.getByRole("link", { name: "商品", exact: true }).first().click();
     await page.waitForURL(/\/zh-TW\/products$/);
