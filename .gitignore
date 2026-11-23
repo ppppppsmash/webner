@@ -47,3 +47,6 @@ uploads/
 
 # e2e
 e2e/output/
+
+# one-off script manifests
+scripts/output/
