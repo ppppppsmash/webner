@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 /** webner wordmark: lowercase bold sans like the packaging, with a small "Germany" line. */
-export function Wordmark({ className, light = false }: { className?: string; light?: boolean }) {
+export function Wordmark({ className, light = false, onTint = false }: { className?: string; light?: boolean; onTint?: boolean }) {
   return (
     <span className={cn("inline-flex flex-col leading-none", className)}>
       <span
@@ -10,7 +10,7 @@ export function Wordmark({ className, light = false }: { className?: string; lig
       >
         webner
       </span>
-      <span className={cn("mt-0.5 text-[0.58rem] font-semibold tracking-[0.32em] uppercase", light ? "text-paper/70" : "text-ink-2")}>
+      <span className={cn("mt-0.5 text-[0.58rem] font-semibold tracking-[0.32em] uppercase", light ? "text-paper/70" : onTint ? "text-ink" : "text-ink-2")}>
         Germany
       </span>
     </span>

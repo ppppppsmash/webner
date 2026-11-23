@@ -17,7 +17,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
     <footer className="mt-20 bg-tint text-ink">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
         <div className="space-y-4">
-          <Wordmark />
+          <Wordmark onTint />
           <p className="max-w-xs text-sm leading-relaxed">{d.footer.about}</p>
         </div>
 
@@ -75,7 +75,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
           </p>
           <div className="flex items-center gap-6">
             <Suspense fallback={null}>
-              <LocaleSwitcher current={locale} label={d.nav.language} />
+              <LocaleSwitcher current={locale} label={d.nav.language} tone="tint" />
             </Suspense>
             <Link href="/management" className="hover:text-brand">
               {d.footer.management}

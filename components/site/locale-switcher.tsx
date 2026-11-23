@@ -17,7 +17,8 @@ export function LocaleSwitcher({
   current: Locale;
   label: string;
   className?: string;
-  tone?: "dark" | "light";
+  /** dark: on white · light: on navy · tint: on the light-blue footer (needs the darker ink to stay readable) */
+  tone?: "dark" | "light" | "tint";
 }) {
   const pathname = usePathname();
   const light = tone === "light";
@@ -25,7 +26,7 @@ export function LocaleSwitcher({
     <nav aria-label={label} className={cn("flex items-center gap-1 text-[0.75rem] tracking-wide", className)}>
       {LOCALES.map((locale, i) => (
         <span key={locale} className="flex items-center">
-          {i > 0 ? <span aria-hidden className={cn("mx-1", light ? "text-paper/40" : "text-line")}>|</span> : null}
+          {i > 0 ? <span aria-hidden className={cn("mx-1", light ? "text-paper/40" : tone === "tint" ? "text-ink/30" : "text-line")}>|</span> : null}
           <Link
             href={switchLocalePath(pathname, locale)}
             hrefLang={locale}
@@ -38,7 +39,9 @@ export function LocaleSwitcher({
                   : "text-paper/75 hover:text-paper"
                 : locale === current
                   ? "font-semibold text-brand underline underline-offset-4"
-                  : "text-ink-2 hover:text-ink",
+                  : tone === "tint"
+                    ? "text-ink hover:text-brand"
+                    : "text-ink-2 hover:text-ink",
             )}
           >
             {SHORT[locale]}
