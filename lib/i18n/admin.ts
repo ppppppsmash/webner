@@ -271,7 +271,7 @@ export const t = {
     faviconDefault: "目前使用內建圖示",
     logoPreview: "標誌預覽",
     sectionName: "網站名稱與標誌",
-    sectionNameHint: "展示網站左上角與頁尾的標誌文字，以及它的顏色。",
+    sectionNameHint: "展示網站左上角與頁尾的標誌文字、它的顏色，以及瀏覽器分頁上的小圖。",
     sectionLook: "外觀",
     sectionLookHint: "展示網站的整體配色與首頁最上方的大圖。",
     sectionShop: "購買連結",

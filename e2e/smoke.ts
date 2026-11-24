@@ -292,7 +292,8 @@ async function main() {
     {
       if ((await page.inputValue("#siteNameColor")) !== "#333333") throw new Error("default site name colour is not #333333");
       await page.fill("#siteNameColor", "#12");
-      await page.getByRole("button", { name: "儲存" }).click();
+      await page.getByRole("tab", { name: "購買連結" }).click();
+      await page.getByRole("button", { name: "儲存" }).click(); // the error is on another tab: the form switches back to it
       await page.getByText("請輸入 # 加 6 位數的色碼").waitFor();
       await page.fill("#siteNameColor", "#aa3322");
       await page.getByRole("button", { name: "儲存" }).click();
@@ -320,6 +321,7 @@ async function main() {
       await visitor.close();
       return theme;
     };
+    await page.getByRole("tab", { name: "外觀" }).click();
     for (const [name, id] of [["海軍藍", "a-marine"], ["冷杉綠", "d-tanne"]] as const) {
       await page.getByRole("button", { name: "預覽與更換" }).click();
       await page.locator("label").filter({ hasText: name }).click();
