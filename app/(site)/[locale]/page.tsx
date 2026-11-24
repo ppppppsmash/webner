@@ -6,13 +6,13 @@ import { LatestScroller } from "@/components/site/home/latest-scroller";
 import { ShopBanner } from "@/components/site/home/shop-banner";
 import { StoryBand } from "@/components/site/home/story-band";
 import { UspRow } from "@/components/site/home/usp-row";
-import { isLocale } from "@/lib/i18n/locales";
+import { isPublicLocale } from "@/lib/i18n/locales";
 import { getDictionary } from "@/lib/i18n/public";
 import { getCategoryTree, getFeaturedProducts, getLatestProducts, getPublicSettings, getPublishedProducts } from "@/lib/queries/public";
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
-  if (!isLocale(locale)) notFound();
+  if (!isPublicLocale(locale)) notFound();
   const d = getDictionary(locale);
 
   const [featured, latest, tree, settings, all] = await Promise.all([

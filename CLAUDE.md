@@ -72,3 +72,4 @@ Add language switcher with de/en/zh-TW/zh-CN order
 
 - 対応言語と優先順: ドイツ語 (de) → 英語 (en) → 繁体字中国語 (zh-TW) → 簡体字中国語 (zh-CN)
 - 詳細は `README.md` の「4.1 言語仕様」を参照
+- 繁体字中国語（zh-TW）は依頼元の希望で **公開側だけ非表示**（2026-11-24）。`lib/i18n/locales.ts` の `HIDDEN_PUBLIC_LOCALES` で外しており、公開側は `PUBLIC_LOCALES` / `isPublicLocale` を使う（言語切替・hreflang・静的生成・検索）。`/zh-TW/...` は `proxy.ts` が同じページの現在の言語へリダイレクトする。管理画面の入力欄・DB の内容・`lib/i18n/public/zh-TW.ts` は残しているので、戻すときは `HIDDEN_PUBLIC_LOCALES` を空にする。公開側の文言は引き続き 4 言語そろえる

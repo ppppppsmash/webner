@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 import { authConfig } from "@/auth.config";
 import { basicAuthChallenge } from "@/lib/basic-auth";
-import { DEFAULT_LOCALE, LOCALES, type Locale } from "@/lib/i18n/locales";
+import { DEFAULT_LOCALE, LOCALES, PUBLIC_LOCALES, type Locale } from "@/lib/i18n/locales";
 
 const { auth } = NextAuth(authConfig);
 
@@ -15,7 +15,7 @@ const LOCALE_COOKIE = "webner_locale";
  */
 function detectLocale(req: { cookies: { get(name: string): { value: string } | undefined } }): Locale {
   const fromCookie = req.cookies.get(LOCALE_COOKIE)?.value;
-  return fromCookie && (LOCALES as readonly string[]).includes(fromCookie) ? (fromCookie as Locale) : DEFAULT_LOCALE;
+  return fromCookie && (PUBLIC_LOCALES as readonly string[]).includes(fromCookie) ? (fromCookie as Locale) : DEFAULT_LOCALE;
 }
 
 export default auth((req) => {
@@ -45,9 +45,15 @@ export default auth((req) => {
   }
 
   // ---- Public site: every page lives under /{locale} ------------------------
-  const hasLocale = LOCALES.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
-  if (hasLocale) {
-    const locale = pathname.split("/")[1];
+  const prefix = LOCALES.find((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
+  if (prefix && !PUBLIC_LOCALES.includes(prefix)) {
+    // A language that is no longer offered: old links and bookmarks land on the same page in an offered one.
+    const url = req.nextUrl.clone();
+    url.pathname = `/${detectLocale(req)}${pathname.slice(prefix.length + 1)}`;
+    return NextResponse.redirect(url);
+  }
+  if (prefix) {
+    const locale = prefix;
     const res = NextResponse.next();
     if (req.cookies.get(LOCALE_COOKIE)?.value !== locale) {
       res.cookies.set(LOCALE_COOKIE, locale, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });

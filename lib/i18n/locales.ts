@@ -4,6 +4,17 @@ export const DEFAULT_LOCALE: Locale = "de";
 
 export const isLocale = (value: string): value is Locale => (LOCALES as readonly string[]).includes(value);
 
+/**
+ * Languages kept in the data and in the management forms but not offered on the public site.
+ * Traditional Chinese is hidden at the client's request; empty this list to bring it back.
+ */
+const HIDDEN_PUBLIC_LOCALES: readonly Locale[] = ["zh-TW"];
+
+/** Languages the public site is served in: URLs, language switcher, hreflang, search. */
+export const PUBLIC_LOCALES: readonly Locale[] = LOCALES.filter((l) => !HIDDEN_PUBLIC_LOCALES.includes(l));
+
+export const isPublicLocale = (value: string): value is Locale => (PUBLIC_LOCALES as readonly string[]).includes(value);
+
 /** BCP 47 tags for <html lang> */
 export const HTML_LANG: Record<Locale, string> = { de: "de", en: "en", "zh-TW": "zh-Hant-TW", "zh-CN": "zh-Hans-CN" };
 

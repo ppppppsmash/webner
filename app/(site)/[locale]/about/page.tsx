@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Values } from "@/components/site/home/values";
 import { Reveal } from "@/components/site/reveal";
-import { isLocale } from "@/lib/i18n/locales";
+import { isPublicLocale } from "@/lib/i18n/locales";
 import { getDictionary } from "@/lib/i18n/public";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/about">): Promise<Metadata> {
   const { locale } = await params;
-  if (!isLocale(locale)) return {};
+  if (!isPublicLocale(locale)) return {};
   const d = getDictionary(locale);
   return { title: d.about.title, description: d.about.lead };
 }
 
 export default async function AboutPage({ params }: PageProps<"/[locale]/about">) {
   const { locale } = await params;
-  if (!isLocale(locale)) notFound();
+  if (!isPublicLocale(locale)) notFound();
   const d = getDictionary(locale);
 
   return (

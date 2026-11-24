@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { ProductGrid } from "@/components/site/product-grid";
-import { LOCALES, type Locale } from "@/lib/i18n/locales";
+import { PUBLIC_LOCALES, type Locale } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import type { PublicProduct } from "@/lib/queries/public";
@@ -28,7 +28,7 @@ export function ProductSearchGrid({
   const filtered = useMemo(() => {
     if (!q) return products;
     return products.filter((p) =>
-      LOCALES.some((l) => (p.name[l] ?? "").toLowerCase().includes(q) || (p.summary[l] ?? "").toLowerCase().includes(q)),
+      PUBLIC_LOCALES.some((l) => (p.name[l] ?? "").toLowerCase().includes(q) || (p.summary[l] ?? "").toLowerCase().includes(q)),
     );
   }, [products, q]);
 

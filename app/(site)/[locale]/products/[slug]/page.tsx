@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/site/product-card";
 import { ProductGallery } from "@/components/site/product-gallery";
 import { Reveal } from "@/components/site/reveal";
 import { VideoEmbed } from "@/components/site/video-embed";
-import { isLocale, pickText } from "@/lib/i18n/locales";
+import { isPublicLocale, pickText } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import { getPublicSettings, getPublishedProductBySlug, getRelatedProducts } from "@/lib/queries/public";
@@ -14,7 +14,7 @@ import { sanitizeRichText } from "@/lib/sanitize";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/products/[slug]">): Promise<Metadata> {
   const { locale, slug } = await params;
-  if (!isLocale(locale)) return {};
+  if (!isPublicLocale(locale)) return {};
   const product = await getPublishedProductBySlug(slug);
   if (!product) return {};
   const image = product.images[0]?.url;
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/products
 
 export default async function ProductPage({ params }: PageProps<"/[locale]/products/[slug]">) {
   const { locale, slug } = await params;
-  if (!isLocale(locale)) notFound();
+  if (!isPublicLocale(locale)) notFound();
   const d = getDictionary(locale);
 
   const [product, settings] = await Promise.all([getPublishedProductBySlug(slug), getPublicSettings()]);

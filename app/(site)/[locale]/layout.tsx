@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { ThemePreview } from "@/components/site/theme-preview";
-import { HTML_LANG, isLocale, LOCALES, type Locale } from "@/lib/i18n/locales";
+import { HTML_LANG, isPublicLocale, PUBLIC_LOCALES, type Locale } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import "@/app/globals.css";
@@ -34,25 +34,25 @@ const notoSerifTC = Noto_Serif_TC({
 });
 
 export function generateStaticParams() {
-  return LOCALES.map((locale) => ({ locale }));
+  return PUBLIC_LOCALES.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
-  if (!isLocale(locale)) return {};
+  if (!isPublicLocale(locale)) return {};
   const d = getDictionary(locale);
   return {
     title: { default: `${d.meta.siteTitle} – ${d.meta.tagline}`, template: `%s | ${d.meta.siteTitle}` },
     description: d.meta.description,
     alternates: {
-      languages: Object.fromEntries(LOCALES.map((l) => [HTML_LANG[l], localePath(l)])),
+      languages: Object.fromEntries(PUBLIC_LOCALES.map((l) => [HTML_LANG[l], localePath(l)])),
     },
   };
 }
 
 export default async function SiteLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
-  if (!isLocale(locale)) notFound();
+  if (!isPublicLocale(locale)) notFound();
 
   return (
     <html

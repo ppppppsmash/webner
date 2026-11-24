@@ -16,7 +16,7 @@ async function main() {
   const errors: string[] = [];
   try {
     // --- desktop ------------------------------------------------------------
-    const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, locale: "zh-TW" });
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, locale: "zh-CN" });
     page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
     page.on("console", (m) => m.type() === "error" && !/compute-pressure/.test(m.text()) && errors.push(`console: ${m.text()}`));
 
@@ -24,18 +24,25 @@ async function main() {
     await page.goto(`${BASE_URL}/`);
     await page.waitForURL(/\/de$/);
     log("/ redirects to /de regardless of the browser language");
-    await page.goto(`${BASE_URL}/zh-TW`);
+    await page.goto(`${BASE_URL}/zh-CN`);
     await page.goto(`${BASE_URL}/`);
-    await page.waitForURL(/\/zh-TW$/);
+    await page.waitForURL(/\/zh-CN$/);
     log("/ redirects to the language chosen before (cookie)");
 
+    // Traditional Chinese is not offered on the public site: old URLs land on the same page in the current language.
+    await page.goto(`${BASE_URL}/zh-TW/products`);
+    await page.waitForURL(/\/zh-CN\/products$/);
+    if (await page.locator("a[hreflang='zh-TW']").count()) throw new Error("zh-TW is still in the language switcher");
+    await page.goto(`${BASE_URL}/zh-CN`);
+    log("/zh-TW redirects and is not offered in the language switcher");
+
     await page.getByRole("link", { name: "商品", exact: true }).first().click();
-    await page.waitForURL(/\/zh-TW\/products$/);
+    await page.waitForURL(/\/zh-CN\/products$/);
     // Next.js keeps previously visited routes mounted (hidden), so only match visible elements.
     const cards = page.locator("main ul li a[href*='/products/']:visible");
     if ((await cards.count()) < 1) throw new Error("no product cards");
     await cards.first().click();
-    await page.waitForURL(/\/zh-TW\/products\/[a-z0-9-]+$/);
+    await page.waitForURL(/\/zh-CN\/products\/[a-z0-9-]+$/);
     const h1 = page.getByRole("heading", { level: 1 });
     await h1.waitFor();
     log(`product page: ${await h1.innerText()}`);
