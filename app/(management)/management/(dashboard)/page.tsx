@@ -1,5 +1,6 @@
 import { ArrowRightIcon, FolderTreeIcon, PackageCheckIcon, PackageIcon, UsersIcon } from "lucide-react";
 import Link from "next/link";
+import { ViewsLineChart } from "@/components/management/views-line-chart";
 import { PageSuspense } from "@/components/management/page-suspense";
 import { Heading } from "@/components/management/heading";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +15,6 @@ import { getViewStats, STATS_DAYS } from "@/lib/queries/stats";
 
 async function DashboardContent() {
   const [stats, recent, views] = await Promise.all([getDashboardStats(), getRecentProducts(), getViewStats()]);
-  const peak = Math.max(1, ...views.daily.map((d) => d.views));
   const localeTotal = views.locales.reduce((sum, l) => sum + l.views, 0);
   const number = new Intl.NumberFormat("zh-TW");
   const visitCards = [
@@ -69,23 +69,10 @@ async function DashboardContent() {
 
           <div>
             <h3 className="mb-2 text-sm font-medium">{t.dashboard.dailyViews}</h3>
-            {/* One bar per day; the exact number is in the tooltip and read out by screen readers. */}
-            <ol className="flex h-28 items-end gap-0.5" aria-label={t.dashboard.dailyViews}>
-              {views.daily.map((d) => (
-                <li key={d.day} className="group relative flex h-full flex-1 items-end" title={t.dashboard.dailyViewsLabel(d.day, d.views)}>
-                  <span className="sr-only">{t.dashboard.dailyViewsLabel(d.day, d.views)}</span>
-                  <span
-                    aria-hidden
-                    className="w-full rounded-t-sm bg-primary/70 transition-colors group-hover:bg-primary"
-                    style={{ height: d.views ? `${Math.max(4, (d.views / peak) * 100)}%` : "2px", opacity: d.views ? undefined : 0.25 }}
-                  />
-                </li>
-              ))}
-            </ol>
-            <div className="mt-1 flex justify-between text-xs text-muted-foreground tabular-nums">
-              <span>{views.daily[0]?.day.slice(5).replace("-", "/")}</span>
-              <span>{views.daily.at(-1)?.day.slice(5).replace("-", "/")}</span>
-            </div>
+            <ViewsLineChart
+              points={views.daily.map((d) => ({ day: d.day, value: d.views, label: t.dashboard.dailyViewsLabel(d.day, d.views) }))}
+              title={t.dashboard.dailyViews}
+            />
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
