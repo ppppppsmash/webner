@@ -35,8 +35,9 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
   return (
     <>
       {/* tier 1: utility bar (scrolls away) */}
-      <div className="on-dark bg-brand text-paper">
-        <div className="mx-auto flex h-9 max-w-6xl items-center justify-between px-4 text-[0.72rem] tracking-wide md:px-6">
+      {/* Raised above the sticky header only while the language list is open, so it never covers the mobile menu. */}
+      <div className="on-dark relative bg-brand text-paper has-[[aria-expanded=true]]:z-[60]">
+        <div className="mx-auto flex h-9 max-w-6xl items-center justify-end px-4 sm:justify-between text-[0.72rem] tracking-wide md:px-6">
           <span className="hidden truncate sm:inline">{d.hero.eyebrow}</span>
           <Suspense fallback={null}>
             <LocaleSwitcher current={locale} label={d.nav.language} tone="light" />
@@ -66,7 +67,7 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
             <Suspense fallback={<span className="size-10 lg:hidden" />}>
               <MobileMenu items={mobileItems} openLabel={d.nav.menu} closeLabel={d.nav.close}>
                 <SearchForm locale={locale} placeholder={d.products.searchPlaceholder} className="mb-6" />
-                <LocaleSwitcher current={locale} label={d.nav.language} className="text-base" />
+                <LocaleSwitcher current={locale} label={d.nav.language} variant="inline" className="text-base" />
               </MobileMenu>
             </Suspense>
           </div>

@@ -68,7 +68,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
           </p>
           <div className="flex items-center gap-6">
             <Suspense fallback={null}>
-              <LocaleSwitcher current={locale} label={d.nav.language} tone="tint" />
+              <LocaleSwitcher current={locale} label={d.nav.language} tone="tint" side="up" align="start" />
             </Suspense>
             <Link href="/management" className="py-1.5 hover:text-brand">
               {d.footer.management}

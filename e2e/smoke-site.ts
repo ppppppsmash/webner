@@ -48,7 +48,12 @@ async function main() {
     log(`product page: ${await h1.innerText()}`);
 
     // language switch keeps the path
-    await page.getByRole("link", { name: "DE", exact: true }).first().click();
+    const switcher = page.locator("button[aria-expanded]:visible").filter({ hasText: "简体中文" }).first();
+    await switcher.click();
+    await page.keyboard.press("Escape");
+    if ((await switcher.getAttribute("aria-expanded")) !== "false") throw new Error("Escape did not close the language list");
+    await switcher.click();
+    await page.locator("a[hreflang='de']:visible").first().click();
     await page.waitForURL(/\/de\/products\/[a-z0-9-]+$/);
     log("locale switch keeps the product path");
 
