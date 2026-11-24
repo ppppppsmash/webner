@@ -385,6 +385,30 @@ async function main() {
     // --- dashboard ----------------------------------------------------------
     await page.goto(`${BASE_URL}/management`);
     await page.getByText("商品總數").waitFor();
+
+    // visit counters: a visitor is counted, a crawler and a logged-in administrator are not
+    const todayViews = async () => {
+      await page.goto(`${BASE_URL}/management`);
+      const text = await page.locator("dl div").filter({ hasText: "今天" }).locator("dd").innerText();
+      return Number(text.replace(/\D/g, ""));
+    };
+    const visit = async (userAgent: string) => {
+      const visitor = await browser.newContext({ userAgent });
+      const site = await visitor.newPage();
+      const counted = site.waitForResponse((r) => r.url().endsWith("/api/track"));
+      await site.goto(`${BASE_URL}/de`);
+      await counted;
+      await visitor.close();
+    };
+    const before = await todayViews();
+    await visit("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15");
+    await visit("Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)");
+    const adminCounted = page.waitForResponse((r) => r.url().endsWith("/api/track"));
+    await page.goto(`${BASE_URL}/de`); // still logged in
+    await adminCounted;
+    const after = await todayViews();
+    if (after !== before + 1) throw new Error(`visit counter went from ${before} to ${after}, expected +1`);
+    log("visits are counted (crawlers and administrators are not)");
     await shot(page, "09-dashboard");
     log("dashboard ok");
   } catch (err) {

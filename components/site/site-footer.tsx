@@ -54,7 +54,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
           <h2 className="footer-title">{d.footer.distributor}</h2>
           <p className="text-sm leading-relaxed">{d.footer.distributorBody}</p>
           {shopUrl ? (
-            <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary mt-4">
+            <a href={shopUrl} target="_blank" rel="noreferrer" data-track-shop="" className="btn-primary mt-4">
               {d.nav.shop}
             </a>
           ) : null}

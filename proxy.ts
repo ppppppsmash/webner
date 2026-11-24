@@ -68,6 +68,6 @@ export default auth((req) => {
 });
 
 export const config = {
-  // Everything except Next internals, auth routes, uploads and static files.
-  matcher: ["/((?!_next|api/auth|uploads|favicon.ico|robots.txt|sitemap.xml|.*\\.[a-zA-Z0-9]+$).*)", "/api/upload/:path*"],
+  // Everything except Next internals, auth routes, the visit counter, uploads and static files.
+  matcher: ["/((?!_next|api/auth|api/track|uploads|favicon.ico|robots.txt|sitemap.xml|.*\\.[a-zA-Z0-9]+$).*)", "/api/upload/:path*"],
 };

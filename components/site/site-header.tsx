@@ -58,7 +58,7 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
               // The wrapper hides it on phones (the menu has the same link): `.btn-outline` sets its own
               // display outside the utilities layer, so `hidden` on the button itself has no effect.
               <span className="hidden md:block">
-                <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-outline">
+                <a href={shopUrl} target="_blank" rel="noreferrer" data-track-shop="" className="btn-outline">
                   {d.nav.shop}
                   <ArrowUpRightIcon className="size-4" />
                 </a>

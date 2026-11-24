@@ -1,3 +1,4 @@
+import { ProductViewTracker } from "@/components/site/view-tracker";
 import { ArrowUpRightIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -56,6 +57,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
   return (
     <article className="mx-auto max-w-6xl px-6 pt-6 pb-8 md:pt-8">
+      <ProductViewTracker productId={product.id} locale={locale} />
       <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1.5 text-xs text-ink-2">
         <Link href={localePath(locale)} className="py-1 hover:text-brand">
           {d.nav.home}
@@ -123,7 +125,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/produ
 
           {shopUrl ? (
             <div className="rise mt-6" style={{ "--rise-delay": "320ms" } as React.CSSProperties}>
-              <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary w-full sm:w-auto">
+              <a href={shopUrl} target="_blank" rel="noreferrer" data-track-shop={product.id} className="btn-primary w-full sm:w-auto">
                 {d.products.buyAt}
                 <ArrowUpRightIcon className="size-4" />
               </a>

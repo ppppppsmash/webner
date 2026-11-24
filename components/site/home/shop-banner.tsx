@@ -11,7 +11,7 @@ export function ShopBanner({ d, shopUrl }: { d: PublicDictionary; shopUrl: strin
           <h2 className="max-w-xl text-4xl leading-tight text-brand md:text-5xl">{d.home.shopBannerTitle}</h2>
           <p className="mt-4 max-w-md text-base text-ink-2 md:text-lg">{d.home.shopBannerBody}</p>
         </div>
-        <a href={shopUrl} target="_blank" rel="noreferrer" className="btn-primary shrink-0 self-start md:self-auto">
+        <a href={shopUrl} target="_blank" rel="noreferrer" data-track-shop="" className="btn-primary shrink-0 self-start md:self-auto">
           {d.home.shopBannerCta}
           <ArrowUpRightIcon className="size-4" />
         </a>

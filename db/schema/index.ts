@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   type AnyPgColumn,
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -15,6 +16,7 @@ import {
 import type { LocalizedText } from "@/lib/i18n/locales";
 import { PRODUCT_BADGES } from "@/lib/product-badges";
 import { PRODUCT_VISIBILITIES } from "@/lib/product-visibility";
+import type { StatKind } from "@/lib/view-stats";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -206,6 +208,24 @@ export const siteSettings = pgTable("site_settings", {
   value: jsonb("value").notNull(),
   updatedAt: timestamps.updatedAt,
 });
+
+// ---------------------------------------------------------------------------
+// Visit counters of the public site: one row per day / kind / product / language.
+// Nothing about the visitor is stored. Written by app/api/track/route.ts.
+// ---------------------------------------------------------------------------
+export const viewStats = pgTable(
+  "view_stats",
+  {
+    /** Calendar day in STATS_TIME_ZONE (lib/view-stats.ts) */
+    day: date("day").notNull(),
+    kind: text("kind").$type<StatKind>().notNull(),
+    /** Product id for product views and shop clicks made on a product page, otherwise "". Not a foreign key: counters of a deleted product simply stop being shown. */
+    ref: text("ref").notNull().default(""),
+    locale: text("locale").notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.kind, t.ref, t.locale] })],
+);
 
 // ---------------------------------------------------------------------------
 // Relations

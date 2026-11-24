@@ -107,6 +107,7 @@ export function MobileMenu({
                 href={item.href}
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noreferrer" : undefined}
+                data-track-shop={item.external ? "" : undefined}
                 className={cn("font-display block text-2xl", item.accent ? "text-brand" : "text-ink")}
               >
                 {item.label}
