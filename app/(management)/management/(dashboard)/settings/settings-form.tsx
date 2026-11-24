@@ -8,12 +8,13 @@ import { toast } from "sonner";
 import { updateSiteSettings } from "@/actions/settings";
 import { SingleImageField } from "@/components/management/single-image-field";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldTitle } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { t } from "@/lib/i18n/admin";
 import { DEFAULT_SITE_THEME } from "@/lib/site-themes";
+import { NameColorField } from "./name-color-field";
 import { ThemeField } from "./theme-field";
 import { DEFAULT_SITE_NAME, DEFAULT_SITE_NAME_COLOR, siteSettingsSchema, type SiteSettings, type SiteSettingsInput } from "@/lib/settings/schema";
 
@@ -39,12 +40,29 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
 
   const errors = form.formState.errors;
   const siteName = useWatch({ control: form.control, name: "siteName" });
+  const typedColour = useWatch({ control: form.control, name: "siteNameColor" }) ?? "";
+  const logoColour = /^#[0-9a-fA-F]{6}$/.test(typedColour) ? typedColour : DEFAULT_SITE_NAME_COLOR;
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
+      {/* 1. name and its colour, with the logo as the public site will show it */}
       <Card>
+        <CardHeader>
+          <CardTitle>{t.settings.sectionName}</CardTitle>
+          <CardDescription>{t.settings.sectionNameHint}</CardDescription>
+        </CardHeader>
         <CardContent>
           <FieldGroup>
+            <div className="rounded-md border bg-white px-5 py-4">
+              <p className="mb-2 text-xs text-neutral-500">{t.settings.logoPreview}</p>
+              <span className="inline-flex flex-col leading-none">
+                <span className="text-[1.9rem] font-extrabold tracking-[-0.03em] break-all" style={{ color: logoColour }}>
+                  {siteName || DEFAULT_SITE_NAME}
+                </span>
+                <span className="mt-0.5 text-[0.58rem] font-semibold tracking-[0.32em] text-neutral-500 uppercase">Germany</span>
+              </span>
+            </div>
+
             <Field data-invalid={Boolean(errors.siteName) || undefined}>
               <FieldLabel htmlFor="siteName">{t.settings.siteName}</FieldLabel>
               <Input id="siteName" {...form.register("siteName")} disabled={pending} />
@@ -55,58 +73,36 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
             <Controller
               control={form.control}
               name="siteNameColor"
-              render={({ field }) => {
-                const value = field.value ?? DEFAULT_SITE_NAME_COLOR;
-                // The colour well only understands a complete #rrggbb; while a code is being typed it keeps the default.
-                const swatch = /^#[0-9a-fA-F]{6}$/.test(value) ? value : DEFAULT_SITE_NAME_COLOR;
-                return (
-                  <Field data-invalid={Boolean(errors.siteNameColor) || undefined}>
-                    <FieldLabel htmlFor="siteNameColor">{t.settings.siteNameColor}</FieldLabel>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <input
-                        type="color"
-                        aria-label={t.settings.siteNameColor}
-                        value={swatch}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        disabled={pending}
-                        className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-60"
-                      />
-                      <Input
-                        id="siteNameColor"
-                        value={value}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        onBlur={field.onBlur}
-                        disabled={pending}
-                        maxLength={7}
-                        spellCheck={false}
-                        className="w-28 font-mono"
-                      />
-                      <span className="px-2 text-xl font-extrabold tracking-tight" style={{ color: swatch }}>
-                        {siteName || DEFAULT_SITE_NAME}
-                      </span>
-                      {value.toLowerCase() !== DEFAULT_SITE_NAME_COLOR ? (
-                        <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={() => field.onChange(DEFAULT_SITE_NAME_COLOR)}>
-                          {t.settings.siteNameColorReset}
-                        </Button>
-                      ) : null}
-                    </div>
-                    <FieldDescription>{t.settings.siteNameColorHint}</FieldDescription>
-                    <FieldError errors={[errors.siteNameColor]} />
-                  </Field>
-                );
-              }}
+              render={({ field }) => (
+                <Field data-invalid={Boolean(errors.siteNameColor) || undefined}>
+                  <FieldLabel htmlFor="siteNameColor">{t.settings.siteNameColor}</FieldLabel>
+                  <NameColorField id="siteNameColor" value={field.value ?? DEFAULT_SITE_NAME_COLOR} onChange={field.onChange} onBlur={field.onBlur} disabled={pending} />
+                  <FieldDescription>{t.settings.siteNameColorHint}</FieldDescription>
+                  <FieldError errors={[errors.siteNameColor]} />
+                </Field>
+              )}
             />
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
+      {/* 2. look of the public site */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t.settings.sectionLook}</CardTitle>
+          <CardDescription>{t.settings.sectionLookHint}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FieldGroup>
             <Controller
               control={form.control}
-              name="showShopLink"
+              name="siteTheme"
               render={({ field }) => (
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldTitle>{t.settings.shopLink}</FieldTitle>
-                    <FieldDescription>{t.settings.shopLinkHint}</FieldDescription>
-                  </FieldContent>
-                  <Switch checked={field.value ?? false} onCheckedChange={field.onChange} disabled={pending} />
+                <Field>
+                  <FieldTitle>{t.settings.theme}</FieldTitle>
+                  <ThemeField value={field.value ?? DEFAULT_SITE_THEME} onChange={field.onChange} disabled={pending} />
+                  <FieldDescription>{t.settings.themeHint}</FieldDescription>
+                  <FieldError errors={[errors.siteTheme]} />
                 </Field>
               )}
             />
@@ -122,16 +118,28 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
                 </Field>
               )}
             />
+          </FieldGroup>
+        </CardContent>
+      </Card>
 
+      {/* 3. link to the shop */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t.settings.sectionShop}</CardTitle>
+          <CardDescription>{t.settings.sectionShopHint}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FieldGroup>
             <Controller
               control={form.control}
-              name="siteTheme"
+              name="showShopLink"
               render={({ field }) => (
-                <Field>
-                  <FieldTitle>{t.settings.theme}</FieldTitle>
-                  <ThemeField value={field.value ?? DEFAULT_SITE_THEME} onChange={field.onChange} disabled={pending} />
-                  <FieldDescription>{t.settings.themeHint}</FieldDescription>
-                  <FieldError errors={[errors.siteTheme]} />
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldTitle>{t.settings.shopLink}</FieldTitle>
+                    <FieldDescription>{t.settings.shopLinkHint}</FieldDescription>
+                  </FieldContent>
+                  <Switch checked={field.value ?? false} onCheckedChange={field.onChange} disabled={pending} />
                 </Field>
               )}
             />
@@ -145,6 +153,7 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
           </FieldGroup>
         </CardContent>
       </Card>
+
       <Button type="submit" disabled={pending}>
         {t.common.save}
       </Button>
