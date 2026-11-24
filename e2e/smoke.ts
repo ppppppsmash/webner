@@ -293,7 +293,11 @@ async function main() {
       return theme;
     };
     for (const [name, id] of [["經典海軍藍", "classic-navy"], ["冷杉綠", "d-tanne"]] as const) {
+      await page.getByRole("button", { name: "預覽與更換" }).click();
       await page.locator("label").filter({ hasText: name }).click();
+      // the preview frame is repainted at once, before anything is saved
+      await page.waitForFunction((expected) => document.querySelector("iframe")?.contentDocument?.documentElement.dataset.theme === expected, id);
+      await page.getByRole("button", { name: "使用這個配色" }).click();
       await page.getByRole("button", { name: "儲存" }).click();
       await page.getByText("設定已儲存").last().waitFor();
       const applied = await themeOnSite();
