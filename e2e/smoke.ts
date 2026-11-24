@@ -288,6 +288,24 @@ async function main() {
       await visitor.close();
       if (!logo.includes(`webner ${stamp}`) || !title.startsWith(`webner ${stamp}`)) throw new Error(`site name not shown on the public site (logo "${logo}", title "${title}")`);
     }
+    // logo colour: the default, a custom one on the public site, and a wrong code is refused
+    {
+      if ((await page.inputValue("#siteNameColor")) !== "#333333") throw new Error("default site name colour is not #333333");
+      await page.fill("#siteNameColor", "#12");
+      await page.getByRole("button", { name: "儲存" }).click();
+      await page.getByText("請輸入 # 加 6 位數的色碼").waitFor();
+      await page.fill("#siteNameColor", "#aa3322");
+      await page.getByRole("button", { name: "儲存" }).click();
+      await page.getByText("設定已儲存").last().waitFor();
+      const visitor = await browser.newContext();
+      const site = await visitor.newPage();
+      await site.goto(`${BASE_URL}/de`);
+      const colour = await site.locator("header a span span").first().evaluate((el) => getComputedStyle(el).color);
+      await visitor.close();
+      if (colour !== "rgb(170, 51, 34)") throw new Error(`logo colour on the public site is ${colour}`);
+      await page.getByRole("button", { name: "恢復預設" }).click();
+      log("site name colour is applied to the logo");
+    }
     await page.fill("#siteName", "webner");
     await page.getByRole("button", { name: "儲存" }).click();
     await page.getByText("設定已儲存").waitFor();

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { updateSiteSettings } from "@/actions/settings";
 import { SingleImageField } from "@/components/management/single-image-field";
@@ -15,7 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { t } from "@/lib/i18n/admin";
 import { DEFAULT_SITE_THEME } from "@/lib/site-themes";
 import { ThemeField } from "./theme-field";
-import { siteSettingsSchema, type SiteSettings, type SiteSettingsInput } from "@/lib/settings/schema";
+import { DEFAULT_SITE_NAME, DEFAULT_SITE_NAME_COLOR, siteSettingsSchema, type SiteSettings, type SiteSettingsInput } from "@/lib/settings/schema";
 
 export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
   const router = useRouter();
@@ -38,6 +38,7 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
   };
 
   const errors = form.formState.errors;
+  const siteName = useWatch({ control: form.control, name: "siteName" });
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-2xl space-y-6">
@@ -50,6 +51,51 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
               <FieldDescription>{t.settings.siteNameHint}</FieldDescription>
               <FieldError errors={[errors.siteName]} />
             </Field>
+
+            <Controller
+              control={form.control}
+              name="siteNameColor"
+              render={({ field }) => {
+                const value = field.value ?? DEFAULT_SITE_NAME_COLOR;
+                // The colour well only understands a complete #rrggbb; while a code is being typed it keeps the default.
+                const swatch = /^#[0-9a-fA-F]{6}$/.test(value) ? value : DEFAULT_SITE_NAME_COLOR;
+                return (
+                  <Field data-invalid={Boolean(errors.siteNameColor) || undefined}>
+                    <FieldLabel htmlFor="siteNameColor">{t.settings.siteNameColor}</FieldLabel>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="color"
+                        aria-label={t.settings.siteNameColor}
+                        value={swatch}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        disabled={pending}
+                        className="size-9 shrink-0 cursor-pointer rounded-md border bg-transparent p-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+                      />
+                      <Input
+                        id="siteNameColor"
+                        value={value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        onBlur={field.onBlur}
+                        disabled={pending}
+                        maxLength={7}
+                        spellCheck={false}
+                        className="w-28 font-mono"
+                      />
+                      <span className="px-2 text-xl font-extrabold tracking-tight" style={{ color: swatch }}>
+                        {siteName || DEFAULT_SITE_NAME}
+                      </span>
+                      {value.toLowerCase() !== DEFAULT_SITE_NAME_COLOR ? (
+                        <Button type="button" variant="ghost" size="sm" disabled={pending} onClick={() => field.onChange(DEFAULT_SITE_NAME_COLOR)}>
+                          {t.settings.siteNameColorReset}
+                        </Button>
+                      ) : null}
+                    </div>
+                    <FieldDescription>{t.settings.siteNameColorHint}</FieldDescription>
+                    <FieldError errors={[errors.siteNameColor]} />
+                  </Field>
+                );
+              }}
+            />
 
             <Controller
               control={form.control}
