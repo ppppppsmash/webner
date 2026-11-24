@@ -292,7 +292,7 @@ async function main() {
       await visitor.close();
       return theme;
     };
-    for (const [name, id] of [["經典海軍藍", "classic-navy"], ["冷杉綠", "d-tanne"]] as const) {
+    for (const [name, id] of [["海軍藍", "a-marine"], ["冷杉綠", "d-tanne"]] as const) {
       await page.getByRole("button", { name: "預覽與更換" }).click();
       await page.locator("label").filter({ hasText: name }).click();
       // the preview frame is repainted at once, before anything is saved

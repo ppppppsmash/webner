@@ -55,11 +55,11 @@ const PURPLE = "紫色系";
 const BOTANICAL = "植萃系";
 
 export const SITE_THEMES: SiteTheme[] = [
-  { id: "classic-navy", group: COOL, name: "經典海軍藍（最初的配色）", brand: "oklch(0.31 0.065 272)", deep: "oklch(0.24 0.055 272)", tint: "oklch(0.83 0.045 240)", soft: "oklch(0.945 0.02 240)", paper2: "oklch(0.968 0.006 240)" },
+  // The default comes first.
+  { id: "d-tanne", group: COOL, name: "冷杉綠", brand: "oklch(0.34 0.055 165)", deep: "oklch(0.26 0.045 165)", tint: "oklch(0.87 0.035 160)", soft: "oklch(0.957 0.014 160)", paper2: "oklch(0.972 0.005 160)" },
   { id: "a-marine", group: COOL, name: "海軍藍", brand: "oklch(0.32 0.09 258)", deep: "oklch(0.25 0.075 258)", tint: "oklch(0.85 0.045 238)", soft: "oklch(0.955 0.018 238)", paper2: "oklch(0.972 0.006 240)" },
   { id: "b-royal", group: COOL, name: "皇家藍", brand: "oklch(0.42 0.13 258)", deep: "oklch(0.3 0.1 258)", tint: "oklch(0.87 0.045 245)", soft: "oklch(0.96 0.018 245)", paper2: "oklch(0.972 0.006 245)" },
   { id: "c-petrol", group: COOL, name: "石油藍綠", brand: "oklch(0.36 0.06 215)", deep: "oklch(0.28 0.05 215)", tint: "oklch(0.86 0.04 205)", soft: "oklch(0.957 0.016 205)", paper2: "oklch(0.972 0.005 205)" },
-  { id: "d-tanne", group: COOL, name: "冷杉綠", brand: "oklch(0.34 0.055 165)", deep: "oklch(0.26 0.045 165)", tint: "oklch(0.87 0.035 160)", soft: "oklch(0.957 0.014 160)", paper2: "oklch(0.972 0.005 160)" },
   { id: "e-bordeaux", group: COOL, name: "波爾多紅", brand: "oklch(0.34 0.09 15)", deep: "oklch(0.26 0.07 15)", tint: "oklch(0.89 0.035 25)", soft: "oklch(0.962 0.014 25)", paper2: "oklch(0.975 0.005 40)" },
 
   { id: "f-amber", group: WARMS, name: "琥珀棕", brand: "oklch(0.38 0.07 55)", deep: "oklch(0.28 0.05 50)", tint: "oklch(0.88 0.04 75)", soft: "oklch(0.96 0.018 80)", paper2: "oklch(0.975 0.006 80)", ...WARM },

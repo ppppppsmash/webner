@@ -35,7 +35,7 @@
 - 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白＋ブランド色 1 色＋淡い帯色。既定は冷杉綠、Lora＋Libre Franklin、長方形ボタン）。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ
 - ルートレイアウトは 2 つ（`app/(site)/[locale]/layout.tsx` と `app/(management)/management/layout.tsx`）。`app/layout.tsx` は置かない
-- 公開サイトの配色は管理画面の「設定 → 展示網站配色」で選ぶ（`site_settings` の `siteTheme`）。配色の一覧は `lib/site-themes.ts`（19 種、既定は冷杉綠 `d-tanne`）。`app/(site)/[locale]/layout.tsx` が `<html data-theme>` と、その配色 1 つ分の `<style>` を出して `.site` のトークンを上書きする。既定の冷杉綠は `app/globals.css` の `.site` に書いてある値そのものなので、既定を変えるときは `DEFAULT_SITE_THEME` と `.site` の両方を直す。公開側の配色切替 UI（レビュー用）は撤去済み。設定画面では現在の配色を 1 行で出し、一覧と実際の公開サイトのプレビュー（同一オリジンの iframe に `data-theme` と配色の CSS を書き込むだけで、保存はしない）はダイアログ内（`settings/theme-field.tsx`）
+- 公開サイトの配色は管理画面の「設定 → 展示網站配色」で選ぶ（`site_settings` の `siteTheme`）。配色の一覧は `lib/site-themes.ts`（18 種、先頭が既定の冷杉綠 `d-tanne`）。`app/(site)/[locale]/layout.tsx` が `<html data-theme>` と、その配色 1 つ分の `<style>` を出して `.site` のトークンを上書きする。既定の冷杉綠は `app/globals.css` の `.site` に書いてある値そのものなので、既定を変えるときは `DEFAULT_SITE_THEME` と `.site` の両方を直す。公開側の配色切替 UI（レビュー用）は撤去済み。設定画面では現在の配色を 1 行で出し、一覧と実際の公開サイトのプレビュー（同一オリジンの iframe に `data-theme` と配色の CSS を書き込むだけで、保存はしない）はダイアログ内（`settings/theme-field.tsx`）
 - Basic 認証は `BASIC_AUTH_USER` と `BASIC_AUTH_PASSWORD` の両方を設定すると有効（`lib/basic-auth.ts`、`proxy.ts` の先頭で判定）。公開ページと管理画面の両方にかかり、`/api/auth`・`/uploads`・静的ファイルは対象外（proxy の matcher 外）。未設定なら無効。公開時は 2 つの環境変数を消すだけ
 - 見た目の変更は `pnpm shoot <paths>` で 390 / 820 / 1440 幅を撮って目視し、`pnpm e2e:site` を通す
 
