@@ -24,6 +24,7 @@ async function main() {
     await page.goto(`${BASE_URL}/`);
     await page.waitForURL(/\/de$/);
     log("/ redirects to /de regardless of the browser language");
+    if (!(await page.locator("link[rel='icon']").count())) throw new Error("no favicon link");
     await page.goto(`${BASE_URL}/zh-CN`);
     await page.goto(`${BASE_URL}/`);
     await page.waitForURL(/\/zh-CN$/);

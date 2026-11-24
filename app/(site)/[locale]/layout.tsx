@@ -7,6 +7,7 @@ import { HTML_LANG, isPublicLocale, PUBLIC_LOCALES, type Locale } from "@/lib/i1
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
 import { getPublicSettings } from "@/lib/queries/public";
+import { siteIcons } from "@/lib/site-icons";
 import { siteThemeCss } from "@/lib/site-themes";
 import "@/app/globals.css";
 
@@ -43,10 +44,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   if (!isPublicLocale(locale)) return {};
   const d = getDictionary(locale);
   // The name set in the management panel (設定 → 網站名稱).
-  const { siteName } = await getPublicSettings();
+  const { siteName, faviconUrl } = await getPublicSettings();
   return {
     title: { default: `${siteName} – ${d.meta.tagline}`, template: `%s | ${siteName}` },
     description: d.meta.description,
+    icons: siteIcons(faviconUrl),
     alternates: {
       languages: Object.fromEntries(PUBLIC_LOCALES.map((l) => [HTML_LANG[l], localePath(l)])),
     },

@@ -82,6 +82,25 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
                 </Field>
               )}
             />
+
+            <Controller
+              control={form.control}
+              name="faviconUrl"
+              render={({ field }) => (
+                <Field>
+                  <FieldLabel>{t.settings.favicon}</FieldLabel>
+                  {field.value ? null : (
+                    <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- a static file from public/, shown as it is */}
+                      <img src="/icon.png" alt="" className="size-20 rounded-lg border bg-white p-2" />
+                      <span className="text-sm text-muted-foreground">{t.settings.faviconDefault}</span>
+                    </div>
+                  )}
+                  <SingleImageField value={field.value ?? ""} onChange={field.onChange} disabled={pending} variant="icon" />
+                  <FieldDescription>{t.settings.faviconHint}</FieldDescription>
+                </Field>
+              )}
+            />
           </FieldGroup>
         </CardContent>
       </Card>

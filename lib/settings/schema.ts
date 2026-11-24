@@ -29,6 +29,8 @@ export const siteSettingsSchema = z.object({
     .default("https://www.japanaceshop.com/categories/webner"),
   /** Full-width photo behind the home hero (uploaded in the management panel). */
   heroImageUrl: z.string().trim().max(2000).default(""),
+  /** Browser tab icon (uploaded in the management panel). Empty: the built-in leaf icon. */
+  faviconUrl: z.string().trim().max(2000).default(""),
   /** Colour theme of the public site: an id from lib/site-themes.ts. An id that no longer exists falls back to the default. */
   siteTheme: z.string().refine(isSiteThemeId, { message: "theme" }).default(DEFAULT_SITE_THEME).catch(DEFAULT_SITE_THEME),
 });

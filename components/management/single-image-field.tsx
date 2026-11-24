@@ -16,12 +16,15 @@ export function SingleImageField({
   disabled,
   uploadLabel = t.settings.uploadHeroImage,
   aspect = "aspect-[2/1]",
+  variant = "photo",
 }: {
   value: string;
   onChange: (url: string) => void;
   disabled?: boolean;
   uploadLabel?: string;
   aspect?: string;
+  /** photo: wide preview, cropped to fill · icon: small square preview showing the whole image */
+  variant?: "photo" | "icon";
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
@@ -55,9 +58,15 @@ export function SingleImageField({
       className="max-w-xl space-y-3"
     >
       {value ? (
-        <div className={`relative w-full max-w-xl overflow-hidden rounded-lg border bg-muted ${aspect}`}>
-          <Image src={value} alt="" fill unoptimized className="object-cover" sizes="600px" />
-        </div>
+        variant === "icon" ? (
+          <div className="relative size-20 overflow-hidden rounded-lg border bg-white">
+            <Image src={value} alt="" fill unoptimized className="object-contain p-2" sizes="80px" />
+          </div>
+        ) : (
+          <div className={`relative w-full max-w-xl overflow-hidden rounded-lg border bg-muted ${aspect}`}>
+            <Image src={value} alt="" fill unoptimized className="object-cover" sizes="600px" />
+          </div>
+        )
       ) : null}
       <div className="flex items-center gap-2">
         <Button type="button" variant="outline" disabled={disabled || progress !== null} onClick={() => fileInput.current?.click()}>

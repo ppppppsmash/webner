@@ -4,18 +4,25 @@ import { ThemeProvider } from "@/components/management/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { t } from "@/lib/i18n/admin";
+import { getPublicSettings } from "@/lib/queries/public";
+import { siteIcons } from "@/lib/site-icons";
 import "@/app/globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: {
-    default: t.app.name,
-    template: `%s | ${t.app.name}`,
-  },
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  // Same tab icon as the public site (設定 → 網站圖示).
+  const { faviconUrl } = await getPublicSettings();
+  return {
+    title: {
+      default: t.app.name,
+      template: `%s | ${t.app.name}`,
+    },
+    robots: { index: false, follow: false },
+    icons: siteIcons(faviconUrl),
+  };
+}
 
 /** Root layout of the management area (separate from the public site's root layout). */
 export default function ManagementLayout({ children }: LayoutProps<"/management">) {
