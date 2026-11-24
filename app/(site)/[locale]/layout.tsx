@@ -3,10 +3,11 @@ import { Libre_Franklin, Lora, Noto_Sans_TC, Noto_Serif_TC } from "next/font/goo
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { ThemePreview } from "@/components/site/theme-preview";
 import { HTML_LANG, isPublicLocale, PUBLIC_LOCALES, type Locale } from "@/lib/i18n/locales";
 import { localePath } from "@/lib/i18n/paths";
 import { getDictionary } from "@/lib/i18n/public";
+import { getPublicSettings } from "@/lib/queries/public";
+import { siteThemeCss } from "@/lib/site-themes";
 import "@/app/globals.css";
 
 const lora = Lora({
@@ -53,16 +54,18 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 export default async function SiteLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   if (!isPublicLocale(locale)) notFound();
+  const { siteTheme } = await getPublicSettings();
+  const themeCss = siteThemeCss(siteTheme);
 
   return (
     <html
       lang={HTML_LANG[locale as Locale]}
       className={`${lora.variable} ${franklin.variable} ${notoSansTC.variable} ${notoSerifTC.variable} h-full`}
-      suppressHydrationWarning
+      data-theme={siteTheme}
     >
       <body className="site flex min-h-full flex-col">
-        {/* Temporary palette review (also the reason for suppressHydrationWarning on <html>): see components/site/theme-preview */}
-        <ThemePreview />
+        {/* Colour theme chosen in the management panel; nothing is rendered for the default one (its colours are in globals.css). */}
+        {themeCss ? <style dangerouslySetInnerHTML={{ __html: themeCss }} /> : null}
         <SiteHeader locale={locale} />
         <main className="flex-1">{children}</main>
         <SiteFooter locale={locale} />

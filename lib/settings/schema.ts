@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_SITE_THEME, isSiteThemeId } from "@/lib/site-themes";
 
 export const siteSettingsSchema = z.object({
   siteName: z.string().trim().max(100).default("webner"),
@@ -12,6 +13,8 @@ export const siteSettingsSchema = z.object({
     .default("https://www.japanaceshop.com/categories/webner"),
   /** Full-width photo behind the home hero (uploaded in the management panel). */
   heroImageUrl: z.string().trim().max(2000).default(""),
+  /** Colour theme of the public site: an id from lib/site-themes.ts. */
+  siteTheme: z.string().refine(isSiteThemeId, { message: "theme" }).default(DEFAULT_SITE_THEME),
 });
 
 export type SiteSettings = z.output<typeof siteSettingsSchema>;

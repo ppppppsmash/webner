@@ -282,6 +282,25 @@ async function main() {
     await page.getByRole("button", { name: "儲存" }).click();
     await page.getByText("設定已儲存").waitFor();
     log("settings saved");
+
+    // colour theme: chosen here, applied to the public site, then put back to the default
+    const themeOnSite = async () => {
+      const visitor = await browser.newContext();
+      const site = await visitor.newPage();
+      await site.goto(`${BASE_URL}/de`);
+      const theme = await site.locator("html").getAttribute("data-theme");
+      await visitor.close();
+      return theme;
+    };
+    for (const [name, id] of [["經典海軍藍", "classic-navy"], ["冷杉綠", "d-tanne"]] as const) {
+      await page.locator("label").filter({ hasText: name }).click();
+      await page.getByRole("button", { name: "儲存" }).click();
+      await page.getByText("設定已儲存").last().waitFor();
+      const applied = await themeOnSite();
+      if (applied !== id) throw new Error(`public site theme is ${applied}, expected ${id}`);
+      await page.waitForTimeout(4500); // let the toast go, so the next save is seen on its own
+    }
+    log("colour theme is applied to the public site");
     await shot(page, "07-settings");
 
     // --- admins: invite -> set password -> login as invitee ------------------

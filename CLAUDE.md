@@ -32,10 +32,10 @@
 - 商品フォームは 5 タブ＋上下の固定保存バー。項目を増やすときは `TAB_FIELDS`（product-form.tsx）にフィールド名を登録するとエラー時にそのタブへ切り替わる。`LocalizedField` は `max` で字数カウンタ、`locale`/`onLocaleChange` で言語タブを外から制御できる
 - Neon（ホスト型 DB）は git 管理外の `.env.neon` で切り替える。スキーマを変えたらローカルの `pnpm db:migrate` に加えて `pnpm db:migrate:neon` も流す。`pnpm dev:neon` で Neon に繋いだ dev サーバー。接続文字列やパスワードは出力・コミットしない
 - スキーマ変更は `pnpm db:generate` → 生成 SQL を確認（データ移行が要るなら UPDATE を挟む）→ `pnpm db:migrate`。generate が列の作成／リネームを聞いてくる場合は TTY が要る
-- 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白・紺・水色、Lora＋Libre Franklin、長方形ボタン、中央揃え）。shadcn のトークンは管理画面専用
+- 公開サイトの色・フォントは `app/globals.css` の `.site` トークン（`bg-paper` / `text-ink` / `text-ink-2` / `bg-brand` / `bg-tint` / `bg-tint-soft` / `border-line`）だけを使う。方向性は「ドイツのブランドショップ」（白＋ブランド色 1 色＋淡い帯色。既定は冷杉綠、Lora＋Libre Franklin、長方形ボタン）。shadcn のトークンは管理画面専用
 - 公開ページで DB を読むときは `lib/queries/public` の `"use cache"` 関数を使い、管理側の書き込みでは `updateTag`（`lib/cache-tags.ts`）を呼ぶ
 - ルートレイアウトは 2 つ（`app/(site)/[locale]/layout.tsx` と `app/(management)/management/layout.tsx`）。`app/layout.tsx` は置かない
-- 【一時的】公開サイト右下の配色切替（上司レビュー用、19 配色）は `components/site/theme-preview/` に閉じている。`<html data-theme>` で `.site` のトークンを上書きするだけで、選択は localStorage、`?theme=<id>` で指定リンクも作れる。外すときはこのフォルダを消し、`app/(site)/[locale]/layout.tsx` の import・`<ThemePreview />`・`suppressHydrationWarning` を削除、採用した色を `app/globals.css` の `.site` に書き写す。消さずに隠すなら `NEXT_PUBLIC_THEME_PREVIEW=0`。本番ビルドでは Basic 認証が有効なときだけ表示される
+- 公開サイトの配色は管理画面の「設定 → 展示網站配色」で選ぶ（`site_settings` の `siteTheme`）。配色の一覧は `lib/site-themes.ts`（19 種、既定は冷杉綠 `d-tanne`）。`app/(site)/[locale]/layout.tsx` が `<html data-theme>` と、その配色 1 つ分の `<style>` を出して `.site` のトークンを上書きする。既定の冷杉綠は `app/globals.css` の `.site` に書いてある値そのものなので、既定を変えるときは `DEFAULT_SITE_THEME` と `.site` の両方を直す。公開側の配色切替 UI（レビュー用）は撤去済み
 - Basic 認証は `BASIC_AUTH_USER` と `BASIC_AUTH_PASSWORD` の両方を設定すると有効（`lib/basic-auth.ts`、`proxy.ts` の先頭で判定）。公開ページと管理画面の両方にかかり、`/api/auth`・`/uploads`・静的ファイルは対象外（proxy の matcher 外）。未設定なら無効。公開時は 2 つの環境変数を消すだけ
 - 見た目の変更は `pnpm shoot <paths>` で 390 / 820 / 1440 幅を撮って目視し、`pnpm e2e:site` を通す
 
