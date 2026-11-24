@@ -42,8 +42,10 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   const { locale } = await params;
   if (!isPublicLocale(locale)) return {};
   const d = getDictionary(locale);
+  // The name set in the management panel (設定 → 網站名稱).
+  const { siteName } = await getPublicSettings();
   return {
-    title: { default: `${d.meta.siteTitle} – ${d.meta.tagline}`, template: `%s | ${d.meta.siteTitle}` },
+    title: { default: `${siteName} – ${d.meta.tagline}`, template: `%s | ${siteName}` },
     description: d.meta.description,
     alternates: {
       languages: Object.fromEntries(PUBLIC_LOCALES.map((l) => [HTML_LANG[l], localePath(l)])),

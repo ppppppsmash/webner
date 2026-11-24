@@ -278,6 +278,16 @@ async function main() {
       (expected) => (document.querySelector("#siteName") as HTMLInputElement | null)?.value === expected,
       `webner ${stamp}`,
     );
+    // the name is what the public site shows: logo text and browser tab title
+    {
+      const visitor = await browser.newContext();
+      const site = await visitor.newPage();
+      await site.goto(`${BASE_URL}/de`);
+      const logo = await site.locator("header a").first().innerText();
+      const title = await site.title();
+      await visitor.close();
+      if (!logo.includes(`webner ${stamp}`) || !title.startsWith(`webner ${stamp}`)) throw new Error(`site name not shown on the public site (logo "${logo}", title "${title}")`);
+    }
     await page.fill("#siteName", "webner");
     await page.getByRole("button", { name: "儲存" }).click();
     await page.getByText("設定已儲存").waitFor();

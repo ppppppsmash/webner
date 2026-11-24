@@ -17,7 +17,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
     <footer className="mt-20 bg-tint text-ink">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 md:grid-cols-[1.3fr_1fr_1fr_1.2fr]">
         <div className="space-y-4">
-          <Wordmark onTint />
+          <Wordmark name={settings.siteName} onTint />
           <p className="max-w-xs text-sm leading-relaxed">{d.footer.about}</p>
         </div>
 
@@ -64,7 +64,7 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
       <div className="border-t border-brand/15">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-5 text-xs md:flex-row md:items-center md:justify-between">
           <p>
-            © {year} webner · {d.footer.rights}
+            © {year} {settings.siteName} · {d.footer.rights}
           </p>
           <div className="flex items-center gap-6">
             <Suspense fallback={null}>

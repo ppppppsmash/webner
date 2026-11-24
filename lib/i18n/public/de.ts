@@ -2,7 +2,6 @@ import type { PublicDictionary } from "./types";
 
 export const de: PublicDictionary = {
   meta: {
-    siteTitle: "webner",
     tagline: "Ätherische Öle & Naturkosmetik aus Deutschland",
     description:
       "webner – naturreine ätherische Öle, Pflanzenwässer und Naturkosmetik aus Deutschland. Entdecken Sie die Kollektion.",

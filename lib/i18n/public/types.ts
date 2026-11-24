@@ -1,7 +1,6 @@
 import type { ProductBadge } from "@/lib/product-badges";
 export interface PublicDictionary {
   meta: {
-    siteTitle: string;
     tagline: string;
     description: string;
   };

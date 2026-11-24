@@ -50,7 +50,7 @@ export async function SiteHeader({ locale }: { locale: Locale }) {
         {/* tier 2: logo, search, shop */}
         <div className="mx-auto flex h-20 max-w-6xl items-center gap-6 px-4 md:px-6">
           <Link href={localePath(locale)} aria-label={d.nav.home} className="shrink-0">
-            <Wordmark />
+            <Wordmark name={settings.siteName} />
           </Link>
           <SearchForm locale={locale} placeholder={d.products.searchPlaceholder} className="hidden flex-1 md:block md:max-w-md lg:mx-auto" />
           <div className="ml-auto flex items-center gap-3">

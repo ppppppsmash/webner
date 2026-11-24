@@ -47,6 +47,7 @@ export function SettingsForm({ initialData }: { initialData: SiteSettings }) {
             <Field data-invalid={Boolean(errors.siteName) || undefined}>
               <FieldLabel htmlFor="siteName">{t.settings.siteName}</FieldLabel>
               <Input id="siteName" {...form.register("siteName")} disabled={pending} />
+              <FieldDescription>{t.settings.siteNameHint}</FieldDescription>
               <FieldError errors={[errors.siteName]} />
             </Field>
 

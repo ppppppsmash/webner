@@ -2,7 +2,6 @@ import type { PublicDictionary } from "./types";
 
 export const zhCN: PublicDictionary = {
   meta: {
-    siteTitle: "webner 苇柏纳",
     tagline: "来自德国的精油与天然护肤",
     description: "webner 苇柏纳－德国制造的纯天然精油、纯露与天然护肤品。探索完整系列。",
   },
